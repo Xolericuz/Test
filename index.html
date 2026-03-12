@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0d0d12">
+    <title>XOLƎRIƆ Kutubxonasi</title>
+    <style>
+        :root {
+            --bg-dark: #0d0d12;
+            --text-main: #e2e2e9;
+            --text-muted: #9494a0;
+            --accent: #6c8aff;
+            --glass-bg: rgba(25, 25, 35, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --font-size: 18px;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top, #1a1a2e 0%, var(--bg-dark) 80%);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Welcome Screen --- */
+        #welcomeScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .welcome-box {
+            padding: 40px; border-radius: 24px;
+            text-align: center; width: 90%; max-width: 400px;
+        }
+        .welcome-box h1 { font-size: 2rem; margin-bottom: 10px; color: #fff; }
+        .welcome-box p { color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem; }
+        .welcome-box input {
+            width: 100%; padding: 15px; border-radius: 12px;
+            border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3);
+            color: #fff; font-size: 1.1rem; outline: none; text-align: center;
+            margin-bottom: 20px; transition: border 0.3s;
+        }
+        .welcome-box input:focus { border-color: var(--accent); }
+        .welcome-box button {
+            width: 100%; padding: 15px; border-radius: 12px; border: none;
+            background: var(--accent); color: #fff; font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; transition: transform 0.2s, background 0.2s;
+        }
+        .welcome-box button:active { transform: scale(0.97); }
+
+        /* --- Header --- */
+        header {
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--glass-border); z-index: 10;
+        }
+        .user-name { font-weight: 600; color: var(--accent); font-size: 1.1rem; }
+        .controls { display: flex; gap: 10px; }
+        .icon-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+            color: var(--text-main); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; cursor: pointer; transition: all 0.2s;
+        }
+        .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
+
+        /* --- Main Content --- */
+        main {
+            flex: 1; overflow-y: auto; padding: 30px 20px 100px 20px;
+            scroll-behavior: smooth;
+        }
+        main::-webkit-scrollbar { width: 5px; }
+        main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 5px; }
+        
+        .book-container { max-width: 800px; margin: 0 auto; }
+        #bookTitle { font-size: 2.2rem; margin-bottom: 30px; color: #fff; text-align: center; }
+        #bookContent { font-size: var(--font-size); line-height: 1.8; text-align: justify; transition: font-size 0.3s ease; }
+        #bookContent p { margin-bottom: 20px; }
+
+        /* --- Next Book Overlay (Double Tap) --- */
+        .next-overlay {
+            position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 350px; padding: 20px; border-radius: 20px;
+            text-align: center; z-index: 50;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .next-overlay.show { bottom: 30px; }
+        .next-btn-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--accent); color: #fff; font-size: 1.2rem; font-weight: bold;
+            display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 10px auto; box-shadow: 0 4px 15px rgba(108, 138, 255, 0.4);
+        }
+        .next-overlay p { font-size: 0.95rem; font-weight: 500; color: var(--text-main); }
+
+        /* --- Menu Modal (TOC) --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: flex-end;
+            z-index: 100; opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            width: 100%; max-width: 600px; height: 75vh;
+            border-radius: 24px 24px 0 0; padding: 25px;
+            display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal.active .modal-content { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; }
+        
+        .book-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
+        .book-list::-webkit-scrollbar { width: 4px; }
+        .book-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+        .book-item {
+            padding: 15px; border-radius: 12px; border: 1px solid transparent;
+            cursor: pointer; transition: 0.2s; color: var(--text-main);
+        }
+        .book-item:active, .book-item.active { background: rgba(255,255,255,0.05); border-color: var(--accent); }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 100, 100, 0.15); border: 1px solid #ff6464; color: #ff6464;
+            padding: 10px 20px; border-radius: 20px; font-size: 0.9rem;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 1000;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="welcomeScreen">
+        <div class="welcome-box glass">
+            <h1>Kutubxona</h1>
+            <p>O'qishni boshlash uchun ismingizni kiriting</p>
+            <input type="text" id="userNameInput" placeholder="Ismingiz...">
+            <button id="startBtn">Kirish va O'qish</button>
+        </div>
+    </div>
+
+    <div class="toast glass" id="exitToast"></div>
+
+    <!-- 1-QADAM: Header'ga 🔊 TTS tugmasi qo'shildi -->
+    <header class="glass">
+        <div class="user-name" id="displayUserName">O'quvchi</div>
+        <div class="controls">
+            <button class="icon-btn" id="ttsBtn">🔊</button>
+            <button class="icon-btn" id="fontMinus">-</button>
+            <button class="icon-btn" id="fontPlus">+</button>
+            <button class="icon-btn" id="openMenu">⚙️</button>
+        </div>
+    </header>
+
+    <main id="mainContent">
+        <div class="book-container">
+            <h1 id="bookTitle">Kutubxona yuklanmoqda...</h1>
+            <div id="bookContent"></div>
+        </div>
+    </main>
+
+    <div class="next-overlay glass" id="nextOverlay">
+        <div class="next-btn-circle">&gt;</div>
+        <p>Keyingi: <span id="nextBookName"></span></p>
+    </div>
+
+    <div class="modal" id="menuModal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>📚 Mundarija</h2>
+                <button class="close-btn" id="closeMenu">&times;</button>
+            </div>
+            <div class="book-list" id="bookList"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // KITOBLAR BAZASI (qisqartirilgan versiya - tezlik uchun)
+        const booksPart1 = [
+    {
+        title: "1. Mukammallik Kuchi: Kichik Odatlar San'ati",
+        content: `
+            <p>Hayotimizda yuz beradigan eng katta o'zgarishlar birdaniga bo'lmaydi. Katta yutuqlar har doim ko'zga ko'rinmas, doimiy ravishda takrorlanadigan kichik harakatlarning jamlanmasidir. "Atomic Habits" konsepsiyasi shuni uqtiradiki, inson o'z ustida har kuni atigi bir foiz (1%) yaxshilanishga erishsa, yil oxiriga kelib u 37 barobar kuchliroq, aqlliroq va tajribaliroq shaxsga aylanadi.</p>
+            <p>Aksariyat insonlar motivatsiyaga tayanib ish ko'radilar. Ammo motivatsiya bu vaqtinchalik hissiy holatdir. Haqiqiy va bardavom natijaga erishish uchun insonga motivatsiya emas, balki qat'iy intizom va to'g'ri ishlab chiqilgan tizim kerak. Maqsad belgilash g'oliblar va mag'lublar o'rtasidagi farqni belgilamaydi, chunki ikkalasining ham maqsadi g'alaba qozonishdir. Ularni farqlaydigan narsa – bu maqsad sari eltuvchi kundalik jarayonlar, ya'ni odatlardir.</p>
+        `
+    },
+    {
+        title: "2. Kiberxavfsizlik va Tarmoq Anatomiyasi",
+        content: `
+            <p>Zamonaviy raqamli dunyoda eng qimmatli resurs bu — neft yoki oltin emas, balki axborot va ma'lumotlardir. Kiberxavfsizlik butun boshli tarmoq arxitekturasini, serverlar va foydalanuvchilar o'rtasidagi maxfiy ma'lumotlar almashinuvini himoya qilishning murakkab va uzluksiz ilmiy tizimidir. Har bir soniyada dunyo bo'ylab millionlab zararli kodlar va xakerlik hujumlari tarmoqlarni sinovdan o'tkazmoqda.</p>
+        `
+    },
+    {
+        title: "3. Moliyaviy Savodxonlik: Sarmoya va Erkinlik",
+        content: `
+            <p>Boylikning haqiqiy o'lchovi bu sizning qancha ko'p pul topishingiz bilan emas, balki o'sha topilgan pulni qanday boshqarishingiz va uni kelajak uchun saqlab qola olishingiz bilan o'lchanadi. Moliyaviy erkinlik insonning ishlash uchun emas, yashash uchun pul topish tizimini yo'lga qo'ygan holatidir.</p>
+        `
+    }
+];
+
+        // ==========================================
+        
+        // Barcha kitoblarni birlashtiruvchi massiv
+        let allBooks = [];
+        
+        if(typeof booksPart1 !== 'undefined') allBooks = allBooks.concat(booksPart1);
+
+        let currentBookIndex  = 0;
+        let currentFontSize = 18;
+        let exitClicks = 0;
+        let exitTimer;
+        let lastTapTime = 0;
+
+        // DOM Elementlar
+        const els = {
+            welcome: document.getElementById('welcomeScreen'),
+            input: document.getElementById('userNameInput'),
+            startBtn: document.getElementById('startBtn'),
+            userName: document.getElementById('displayUserName'),
+            title: document.getElementById('bookTitle'),
+            content: document.getElementById('bookContent'),
+            main: document.getElementById('mainContent'),
+            nextOverlay: document.getElementById('nextOverlay'),
+            nextName: document.getElementById('nextBookName'),
+            menu: document.getElementById('menuModal'),
+            bookList: document.getElementById('bookList'),
+            toast: document.getElementById('exitToast'),
+            ttsBtn: document.getElementById('ttsBtn') // <-- 2-QADAM: ttsBtn qo'shildi
+        };
+
+        // 1. Dasturga kirish va Fullscreen
+        els.startBtn.addEventListener('click', () => {
+            if(els.input.value.trim().length < 2) {
+                alert('Ismingizni kiriting');
+                return;
+            }
+            els.userName.innerHTML = `👤 ${els.input.value.trim()}`;
+            
+            if(document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(e => console.log(e));
+            }
+            els.welcome.style.opacity = '0';
+            els.welcome.style.visibility = 'hidden';
+            
+            initLibrary();
+        });
+
+        // 2. Kutubxonani yuklash
+        function initLibrary() {
+            if(allBooks.length === 0) {
+                els.title.innerText = "Hozircha kitoblar yo'q";
+                els.content.innerHTML = "Iltimos, JS kod ichiga booksPart... massivlarini joylashtiring.";
+                return;
+            }
+            
+            els.bookList.innerHTML = '';
+            allBooks.forEach((book, index) => {
+                let div = document.createElement('div');
+                div.className = 'book-item';
+                div.innerText = book.title;
+                div.onclick = () => { 
+                    loadBook(index); 
+                    els.menu.classList.remove('active'); 
+                };
+                els.bookList.appendChild(div);
+            });
+            loadBook(0);
+        }
+
+        // 3-QADAM: Yangilangan loadBook funksiyasi
+        function loadBook(index) {
+            currentBookIndex = index;
+            els.title.innerText = allBooks[index].title;
+            els.content.innerHTML = allBooks[index].content;
+            els.main.scrollTop = 0;
+            
+            document.querySelectorAll('.book-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+
+            // Yangi qo'shilgan qism: Boshqa kitobga o'tganda ovozni to'xtatish
+            stopSpeaking();
+        }
+
+        // 3. Shrift o'lchami (+ va -)
+        document.getElementById('fontPlus').onclick = () => {
+            if(currentFontSize < 34) { 
+                currentFontSize += 2; 
+                document.documentElement.style.setProperty('--font-size', `${currentFontSize}px`); 
+            }
+        };
+        document.getElementById('fontMinus').onclick = () => {
+            if(currentFontSize > 14) { 
+                currentFontSize -= 2; 
+                document.documentElement.style.setProperty('--font-size', `${currentFontSize}px`); 
+            }
+        };
+
+        // 4. Menyu (⚙️)
+        document.getElementById('openMenu').onclick = () => els.menu.classList.add('active');
+        document.getElementById('closeMenu').onclick = () => els.menu.classList.remove('active');
+
+        // 5. Ikki marta bosish (Keyingi kitob)
+        function handleDoubleTap() {
+            if(els.menu.classList.contains('active')) return;
+            if(currentBookIndex < allBooks.length - 1) {
+                els.nextName.innerText = allBooks[currentBookIndex + 1].title;
+                els.nextOverlay.classList.add('show');
+                setTimeout(() => els.nextOverlay.classList.remove('show'), 4000);
+            }
+        }
+
+        els.main.addEventListener('click', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            if(tapLength < 300 && tapLength > 0) {
+                handleDoubleTap();
+                e.preventDefault();
+            }
+            lastTapTime = currentTime;
+        });
+
+        els.nextOverlay.onclick = () => {
+            if(currentBookIndex < allBooks.length - 1) {
+                loadBook(currentBookIndex + 1);
+                els.nextOverlay.classList.remove('show');
+            }
+        };
+
+        // 6. 6 marta bosib chiqish
+        document.body.addEventListener('click', (e) => {
+            if(e.target.closest('header') || e.target.closest('.modal-content') || e.target.closest('#welcomeScreen') || e.target.closest('.next-overlay')) {
+                exitClicks = 0; 
+                return;
+            }
+
+            exitClicks++;
+            clearTimeout(exitTimer);
+
+            if(exitClicks >= 2 && exitClicks < 6) {
+                els.toast.innerText = `Chiqish uchun yana ${6 - exitClicks} marta bosing`;
+                els.toast.classList.add('show');
+            }
+
+            if(exitClicks === 6) {
+                els.toast.classList.remove('show');
+                exitClicks = 0;
+                if(document.fullscreenElement) { 
+                    document.exitFullscreen().catch(err => console.log(err)); 
+                }
+            }
+
+            exitTimer = setTimeout(() => {
+                exitClicks = 0;
+                els.toast.classList.remove('show');
+            }, 500);
+        });
+
+        // O'ng tugmani bloklash
+        document.addEventListener('contextmenu', e => e.preventDefault());
+
+        // ==========================================
+        // 4-QADAM: OVOZLI O'QISH (TTS) MANTIG'I - TO'G'RILANGAN VERSIYA
+        // ==========================================
+        let isSpeaking = false;
+        let currentUtterance = null;
+
+        // Ovozni to'xtatish funksiyasi
+        function stopSpeaking() {
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                if (els.ttsBtn) {
+                    els.ttsBtn.innerText = '🔊';
+                }
+            }
+        }
+
+        // TTS tugmasi bosilganda
+        if (els.ttsBtn) {
+            els.ttsBtn.addEventListener('click', () => {
+                // SpeechSynthesis qo'llab-quvvatlanadimi?
+                if (!window.speechSynthesis) {
+                    alert('Kechirasiz, sizning brauzeringiz ovozli o\'qishni qo\'llab-quvvatlamaydi.');
+                    return;
+                }
+
+                if (isSpeaking) {
+                    // Agar o'qiyotgan bo'lsa, to'xtatamiz
+                    stopSpeaking();
+                } else {
+                    try {
+                        // Avval to'xtatamiz (xavfsizlik uchun)
+                        window.speechSynthesis.cancel();
+                        
+                        // O'qish uchun matnni olamiz
+                        const titleText = els.title.innerText || '';
+                        // HTML teglarni olib tashlash uchun innerText ishlatamiz
+                        const bodyText = els.content.innerText || els.content.textContent || '';
+                        const fullText = titleText + '. ' + bodyText;
+                        
+                        if (fullText.trim() === '') {
+                            alert('O\'qish uchun matn topilmadi.');
+                            return;
+                        }
+
+                        // Yangi utterance yaratish (har safar yangi obyekt)
+                        currentUtterance = new SpeechSynthesisUtterance(fullText);
+                        
+                        // O'zbek tiliga moslash
+                        currentUtterance.lang = 'uz-UZ';
+                        currentUtterance.rate = 0.9; // Sekinroq va aniqroq
+                        currentUtterance.pitch = 1;
+                        currentUtterance.volume = 1;
+                        
+                        // Event handlers
+                        currentUtterance.onstart = () => {
+                            isSpeaking = true;
+                            els.ttsBtn.innerText = '⏹';
+                        };
+                        
+                        currentUtterance.onend = () => {
+                            isSpeaking = false;
+                            els.ttsBtn.innerText = '🔊';
+                        };
+                        
+                        currentUtterance.onerror = (event) => {
+                            console.log('Ovozli o\'qish xatosi:', event);
+                            isSpeaking = false;
+                            els.ttsBtn.innerText = '🔊';
+                        };
+                        
+                        // Ovozni boshlash
+                        window.speechSynthesis.speak(currentUtterance);
+                        
+                    } catch (error) {
+                        console.error('TTS xatosi:', error);
+                        alert('Ovozli o\'qishni boshlashda xatolik yuz berdi.');
+                        isSpeaking = false;
+                        els.ttsBtn.innerText = '🔊';
+                    }
+                }
+            });
+        }
+
+        // Dasturdan chiqilganda ovozni to'xtatish
+        window.addEventListener('beforeunload', () => {
+            stopSpeaking();
+        });
+
+        // Agar boshqa kitobga o'tilsa, ovozni to'xtatish
+        window.stopSpeaking = stopSpeaking;
+    </script>
+</body>
+</html>
