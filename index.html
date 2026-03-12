@@ -720,7 +720,7 @@
         // ==========================================
         // TTS ENGINE (Professional Modul)
         // ==========================================
-        class IdealTTS {
+                class IdealTTS {
             constructor(options = {}){
                 this.synth = window.speechSynthesis;
                 this.voice = null;
@@ -729,7 +729,7 @@
                 
                 this.rate = options.rate || 0.95;
                 this.pitch = options.pitch || 1;
-                this.lang = options.lang || "uz-UZ";
+                this.lang = options.lang || "uz-UZ"; 
                 
                 this.isPlaying = false;
                 this.isPaused = false;
@@ -743,18 +743,33 @@
             loadVoices(){
                 const load = () => {
                     const voices = this.synth.getVoices();
-                    this.voice = voices.find(v => v.lang.includes("uz")) || voices.find(v => v.lang.includes("tr")) || voices.find(v => v.lang.includes("ru")) || voices[0];
+                    if(voices.length > 0) {
+                        this.voice = voices.find(v => v.lang.includes("uz")) || 
+                                     voices.find(v => v.lang.includes("tr")) || 
+                                     voices.find(v => v.lang.includes("ru")) || 
+                                     voices[0];
+                    }
                 };
+                
+                // Darhol yuklashga urinish
                 load();
-                speechSynthesis.onvoiceschanged = load;
+                
+                // Brauzer ovozlarni kechikib yuklasa, ushlab qolish
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = load;
+                }
             }
 
             speak(paragraphsArray){
                 this.stop();
-                this.queue = paragraphsArray;
-                this.index = 0;
-                this.isPlaying = true;
-                this.next();
+                
+                // Mobil brauzerlarda eski keshni tozalash uchun kichik pauza kerak
+                setTimeout(() => {
+                    this.queue = paragraphsArray;
+                    this.index = 0;
+                    this.isPlaying = true;
+                    this.next();
+                }, 50);
             }
 
             next(){
@@ -768,12 +783,24 @@
                 this.onParagraph(this.index);
                 
                 const utter = new SpeechSynthesisUtterance(paragraphText);
-                utter.voice = this.voice;
+                
+                // Agar ovoz topilgan bo'lsa o'rnatamiz, bo'lmasa brauzer standartini ishlatadi
+                if(this.voice) {
+                    utter.voice = this.voice;
+                }
+                
                 utter.rate = this.rate;
                 utter.pitch = this.pitch;
                 utter.lang = this.lang;
                 
                 utter.onend = () => {
+                    this.index++;
+                    this.next();
+                };
+
+                // Agar biror paragrafda xatolik chiqsa, to'xtab qolmasdan keyingisiga o'tadi
+                utter.onerror = (e) => {
+                    console.warn("TTS Error:", e);
                     this.index++;
                     this.next();
                 };
@@ -801,6 +828,7 @@
                 this.isPaused = false;
             }
         }
+
 
         // ==========================================
         // DASTUR MANTIQI
