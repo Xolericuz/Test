@@ -721,113 +721,128 @@
         // TTS ENGINE (Professional Modul)
         // ==========================================
                 class IdealTTS {
-            constructor(options = {}){
-                this.synth = window.speechSynthesis;
-                this.voice = null;
-                this.queue = [];
-                this.index = 0;
-                
-                this.rate = options.rate || 0.95;
-                this.pitch = options.pitch || 1;
-                this.lang = options.lang || "uz-UZ"; 
-                
-                this.isPlaying = false;
-                this.isPaused = false;
-                
-                this.onParagraph = options.onParagraph || (()=>{});
-                this.onEnd = options.onEnd || (()=>{});
-                
-                this.loadVoices();
-            }
 
-            loadVoices(){
-                const load = () => {
-                    const voices = this.synth.getVoices();
-                    if(voices.length > 0) {
-                        this.voice = voices.find(v => v.lang.includes("uz")) || 
-                                     voices.find(v => v.lang.includes("tr")) || 
-                                     voices.find(v => v.lang.includes("ru")) || 
-                                     voices[0];
-                    }
-                };
-                
-                // Darhol yuklashga urinish
-                load();
-                
-                // Brauzer ovozlarni kechikib yuklasa, ushlab qolish
-                if (speechSynthesis.onvoiceschanged !== undefined) {
-                    speechSynthesis.onvoiceschanged = load;
-                }
-            }
+constructor(options = {}){
 
-            speak(paragraphsArray){
-                this.stop();
-                
-                // Mobil brauzerlarda eski keshni tozalash uchun kichik pauza kerak
-                setTimeout(() => {
-                    this.queue = paragraphsArray;
-                    this.index = 0;
-                    this.isPlaying = true;
-                    this.next();
-                }, 50);
-            }
+this.synth = window.speechSynthesis
+this.voice = null
+this.queue = []
+this.index = 0
 
-            next(){
-                if(this.index >= this.queue.length){
-                    this.isPlaying = false;
-                    this.onEnd();
-                    return;
-                }
-                
-                const paragraphText = this.queue[this.index];
-                this.onParagraph(this.index);
-                
-                const utter = new SpeechSynthesisUtterance(paragraphText);
-                
-                // Agar ovoz topilgan bo'lsa o'rnatamiz, bo'lmasa brauzer standartini ishlatadi
-                if(this.voice) {
-                    utter.voice = this.voice;
-                }
-                
-                utter.rate = this.rate;
-                utter.pitch = this.pitch;
-                utter.lang = this.lang;
-                
-                utter.onend = () => {
-                    this.index++;
-                    this.next();
-                };
+this.rate = options.rate || 0.95
+this.pitch = options.pitch || 1
+this.lang = options.lang || "en-US"
 
-                // Agar biror paragrafda xatolik chiqsa, to'xtab qolmasdan keyingisiga o'tadi
-                utter.onerror = (e) => {
-                    console.warn("TTS Error:", e);
-                    this.index++;
-                    this.next();
-                };
-                
-                this.synth.speak(utter);
-            }
+this.isPlaying = false
+this.isPaused = false
 
-            pause(){
-                if(!this.isPlaying) return;
-                this.synth.pause();
-                this.isPaused = true;
-            }
+this.onParagraph = options.onParagraph || (()=>{})
+this.onEnd = options.onEnd || (()=>{})
 
-            resume(){
-                if(!this.isPaused) return;
-                this.synth.resume();
-                this.isPaused = false;
-            }
+this.loadVoices()
 
-            stop(){
-                this.synth.cancel();
-                this.queue = [];
-                this.index = 0;
-                this.isPlaying = false;
-                this.isPaused = false;
-            }
-        }
+}
+
+loadVoices(){
+
+const load = () => {
+
+const voices = this.synth.getVoices()
+
+this.voice =
+voices.find(v=>v.lang.includes("en")) ||
+voices[0]
+
+}
+
+load()
+speechSynthesis.onvoiceschanged = load
+
+}
+
+splitParagraphs(text){
+
+return text
+.replace(/\n+/g,"\n")
+.split("\n")
+.map(t=>t.trim())
+.filter(Boolean)
+
+}
+
+speak(text){
+
+this.stop()
+
+this.queue = this.splitParagraphs(text)
+this.index = 0
+
+this.isPlaying = true
+this.next()
+
+}
+
+next(){
+
+if(this.index >= this.queue.length){
+
+this.isPlaying = false
+this.onEnd()
+return
+
+}
+
+const paragraph = this.queue[this.index]
+
+this.onParagraph(this.index, paragraph)
+
+const utter = new SpeechSynthesisUtterance(paragraph)
+
+utter.voice = this.voice
+utter.rate = this.rate
+utter.pitch = this.pitch
+utter.lang = this.lang
+
+utter.onend = () => {
+
+this.index++
+this.next()
+
+}
+
+this.synth.speak(utter)
+
+}
+
+pause(){
+
+if(!this.isPlaying) return
+
+this.synth.pause()
+this.isPaused = true
+
+}
+
+resume(){
+
+if(!this.isPaused) return
+
+this.synth.resume()
+this.isPaused = false
+
+}
+
+stop(){
+
+this.synth.cancel()
+this.queue = []
+this.index = 0
+this.isPlaying = false
+this.isPaused = false
+
+}
+
+}
 
 
         // ==========================================
