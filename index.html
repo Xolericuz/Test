@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#050505">
+    <title>XOLƎRIƆ Premium</title>
+    <link rel="manifest" href="manifest.json">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* =========================================
+           ASOSIY DIZAYN (QORA VA KUMUSH)
+           ========================================= */
+        :root {
+            --bg-deep: #050505;
+            --silver-light: #E0E0E0;
+            --silver-mid: #C0C0C0;
+            --silver-dark: #8E8E8E;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(192, 192, 192, 0.2);
+            --neon-shadow: 0 0 20px rgba(192, 192, 192, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg-deep);
+            color: var(--silver-light);
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Kumush animatsiyali matn */
+        .silver-text-animated {
+            background: linear-gradient(120deg, #a0a0a0 0%, #ffffff 20%, #a0a0a0 40%, #e0e0e0 100%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 800;
+            text-shadow: 2px 2px 10px rgba(192,192,192,0.1);
+            animation: shine 4s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* Sokin statik kumush matn */
+        .silver-text {
+            background: linear-gradient(to right, var(--silver-mid) 0%, var(--silver-light) 50%, var(--silver-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        /* Glassmorphism panellar */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        /* =========================================
+           KUTUBXONA (GRID) EKRANI
+           ========================================= */
+        #libraryScreen {
+            flex: 1; overflow-y: auto; padding: 20px;
+            display: flex; flex-direction: column; align-items: center;
+            opacity: 1; transition: opacity 0.5s;
+        }
+        #libraryScreen::-webkit-scrollbar { width: 4px; }
+        #libraryScreen::-webkit-scrollbar-thumb { background: var(--silver-dark); border-radius: 4px; }
+
+        header { width: 100%; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; padding: 20px 0; margin-bottom: 30px; }
+        header h1 { font-size: 28px; letter-spacing: 3px; }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px; width: 100%; max-width: 1200px;
+            padding-bottom: 50px;
+        }
+
+        /* UX: Kitob Kartochkalari */
+        .book-card {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(192, 192, 192, 0.15);
+            padding: 25px; border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 180px;
+        }
+        .book-card:hover, .book-card:active {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(192, 192, 192, 0.15);
+            border-color: rgba(192, 192, 192, 0.5);
+            background: rgba(30, 30, 30, 0.8);
+        }
+        .card-number { font-size: 14px; color: var(--silver-dark); margin-bottom: 10px; font-weight: 600; letter-spacing: 1px; }
+        .card-title { font-size: 18px; line-height: 1.4; margin-bottom: 20px; color: var(--silver-light); font-weight: 600; }
+        .card-btn {
+            background: linear-gradient(135deg, var(--silver-dark), var(--silver-mid), var(--silver-light));
+            color: #000; padding: 12px; border-radius: 12px; text-align: center;
+            font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;
+            transition: opacity 0.3s;
+        }
+        .book-card:active .card-btn { opacity: 0.8; }
+
+        /* =========================================
+           O'QISH EKRANI (READER)
+           ========================================= */
+        #readerScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-deep); z-index: 100;
+            display: flex; flex-direction: column;
+            transform: translateX(100%); transition: transform 0.4s ease-in-out;
+        }
+        #readerScreen.active { transform: translateX(0); }
+
+        .reader-nav {
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .icon-btn {
+            background: transparent; border: 1px solid var(--glass-border); color: var(--silver-light);
+            width: 45px; height: 45px; border-radius: 50%; font-size: 18px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .icon-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.9); }
+
+        .reader-content {
+            flex: 1; overflow-y: auto; padding: 30px 20px 150px 20px;
+            max-width: 800px; margin: 0 auto; width: 100%;
+            scroll-behavior: smooth;
+        }
+        .reader-content::-webkit-scrollbar { display: none; }
+        
+        #readTitle { font-size: 28px; margin-bottom: 40px; text-align: center; line-height: 1.3; }
+        #readText { font-size: 18px; line-height: 1.8; color: #b3b3b3; text-align: justify; }
+        
+        /* Gipnotik o'qish effekti (Highlight) */
+        #readText p { margin-bottom: 25px; transition: all 0.4s ease; padding: 10px; border-radius: 12px; border-left: 2px solid transparent; }
+        #readText p.active { 
+            color: #fff; 
+            background: rgba(192, 192, 192, 0.05); 
+            border-left: 3px solid var(--silver-light);
+            box-shadow: -10px 0 20px rgba(192,192,192,0.05);
+            transform: scale(1.02);
+            padding-left: 20px;
+        }
+
+        /* =========================================
+           AUDIO PLAYER (Premium Bottom Bar)
+           ========================================= */
+        .audio-player {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 500px;
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px; padding: 15px 25px;
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(192,192,192,0.05);
+        }
+        
+        .progress-container { flex: 1; margin: 0 20px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; position: relative; }
+        .progress-bar { height: 100%; background: var(--silver-light); width: 0%; border-radius: 2px; transition: width 0.3s linear; box-shadow: 0 0 10px var(--silver-light); }
+        
+        .play-btn {
+            background: linear-gradient(135deg, #E0E0E0, #8E8E8E);
+            border: none; width: 55px; height: 55px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 0 15px rgba(192,192,192,0.3);
+            transition: transform 0.2s;
+        }
+        .play-btn:active { transform: scale(0.92); }
+        .play-btn svg { width: 20px; height: 20px; fill: #000; margin-left: 4px; }
+        .play-btn.playing svg { margin-left: 0; }
+
+    </style>
+</head>
+<body>
+
+    <div id="libraryScreen">
+        <header>
+            <h1 class="silver-text-animated">XOLƎRIƆ</h1>
+            <div style="font-size: 14px; color: var(--silver-dark); font-weight: 600;">PREMIUM BAZA</div>
+        </header>
+        <div class="books-grid" id="booksGrid">
+            </div>
+    </div>
+
+    <div id="readerScreen">
+        <div class="reader-nav glass-panel">
+            <button class="icon-btn" id="backBtn" aria-label="Orqaga">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </button>
+            <div class="silver-text" style="font-size: 16px;">O'QISH REJIMI</div>
+            <button class="icon-btn" id="settingsBtn">Aa</button>
+        </div>
+
+        <div class="reader-content" id="readerContent">
+            <h1 id="readTitle" class="silver-text-animated"></h1>
+            <div id="readText"></div>
+        </div>
+
+        <div class="audio-player glass-panel">
+            <div style="font-size: 12px; font-weight: bold; color: var(--silver-dark);" id="progressText">0%</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <button class="play-btn" id="mainPlayBtn">
+                <svg id="iconPlay" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                <svg id="iconPause" viewBox="0 0 24 24" style="display: none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 50 TA KITOB BAZASI
+        // ==========================================
+        const allBooks = [
+            { title: "1. Mukammallik Kuchi: Kichik Odatlar San'ati", content: "<p>Hayotimizda yuz beradigan eng katta o'zgarishlar birdaniga bo'lmaydi. Katta yutuqlar har doim ko'zga ko'rinmas, doimiy ravishda takrorlanadigan kichik harakatlarning jamlanmasidir. \"Atomic Habits\" konsepsiyasi shuni uqtiradiki, inson o'z ustida har kuni atigi bir foiz yaxshilanishga erishsa, yil oxiriga kelib u 37 barobar kuchliroq shaxsga aylanadi.</p><p>Aksariyat insonlar motivatsiyaga tayanib ish ko'radilar. Ammo motivatsiya bu vaqtinchalik hissiy holatdir. Haqiqiy va bardavom natijaga erishish uchun insonga motivatsiya emas, balki qat'iy intizom va to'g'ri ishlab chiqilgan tizim kerak.</p><p>Yangi odatni shakllantirish uchun uni ko'zga tashlanadigan, jozibador, bajarishga oson va qoniqarli qilish zarur. Salbiy odatlardan qutulish uchun esa ularni ko'zdan uzoqroq va murakkab qilib qo'yish kerak.</p><p>Biz o'zimiz istagan odamga aylanishimiz uchun, avvalo e'tiqodimizni o'zgartirishimiz lozim. O'zingizni shunchaki kitob o'qiyotgan odamdek emas, balki \"kitobxon\" sifatida his qiling. Siz nima ishlarni takrorlayotgan bo'lsangiz – siz o'shasiz!</p>" },
+            { title: "2. Kiberxavfsizlik va Tarmoq Anatomiyasi", content: "<p>Zamonaviy raqamli dunyoda eng qimmatli resurs bu — neft yoki oltin emas, balki axborot va ma'lumotlardir. Kiberxavfsizlik butun boshli tarmoq arxitekturasini, serverlar va foydalanuvchilar o'rtasidagi maxfiy ma'lumotlar almashinuvini himoya qilish tizimidir.</p><p>Kiberhimoyaning asosi operatsion tizimlarning ichki tuzilishini chuqur tushunishdan boshlanadi. Tizimdagi ochiq portlar va kodlardagi kichik xatolar axloqiy xakerlar tomonidan doimiy ravishda tekshirilib boriladi.</p><p>Ma'lumotlar bazasiga inyeksiya hujumlari va ijtimoiy muhandislik bugungi kundagi eng keng tarqalgan tahdidlardan hisoblanadi. Axborot xavfsizligida eng zaif halqa bu kompyuter emas, insonning o'zidir.</p><p>Kriptografiya, ya'ni ma'lumotlarni shifrlash san'ati ushbu sohaning yadrosidir. Kiberxavfsizlik mutaxassisi bo'lish nafaqat yuqori texnik bilimlarni, balki nostandart fikrlash qobiliyatini ham talab etadi.</p>" },
+            { title: "3. Moliyaviy Savodxonlik: Sarmoya va Erkinlik", content: "<p>Boylikning haqiqiy o'lchovi qancha ko'p pul topishingiz bilan emas, balki o'sha topilgan pulni qanday boshqarishingiz bilan o'lchanadi. Moliyaviy erkinlik insonning ishlash uchun emas, yashash uchun pul topish tizimini yo'lga qo'ygan holatidir.</p><p>Kambag'al insonlar o'zlariga asosan \"passivlar\" sotib olishadi. Haqiqiy boylar esa \"aktivlar\" yig'adilar. Aktivlar — bu o'z-o'zidan cho'ntagingizga pul keltiruvchi narsalar: biznes yoki qimmatli qog'ozlardir.</p><p>Murakkab foiz (compound interest) atamasi iqtisodiyotdagi sakkizinchi mo'jiza hisoblanadi. Kichik summalarni sarmoya qilib borish yillar o'tib eksponensial tarzda o'sishni boshlaydi.</p><p>Har bir sarflanayotgan so'm sizning moliyaviy armiyangizning bir askaridir. Ularni behuda o'limga yo'llash o'rniga, ko'proq pul topib kelishi uchun jangga yuboring.</p>" },
+            { title: "4. Chuqur Diqqat: Axborot Asrida Konsentratsiya", content: "<p>Chalg'ituvchi omillar shu qadar ko'pki, bitta vazifaga to'liq diqqatni jamlab ishlash noyob va o'ta qimmatbaho qobiliyatga aylanib bormoqda. \"Chuqur ish\" tushunchasi aqliy sig'imni maksimal ishlatib qadriyat yaratish holatini anglatadi.</p><p>Aksariyat odamlar kunini elektron pochtalarga javob berish, qisqa videolarni ko'rish bilan o'tkazadilar. Chuqur diqqat holatiga kirish uchun iroda kuchining o'zi yetarli emas, raqamli gigiyena o'rnatish lozim.</p><p>Inson miyasi ko'p vazifalilikni (multitasking) yoqtirmaydi. Fokusni bitta nuqtaga qaratish miyadagi neyron aloqalarni mustahkamlaydi.</p><p>Telefoningizdagi bildirishnomalarni to'liq o'chirib qo'yish va zerikishga ruxsat berish diqqat mushaklarini chiniqtiradi. Eng muhim kashfiyotlar yolg'izlik va chuqur tafakkur mevasidir.</p>" },
+            { title: "5. Kosmik Olam: Koinot va Qora Tuynuklar Sirlari", content: "<p>Koinot shu qadar ulkan va sirli ki, inson aqli uning o'lchamlarini to'liq tasavvur qilishga ojizdir. Biz har safar yulduzlarga qaraganimizda aslida o'tmishni ko'rayotgan bo'lamiz.</p><p>Koinotdagi eng qiziqarli obyektlardan biri bu — qora tuynuklardir. Uning tortishish kuchi shu qadar kuchliki, undan hatto yorug'lik ham qochib qutula olmaydi.</p><p>Biz yashayotgan Quyosh tizimi Somon Yo'li galaktikasining bitta kichik chekkasida joylashgan. Yerdan tashqarida hayot bo'lish ehtimoli matematik jihatdan juda ham yuqori.</p><p>Yulduzlar ortidagi cheksizlik insonni tavoze'li bo'lishga va atrofidagi hayotning naqadar noyob mo'jiza ekanini qadrlashga o'rgatadi.</p>" },
+            { title: "6. Veb-Dasturlash: Raqamli Arxitektura", content: "<p>Zamonaviy veb-dasturlash insonlar hayotini osonlashtiruvchi, global miqyosda ishlovchi murakkab raqamli ilovalar qurish san'atidir. Har bir sayt ortida yuzlab soatlik mehnat yotadi.</p><p>Frontend va Backend o'rtasidagi uyg'unlik mukammal dastur ishlashining kafolatidir. Shisha effektlari va silliq animatsiyalar foydalanuvchilarni o'ziga jalb qiladi.</p><p>Dastur kodlarini toza, tartibli va boshqalar tushunishi oson qilib yozish (Clean Code) chinakam muhandislik madaniyatidir.</p><p>Veb-dasturlash faqatgina texnik qoidalar to'plami emas, u ijodkor insonlar o'z dunyosini yaratishi uchun cheksiz maydondir.</p>" },
+            { title: "7. Kiberhimoya: Tarmoq Sirlari va Tahlil", content: "<p>Bugungi kunda tashkilotning eng muhim boyligi ma'lumotlar bazasidir. Kiberxavfsizlik axborotlarni uchinchi shaxslar hujumidan himoya qiluvchi tizimdir.</p><p>Xavfsizlik mutaxassislari doimiy ravishda kod tahlili va tarmoq trafigini monitoring qilib borishlari talab etiladi. Axloqiy xakerlik amaliyoti tizim qalqonini mustahkamlaydi.</p><p>SQL inyeksiya va XSS kabi hujum turlariga qarshi har bir kod qatori tekshiriladi. Ma'lumotlar almashinuvi to'liq shifrlangan bo'lishi shart.</p><p>Kiberxavfsizlik mutaxassisi nafaqat himoyachi, balki kiber-hujumchining psixologiyasini tushuna oladigan strateg bo'lishi kerak.</p>" },
+            { title: "8. Ovoz Muhandisligi: Phonk va Instrumental San'at", content: "<p>Musiqa yaratish jarayoni bugungi kunda to'liq raqamli muhandislik san'atiga aylangan. Elektron musiqa, xususan Phonk janri o'zining kuchli basslari bilan ajralib turadi.</p><p>Bu yo'nalishda trek yaratish ijodkordan dasturiy ta'minotlarni chuqur bilishni talab qiladi. Har bir tovush ekvalayzer yordamida tozalanadi.</p><p>Instrumental musiqa hech qanday so'zlarsiz ham inson ruhiyatiga kuchli ta'sir qila oladi. Tovush effekti his-tuyg'ularning raqamli ko'rinishidir.</p><p>Ovoz to'lqinlari bilan ishlash matematika va san'atning ajoyib uchrashuv nuqtasi bo'lib, ijodkorning ichki olamini aks ettiradi.</p>" },
+            { title: "9. Raqamli Ta'lim: Interaktiv Savodxonlik", content: "<p>Raqamli asr bolalar e'tiborini jalb qilish uchun interaktiv yondashuvlarni talab qiladi. Dasturlar bolalar psixologiyasiga to'liq moslashtirilgan bo'lishi kerak.</p><p>Bolalar mantiqiy mashqlarni bajarish jarayonida qiziqarli virtual sarguzashtda ishtirok etayotgandek his qiladilar. Ijobiy rag'batlar motivatsiyani oshiradi.</p><p>Bunday dasturlar har bir foydalanuvchining o'zlashtirish tezligiga qarab avtomatik moslasha oladi. Ovozli yordamchilar eshitish xotirasini ishga tushiradi.</p><p>Raqamli ta'lim mustaqil fikrlash ko'nikmalarini o'rgatadi. Ta'lim va texnologiya birlashganda bilim olish sevimli mashg'ulotga aylanadi.</p>" },
+            { title: "10. Sun'iy Intellekt: Mashinali O'rganish Asoslari", content: "<p>Sun'iy intellekt (AI) insoniyat tarixidagi eng ulug'vor kashfiyotlardan biridir. Mashinali o'rganish kompyuterlarga ma'lumotlarni tahlil qilish imkonini bermoqda.</p><p>Neyrotarmoqlar inson miyasidagi neyronlarning ishlash prinsipiga asoslanadi. Dastur xatolardan saboq chiqarishga va o'zini takomillashtirishga qodir.</p><p>Bu imkoniyatlar mas'uliyatni ham talab qiladi. Axloqiy va texnik masalalar, ma'lumotlar xavfsizligi doim nazoratda bo'lishi shart.</p><p>AI inson aql-zakovatini almashtiruvchi vosita emas, balki uni ming karra kuchaytiruvchi eng mukammal quroldir.</p>" },
+            { title: "11. Kvant Fizikasi: Borliqning Ko'rinmas Asoslari", content: "<p>Kvant fizikasi eng mitti zarrachalar qanday ishlashini o'rganadi. Kvant olamida jismlar bir vaqtning o'zida ikkita joyda bo'lishi mumkin.</p><p>Zarrachaning o'zini qanday tutishi uni \"kuzatuvchi\" bor yoki yo'qligiga qarab o'zgaradi. Inson ongi koinot jarayonlariga bevosita ta'sir o'tkaza oladi.</p><p>Kvant kompyuterlari hisoblash tezligini tasavvur qilib bo'lmaydigan darajada yuqoriga ko'taradi. Ular kubitlar yordamida ishlaydi.</p><p>Borliq faqat biz uni kuzatganimizdagina aniq bir holatga keladi. Bu soha insoniyatni butunlay yangi bosqichga olib chiqadi.</p>" },
+            { title: "12. Vaqtni Boshqarish: Samaradorlik San'ati", content: "<p>Vaqt — inson hayotidagi yagona qaytarib bo'lmaydigan resursdir. Vaqtni boshqarish aslida o'z-o'zini boshqarish demakdir.</p><p>Eyzenxauer matritsasi barcha ishlarni muhimlik va shoshilinchlik darajasiga ko'ra toifalarga ajratadi. Biz ko'pincha muhim ishlarni ortga suramiz.</p><p>Pomodoro texnikasi diqqat bilan ishlash va qat'iy dam olishni o'z ichiga oladi. Bu miyani charchoqdan asraydi.</p><p>Raqamli minimalizm va kuningizni rejalashtirish o'zingizga bo'lgan ishonchni oshiradi. Siz hayotingizning haqiqiy egasisiz.</p>" },
+            { title: "13. Psixologiya: Inson Ongi Sirlari", content: "<p>Inson miyasi koinotdagi eng murakkab obyektlardan biridir. Bizning qarorlarimiz ortida chuqur psixologik sabablar yotadi.</p><p>Harakatlarimizning qariyb 95% ongsiz ravishda, avtopilot rejimida amalga oshiriladi. O'z-o'zini anglash qarorlarni ochiq idrok bilan qabul qilish yo'lidir.</p><p>Kognitiv xatolar miyamizning mantiqiy zaifliklaridir. Tanqidiy fikrlash bizni manipulyatsiyalardan asraydi.</p><p>Miya neyroplastiklik xususiyatiga ega. Biz har qanday yoshda ham yangi narsalarni o'rganishimiz va o'zgarishimiz mumkin.</p>" },
+            { title: "14. Kriptovalyuta va Blokcheyn Inqilobi", content: "<p>Moliyaviy dunyo markazlashmagan raqamli pullar davriga qadam qo'ydi. Kriptovalyutalar erkin moliya tizimi g'oyasini haqiqatga aylantirdi.</p><p>Blokcheyn ma'lumotlarni butun dunyodagi minglab kompyuterlarda saqlash usulidir. Bu tranzaksiyalarning 100% xavfsizligini ta'minlaydi.</p><p>Bitcoin kabi kriptovalyutalar algoritm orqali qat'iy cheklangan bo'lib, inflatsiya xavfidan xoli hisoblanadi.</p><p>Blokcheyn texnologiyasi pul tizimidan tashqari logistika, tibbiyot va saylov tizimlarini ham o'zgartirish potensialiga ega.</p>" },
+            { title: "15. Bionika: Tabiatdan Texnologiyaga", content: "<p>Bionika tabiatdagi biologik mexanizmlarni zamonaviy texnologiyalarga tadbiq etuvchi kelajak fanidir. Tabiat eng mukammal dizaynerdir.</p><p>Eng tezkor poezdlarning dizayni baliqchi qushning tumshug'idan ilhomlanib yaratilgan. Bu energiya tejamkorligini oshiradi.</p><p>Tibbiyotda bionik protezlar inson asab tizimiga ulanib, miya impulslari orqali boshqarilmoqda.</p><p>Bionika insoniyatga o'zini tabiatning hokimi emas, balki uning o'quvchisi sifatida ko'rishi kerakligini isbotlaydi.</p>" },
+            { title: "16. Nanotexnologiya: Ko'rinmas Olilmdagi Inqilob", content: "<p>Nanotexnologiya moddalarni atom darajasida boshqarish fanidir. Bu o'lchamda moddalarning fizik xususiyatlari butunlay o'zgaradi.</p><p>Grafen po'latdan 200 barobar kuchli va o'ta yengil materialdir. U kelajak elektronikasi uchun inqilobiy ahamiyatga ega.</p><p>Tibbiyotda nanorobotlar faqatgina kasallangan hujayralarni topib, ularga aniq zarba bera oladi, bu an'anaviy davolashni o'zgartiradi.</p><p>Nanofoltrlar atrof-muhitni tozalashda ham muhim rol o'ynaydi. Ammo bu texnologiyaning xavfli tomonlari ham o'rganilmoqda.</p>" },
+            { title: "17. Ekologiya va Iqlim Inqirozi: Sayyoramiz Kelajagi", content: "<p>Global isish jarayoni to'g'ridan-to'g'ri inson faoliyati bilan bog'liqdir. Sayyoramiz ulkan issiqxonaga aylanib bormoqda.</p><p>Muzliklarning erishi va okeanlar kislotalashuvi butun ekotizimning buzilishiga olib kelmoqda.</p><p>Qayta tiklanuvchi energiya manbalariga o'tish bu inqirozdan chiqishning yagona yo'lidir. Quyosh va shamol energiyasi arzonlashmoqda.</p><p>Iqlim o'zgarishini to'xtatish uchun har bir insonning iste'mol madaniyati o'zgarishi zarur. Tabiat bizsiz ham yashay oladi, biz esa uningsiz yashay olmaymiz.</p>" },
+            { title: "18. Metaolam va Virtual Reallik (VR/AR)", content: "<p>Internet ikki o'lchamli ekranlardan uch o'lchamli fazoga — Metaolamga ko'chib o'tmoqda. VR orqali biz ramanli olam ichiga kiramiz.</p><p>Virtual reallik ta'lim va tibbiyot kabi sohalarda inqilob qilmoqda. Jarrohlar murakkab operatsiyalarni virtual mashq qilmoqdalar.</p><p>Metaolam kelajakdagi yangi raqamli iqtisodiyotning markaziga aylanadi. Masofadan ishlash gologrammalar vositasida kechadi.</p><p>Ammo to'liq virtual olamga qochib o'tish chuqur yolg'izlikka olib kelishi mumkin. Texnologiya insoniy aloqalarni o'ldirmasligi kerak.</p>" },
+            { title: "19. Avtomobilsozlik Evolyutsiyasi: EV va Avtopilot", content: "<p>Ichki yonuv dvigatellari o'z o'rnini elektromobillarga (EV) bo'shatib bermoqda. Elektromobillarning ishonchliligi juda yuqori.</p><p>Qattiq jismli batareyalar avtomobillarga minglab kilometr masofani tez quvvatlanish bilan bosib o'tish imkonini beradi.</p><p>Avtonom boshqaruv texnologiyasi orqali sun'iy intellekt insonlardan ko'ra xavfsizroq qaror qabul qiladi.</p><p>Kelajakda mashinalar shaxsiy mulk emas, balki g'ildirakli superkompyuterlar va xizmat vositasi sifatida ko'riladi.</p>" },
+            { title: "20. Tibbiyotda Inqilob: Robot-Jarrohlar va DNK Tahriri", content: "<p>An'anaviy jarrohlik o'rnini robot-jarrohlar egallamoqda. Ular o'ta murakkab ishlarni millimetr aniqlikda bajaradi.</p><p>CRISPR texnologiyasi orqali DNKdagi xato genlarni tahrirlash imkoni paydo bo'ldi. Bu davosiz dardlarga chek qo'yishi mumkin.</p><p>Sun'iy intellekt diagnostika jarayonini tubdan o'zgartirdi. Kasallikni u paydo bo'lishidan avval prognoz qilish oddiy holga aylanadi.</p><p>Shaxsiylashtirilgan tibbiyot davrida insoniyat qarish jarayonini sekinlashtirish sirlarini ochish ostonasida turibdi.</p>" },
+            { title: "21. Sotsiologiya: Ommaviy Ong va Jamiyat", content: "<p>Sotsiologiya insonlarning o'zaro munosabatlarini o'rganadi. Bizning didimiz va maqsadlarimiz ko'pincha jamiyat tomonidan belgilanadi.</p><p>Ommaviy ong manipulyatsiyasi axborot asrida kuchaydi. Hissiyotlarga asoslangan instinktlar inqiloblarga sabab bo'lishi mumkin.</p><p>Konformizm, ya'ni ko'pchilikka ko'r-ko'rona ergashish jamiyat rivojlanishiga eng katta to'siqdir.</p><p>Intellektual erkinlik — bu o'z guruhining ishonchlarini shubha ostiga ola bilish va mustaqil fikr yurita olish qobiliyatidir.</p>" },
+            { title: "22. Kino San'ati: Kadrlarga Muhrlangan Tarix", content: "<p>Kino texnologiya va inson xayolotining evolyutsiyasidir. U davr ruhiyatini aks ettiruvchi vizual oynadir.</p><p>Kinematografiyaning sehri montaj jarayonida yashirin. Kadrlar ketma-ketligi tomoshabinda yangi hissiyot uyg'otadi.</p><p>Ovoz va musiqa kinoning ta'sir kuchini o'n barobar oshiradi. U to'g'ridan-to'g'ri yurakka nishonga uradi.</p><p>Kino san'ati g'oyalar bilan bo'lishishning eng universal va ta'sirchan tiliga aylanib ulgurgan.</p>" },
+            { title: "23. Arxitektura: Muzlagan Musiqa va Dizayn", content: "<p>Arxitektura muhandislik, san'at va psixologiyaning mukammal kesishuv nuqtasidir. U inson ruhiyatiga sokinlik baxsh etadi.</p><p>Zamonaviy urbanistika \"odamlar uchun shaharlar\" konsepsiyasiga qaytmoqda. Yashil bog'lar va jamoat joylari muhim ahamiyat kasb etdi.</p><p>Kelajak arxitekturasi barqarorlik va ekologiya tamoyillariga asoslanadi. Bino o'z energiyasini ishlab chiqaruvchi aqlli organizmga aylanmoqda.</p><p>Biz qanday binolarda yashashimiz bizning fikrlash tarzimizga to'g'ridan-to'g'ri ta'sir ko'rsatadi.</p>" },
+            { title: "24. Global Logistika: Iqtisodiyotning Qon Tomirlari", content: "<p>Global logistika jahon iqtisodiyotining ko'rinmas qon tomirlaridir. Metall konteynerlarning kashf etilishi savdoni yuz barobar arzonlashtirdi.</p><p>Zamonaviy yetkazib berish zanjirlari \"Just-in-Time\" falsafasiga qurilgan. Bu tizim o'ta samarali, ammo zaif nuqtalarga ham ega.</p><p>Kelajak logistikasi to'liq avtomatlashtirishga qarab ketmoqda. Dronlar va AI tizimlari jarayonni boshqaradi.</p><p>Savdo yo'llari faqat iqtisodiyotni emas, global geosiyosiy qudratni ham belgilab beradi.</p>" },
+            { title: "25. Diplomatiya va Siyosat: Yumshoq Kuch San'ati", content: "<p>Dunyoni qurol emas, so'z va kelishuvlar ushlab turadi. Diplomatiya davlatlar manfaatlarini tinch yo'l bilan hal etish san'atidir.</p><p>\"Yumshoq kuch\" davlatning madaniyati va texnologiyalari jozibadorligi orqali o'lchanadi. Bu kuchli diplomatik quroldir.</p><p>Xalqaro institutlar dunyo tartibotini saqlab turuvchi ko'rinmas arqonlardir. Siyosat kelishuvlar va murosaga kelish asosida ishlaydi.</p><p>Raqamli diplomatiya axborot asrining ajralmas qismiga aylandi, davlatlar endi bevosita xalqlar bilan muloqot qilmoqda.</p>" },
+            { title: "26. Mifologiya: Qadimgi Dunyo Sirlari", content: "<p>Mifologiya qadimgi insonlarning koinot haqidagi murakkab tasavvurlari majmuasidir. U jahon madaniyatining asosi hisoblanadi.</p><p>Yunon xudolari insoniy nuqsonlarga ega obrazlar orqali adolat va qasos tushunchalarini tushuntirgan.</p><p>Miflar shunchaki ertak emas, u insoniyatning kollektiv ongosti xotirasidir va inson psixologiyasini tushunishga yordam beradi.</p><p>Barcha madaniyatlardagi afsonalarda uchraydigan o'xshash arxetiplar inson miyasiga kodlangan universal tushunchalardir.</p>" },
+            { title: "27. Biologik Xilma-xillik: Tabiat Muvozanati", content: "<p>Biologik xilma-xillik barcha tirik organizmlarning o'zaro murakkab tarmog'idir. Tabiatdagi hech bir tur ortiqcha emas.</p><p>Asalarilarsiz oziq-ovqat xavfsizligi xavf ostida qoladi. Tabiatdagi muvozanat mukammal sozlangan tizimdir.</p><p>Inson faoliyati sababli ko'plab turlar qirilib ketmoqda. Biz sayyoramizning ommaviy qirilish davriga kirdik.</p><p>Biologik xilma-xillikni asrash bizning omon qolishimiz uchun zarur. Tabiat bizning eng katta dorixonamiz va ilhom manbayimizdir.</p>" },
+            { title: "28. Koinotni O'zlashtirish: Yulduzlar Sari", content: "<p>Insoniyatning koinotni o'zlashtirishi azaliy orzu edi. Bugungi kunda bu xususiy kompaniyalarning ochiq kosmik poygasiga aylandi.</p><p>Marsda koloniya barpo etish asosiy maqsadlardan biridir. Ko'p ishlatiladigan raketalar parvozlar narxini arzonlashtirdi.</p><p>Xalqaro Kosmik Stansiya ilm-fan yo'lida davlatlarning birlasha olishini isbotladi.</p><p>Koinot sari intilish insoniyatning evolyutsion qismatidir. Biz abadiy Yer sayyorasida qola olmaymiz.</p>" },
+            { title: "29. Xotirani Kuchaytirish: Aql Saroylari", content: "<p>Xotira passiv arxiv emas, murakkab neyrobiologik jarayondir. Sog'lom miya deyarli cheksiz ma'lumot saqlash imkoniga ega.</p><p>Mnemonika qiyin ma'lumotlarni yorqin vizual obrazlarga aylantiradi. \"Xotira saroyi\" texnikasi orqali ma'lumotlar uzoq vaqt saqlanadi.</p><p>Intervalli takrorlash usuli ma'lumotni miyadan o'chib ketish arafasida qayta takrorlashni taqozo etadi.</p><p>Sog'lom uyqu va sport xotiraning eng kuchli himoyachilaridir. Ma'lumotlar chuqur uyqu paytida xotiraga muhrlanadi.</p>" },
+            { title: "30. Kriptografiya va Sirli Kodlar: Maxfiylik Ilmi", content: "<p>Kriptografiya axborotni yashirish va uni qulflash san'atidir. Qadimda bu davlat sirlarini saqlash uchun ishlatilgan.</p><p>Zamonaviy shifrlash asimmetrik kalitlar yordamida ishlaydi. Bu internetda axborot xavfsizligining poydevoridir.</p><p>Kriptografiya bugun ma'lumot yaxlitligini tasdiqlash vazifasini ham bajarmoqda. Blokcheyn butunlay shu ilm asosida qurilgan.</p><p>Kelajakda Kvant kriptografiyasi fizika qonunlariga asoslangan, buzib bo'lmas mutlaq xavfsiz tizimni taqdim etadi.</p>" },
+            { title: "31. Bioxaking: Inson Organizmini Dasturlash", content: "<p>Bioxaking insonning o'z qobiliyatlarini maksimal oshirishga qaratilgan harakatdir. Bioxakerlar tanalarini tajriba maydoniga aylantiradilar.</p><p>Uyquni optimallashtirish va to'g'ri ovqatlanish miyani qayta tiklovchi asosiy mexanizmlardir.</p><p>Interval ochlik va nootroplar kognitiv qobiliyatlarni kuchaytiradi va qariyalikni sekinlashtiradi.</p><p>Bioxaking shunchaki vitaminlar ichish emas, u tanani eshitish va tabiat bilan muvozanatni tiklash san'atidir.</p>" },
+            { title: "32. Minimalizm: Buyumlarga Qaramlikdan Xalos Bo'lish", content: "<p>Minimalizm muhim narsalarga joy ajratish uchun keraksiz ashyolardan voz kechish falsafasidir.</p><p>Iste'molchilik jamiyati insonga baxtni sotib olish mumkinligini uqtiradi. Ammo bu cheksiz va charchatuvchi poygadir.</p><p>Uyimizdagi tartibsizlik ongimizdagi tartibsizlikni keltirib chiqaradi. Buyumlar sizga quvonch keltirishi kerak.</p><p>Buyumlarga bog'lanmaslik insonga ulkan erkinlik beradi. Diqqat ashyolarga emas, hayotiy tajribalarga qaratiladi.</p>" },
+            { title: "33. Kvant Ruhiyati: Ong va Borliq Aloqasi", content: "<p>Kvant fizikasida ong zarrachalar holatiga ta'sir qilishi isbotlangan. Fikrlar obyektiv reallikka o'zgarish kiritishi mumkin.</p><p>Platsebo effekti inson ishonchi tanani qanday o'zgartira olishiga yaqqol misoldir.</p><p>Vizualizatsiya miyada yangi neyron aloqalarni shakllantiradi va real voqelikni dasturlashtiradi.</p><p>Biz o'z hayotimizning qurbonlari emas, ijodkorlarimiz. Fikrlarni boshqarish orqali koinot qonunlariga moslashish mumkin.</p>" },
+            { title: "34. Axborot Urushi: Haqiqatni Qidirish", content: "<p>Bugun qurollar o'rnini ongga qaratilgan axborot urushlari egalladi. Axborot XXI asrning eng xavfli qurolidir.</p><p>Feyk xabarlar inson hissiyotiga, qo'rquviga qaratilgani uchun haqiqatdan tezroq tarqaladi.</p><p>Deepfake texnologiyasi orqali endi o'z ko'zingiz ko'rgan narsaga ham ishonib bo'lmaydi.</p><p>Media savodxonlik va tanqidiy fikrlash bu urushda yashab qolishning yagona yo'lidir. Axborot manbasini doim tekshiring.</p>" },
+            { title: "35. Mikrobiom: Ichimizdagi Olis Koinot", content: "<p>Inson organizmida hujayralardan ko'ra ko'proq mikroblar yashaydi. Ular bizning sog'lig'imizni va kayfiyatimizni boshqaradi.</p><p>Baxt gormonining katta qismi ichaklarda, bakteriyalar ishtirokida ishlab chiqariladi.</p><p>Noto'g'ri ovqatlanish va antibiotiklar mikrobiomga qirg'in keltiradi, bu esa depressiya va kasalliklarga sabab bo'ladi.</p><p>Tolali va fermentlangan oziq-ovqatlar mikrobiomni sog'lom saqlaydi. Biz ichimizdagi do'stlarimizni asrashimiz kerak.</p>" },
+            { title: "36. Xalqaro Huquq: Dunyo Tartiboti Asoslari", content: "<p>Xalqaro huquq davlatlar o'rtasidagi munosabatlarni tartibga soluvchi ko'rinmas qoidalar majmuasidir.</p><p>Jeneva konvensiyalari urushning ham insoniylik chegaralarini o'rnatgan muhim hujjatdir.</p><p>Lekin bu huquqning ijro etilishida doim ham xolislik yo'q. Geosiyosiy kuchlar muvozanati ko'pincha adolatdan ustun keladi.</p><p>Kelajakda sun'iy intellekt va ekologik inqirozlar xalqaro huquq uchun mutlaqo yangi vazifalarni yuklaydi.</p>" },
+            { title: "37. O'z-o'zini Rivojlantirish: Kaizen Falsafasi", content: "<p>Kaizen falsafasi har kuni atigi 1 foiz yaxshilanishni talab qiladi. Shaxsiyat muntazam ravishda qayta quriladi.</p><p>O'sish fikrlash tarziga ega insonlar qobiliyatni mehnat orqali rivojlantirish mumkinligiga ishonadilar.</p><p>Kechiktirish (prokrastinatsiya) rivojlanishning ashaddiy dushmanidir. Intizom hissiyotlarga qaramay harakat qilish qobiliyatidir.</p><p>O'z-o'zini tahlil qilish va kundalik tutish miyadagi xaotik o'ylarni tartibga soladi. Rivojlanish bir umrlik jarayondir.</p>" },
+            { title: "38. Musiqa va Miya: Neyrobiologik Simfoniya", content: "<p>Musiqa miyaning barcha hududlarini bir vaqtda faollashtiruvchi universal tildir.</p><p>Musiqa tinglash dopamin ajralishiga olib keladi va kuchli ijobiy hissiyotlarni uyg'otadi.</p><p>Cholg'u chalish asab tizimi o'rtasidagi aloqani favqulodda tezlashtiradi va neyroplastiklikni oshiradi.</p><p>Musiqa terapiyasi bugun yo'qolgan xotiralarni tiklash va og'riq qoldirishda samarali qo'llanilmoqda.</p>" },
+            { title: "39. Ijtimoiy Tarmoqlar: Raqamli Dopamin", content: "<p>Ijtimoiy tarmoqlar \"Diqqat iqtisodiyoti\" deb ataluvchi ulkan biznesdir. Eng qimmat valyuta — foydalanuvchi vaqtidir.</p><p>Cheksiz varaqlash qimor o'yinlari prinsipi asosida qurilgan. U miyada narkotik qaramlikni shakllantiradi.</p><p>Solishtirish madaniyati depressiya va o'ziga ishonchsizlikni keskin oshirib yubordi.</p><p>Raqamli minimalizm diqqatni boshqarish usulidir. Texnologiya hayotingizning markazi bo'lmasligi kerak.</p>" },
+            { title: "40. Startaplar Anatomiyasi: G'oyadan Unicorngacha", content: "<p>Startap yuqori noaniqlikda yaratilgan, tezkor o'sishga mo'ljallangan innovatsion loyihadir.</p><p>\"Tejamkor startap\" modeli mahsulotning eng oddiy versiyasini chiqarib, mijozlar fikri asosida uni rivojlantirishni talab qiladi.</p><p>Moliyalashtirish farishta investorlar va venchur fondlari orqali amalga oshadi. Maqsad milliard dollarlik \"Unicorn\" ga aylanishdir.</p><p>G'oyaning o'zi qadrli emas, hamma narsani uning ijro etilishi va kuchli jamoa hal qiladi.</p>" },
+            { title: "41. Muvaffaqiyatsizlik Saboqlari: Mag'lubiyat San'ati", content: "<p>Har bir buyuk g'alaba o'nlab mag'lubiyatlar ustiga quriladi. Xato bu tizimning zaifligini ko'rsatuvchi ma'lumotdir.</p><p>\"Tezroq xato qil\" qoidasi qaysi yo'l noto'g'ri ekanligini tez tushunishga yordam beradi.</p><p>Buyuk kashfiyotchilar ham minglab marta xato qilishgan. Ular buni xato emas, ishlamaydigan usullar deb bilganlar.</p><p>O'zingizni xatolaringiz bilan tenglashtirmang. Mag'lubiyatni qabul qilish inson irodasini toblaydigan jarayondir.</p>" },
+            { title: "42. Loyiha Boshqaruvi: Agile va Scrum Falsafasi", content: "<p>Agile mijoz ehtiyojlariga moslashish va mahsulotni qisqa muddatlarda tayyorlashga asoslangan metodologiyadir.</p><p>Scrum usulida ishlar sprintlarga bo'linadi, bu jamoaga doimiy tahlil va xatolarni tezkor tuzatish imkonini beradi.</p><p>Shaffoflik va ochiq muloqot bu boshqaruvning poydevoridir. Jamoaviy mas'uliyat doim ustun turadi.</p><p>Mukammallikdan ko'ra foydalilik muhim. O'zgarishlardan qo'rqmay, ularni imkoniyatga aylantirish kerak.</p>" },
+            { title: "43. Zamonaviy San'at: Ma'no va Estetika", content: "<p>Zamonaviy san'at asarining qadri uning texnikasida emas, balki uyg'otadigan g'oyasi va hissiyotida yashirin.</p><p>San'at dunyoni nusxalamaydi, balki odatiy narsalarga yangicha nazar bilan qarashga undaydi.</p><p>Raqamli san'at va NFT davri san'at asari fizik shaklda bo'lishi shart emasligini ko'rsatib berdi.</p><p>San'at kundalik hayotdan yuqoriga ko'taradi va miyadagi qotib qolgan fikrlarni harakatga keltiradi.</p>" },
+            { title: "44. Raqamli Minimalizm: Diqqatni Qutqarish", content: "<p>Biz har kuni telefonlarga tobelik tufayli qimmatli diqqatimizni yo'qotmoqdamiz. Raqamli minimalizm bunga qarshi kurashdir.</p><p>Har bir chalg'ishdan so'ng diqqatni tiklash uchun miyaga o'rtacha 23 daqiqa kerak bo'ladi.</p><p>Raqamli tozalash orqali faqatgina o'ta muhim ilovalarni saqlab qolish ruhiy xotirjamlikni qaytaradi.</p><p>Telefoningizni asbob sifatida ishlating. Diqqatni boshqarish — zamonaviy dunyodagi eng katta kuchdir.</p>" },
+            { title: "45. Xalqaro Munosabatlar: Yangi Geosiyosat", content: "<p>Dunyo endilikda ko'p qutbli bo'lib qoldi. Geosiyosat endi faqat hududlar emas, internet va texnologiyalar uchun kurashmoqda.</p><p>Iqtisodiy sanksiyalar va yarimo'tkazgichlar ishlab chiqarish yangi urushning eng kuchli qurollaridir.</p><p>Kiberhujumlar davlat tizimlarini uydan turib ham izdan chiqarish qudratiga ega.</p><p>Kelajak muammolarini hal qilishda raqobat emas, xalqaro hamkorlik hal qiluvchi rol o'ynaydi.</p>" },
+            { title: "46. Kiber-Psixologiya: Raqamli Shaxsiyat", content: "<p>Kiber-psixologiya inson va internet o'rtasidagi munosabatlarni o'rganadi. Raqamli shaxsiyat real hayotdan butunlay farq qilishi mumkin.</p><p>Anonimlik insonlarga agressiv va mas'uliyatsiz muloqot qilish imkonini yaratmoqda.</p><p>Ijtimoiy tarmoqdagi ijobiy sharhlar insonda kuchli qaramlikni shakllantiradi va o'ziga baho berish mezonini o'zgartiradi.</p><p>Biz texnologiyalar ichida yashab, jonli muloqot qadriyatlarini yo'qotib qo'ymasligimiz zarur.</p>" },
+            { title: "47. Smart City: Kelajak Shaharlari", content: "<p>Aqlli shaharlar barcha infratuzilmani raqamli tarmoqqa ulab, aholi yashash tarzini avtomatlashtiradi.</p><p>Tirbandliklar sun'iy intellekt tomonidan boshqariladi va energiya sarfi minimal darajaga tushiriladi.</p><p>Shahar xizmatlari katta ma'lumotlar tahlili orqali fuqarolarning ehtiyojlariga moslashtiriladi.</p><p>Aqlli shahar ekologiya va texnologiya uyg'unligi asosida ishlaydi, u tabiatga ziyon yetkazmasligi kerak.</p>" },
+            { title: "48. Neyro-interfeys: Fikr Kuchi Bilan Boshqarish", content: "<p>Neyro-interfeys miya va kompyuter o'rtasida to'g'ridan-to'g'ri raqamli aloqa o'rnatish texnologiyasidir.</p><p>Bu texnologiya falaj bemorlarga robot qo'llarni boshqarish va ochiq muloqot qilish imkonini beradi.</p><p>Kelajakda axborotni to'g'ridan-to'g'ri miyaga yuklash orqali sun'iy va inson intellekti birlashishi mumkin.</p><p>Biroq miyaga raqamli kirish axborot xavfsizligi va fikr daxlsizligi uchun yangi xavflarni keltirib chiqaradi.</p>" },
+            { title: "49. Kvant Kompyuterlari va Koinot Fizikasi", content: "<p>Kvant kompyuterlari fantastik hisoblash quvvatiga ega. Ular koinot sirlarini tushunishda yagona vositadir.</p><p>Kvant gravitatsiyasi nazariyasi fizika qonunlaridagi ziddiyatlarni bartaraf etish uchun eng katta qadamdir.</p><p>Kvant chalkashligi orqali koinotning bir nuqtasidan ikkinchisiga zudlik bilan ma'lumot o'tkazish mumkin bo'ladi.</p><p>Koinotni anglash insonning u yerdagi haqiqiy o'rnini tushunishga va qonuniyatlarni kashf etishga olib keladi.</p>" },
+            { title: "50. Insoniyatning Yakuniy Taqdiri", content: "<p>Biz sivilizatsiyaning muhim burilish nuqtasida turibmiz. Texnologiyalar bizni yo halok qiladi, yo yangi bosqichga olib chiqadi.</p><p>Transhumanizm davrida inson va kompyuter birlashishi kutilmoqda. Boshqa sayyoralarni o'zlashtirish zaruratdir.</p><p>Koinot milliardlab yillar mavjud bo'ladi. Insoniyat — bu koinotning o'zini o'zi anglashga urinishidir.</p><p>Bilim chegara bilmas kuchdir. Insoniyatning buyukligi uning tafakkurida va izlanishdan to'xtamasligidadir.</p>" }
+        ];
+
+        // ==========================================
+        // DASTUR HOLATI VA DOM
+        // ==========================================
+        let currentBookIndex = 0;
+        let isReading = false;
+
+        const screens = {
+            library: document.getElementById('libraryScreen'),
+            reader: document.getElementById('readerScreen')
+        };
+        const els = {
+            grid: document.getElementById('booksGrid'),
+            backBtn: document.getElementById('backBtn'),
+            title: document.getElementById('readTitle'),
+            content: document.getElementById('readText'),
+            playBtn: document.getElementById('mainPlayBtn'),
+            iconPlay: document.getElementById('iconPlay'),
+            iconPause: document.getElementById('iconPause'),
+            progressBar: document.getElementById('progressBar'),
+            progressText: document.getElementById('progressText')
+        };
+
+        // UX: Haptic Feedback funksiyasi
+        function vibrate(ms) {
+            if ("vibrate" in navigator) {
+                try { navigator.vibrate(ms); } catch(e) {}
+            }
+        }
+
+        // ==========================================
+        // MUKAMMAL TTS ENGINE (Web Speech API)
+        // ==========================================
+        class SyncTTS {
+            constructor() {
+                this.synth = window.speechSynthesis;
+                this.paragraphs = [];
+                this.currentIndex = 0;
+                this.isPlaying = false;
+                this.isPaused = false;
+                this.voice = null;
+                this.initVoices();
+            }
+
+            initVoices() {
+                const setVoice = () => {
+                    let voices = this.synth.getVoices();
+                    // O'zbek yoki Rus tilidagi eng yaxshi ovozni topishga harakat qilamiz, yoki standartini olamiz
+                    this.voice = voices.find(v => v.lang.includes('uz')) || 
+                                 voices.find(v => v.lang.includes('ru')) || 
+                                 voices.find(v => v.name.includes('Google')) || 
+                                 voices[0];
+                };
+                setVoice();
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = setVoice;
+                }
+            }
+
+            loadText(domParagraphs) {
+                this.paragraphs = domParagraphs;
+                this.currentIndex = 0;
+                this.updateProgress();
+            }
+
+            play() {
+                if(this.isPaused) {
+                    this.synth.resume();
+                    this.isPaused = false;
+                    this.isPlaying = true;
+                    return;
+                }
+
+                if(this.currentIndex >= this.paragraphs.length) this.currentIndex = 0;
+                this.isPlaying = true;
+                this.speakNext();
+            }
+
+            speakNext() {
+                if(!this.isPlaying) return;
+                if(this.currentIndex >= this.paragraphs.length) {
+                    this.stop();
+                    updatePlayButtonUI(false);
+                    return;
+                }
+
+                // UI dagi barcha matnlarni o'chirish va hozirgisini yoqish
+                this.paragraphs.forEach(p => p.classList.remove('active'));
+                let currentP = this.paragraphs[this.currentIndex];
+                currentP.classList.add('active');
+                currentP.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                this.updateProgress();
+
+                let utter = new SpeechSynthesisUtterance(currentP.innerText);
+                if(this.voice) utter.voice = this.voice;
+                utter.rate = 0.95; // Qulay eshitish tezligi
+
+                utter.onend = () => {
+                    this.currentIndex++;
+                    this.speakNext();
+                };
+
+                utter.onerror = (e) => {
+                    console.warn("TTS Error", e);
+                    this.currentIndex++;
+                    this.speakNext();
+                }
+
+                this.synth.speak(utter);
+            }
+
+            pause() {
+                this.synth.pause();
+                this.isPaused = true;
+                this.isPlaying = false;
+            }
+
+            stop() {
+                this.synth.cancel();
+                this.isPlaying = false;
+                this.isPaused = false;
+                this.paragraphs.forEach(p => p.classList.remove('active'));
+                this.updateProgress();
+            }
+
+            updateProgress() {
+                let total = this.paragraphs.length;
+                if(total === 0) return;
+                let percent = Math.floor((this.currentIndex / total) * 100);
+                if(percent > 100) percent = 100;
+                els.progressBar.style.width = percent + '%';
+                els.progressText.innerText = percent + '%';
+            }
+        }
+
+        const tts = new SyncTTS();
+
+        function updatePlayButtonUI(isPlaying) {
+            if(isPlaying) {
+                els.iconPlay.style.display = 'none';
+                els.iconPause.style.display = 'block';
+                els.playBtn.classList.add('playing');
+            } else {
+                els.iconPlay.style.display = 'block';
+                els.iconPause.style.display = 'none';
+                els.playBtn.classList.remove('playing');
+            }
+        }
+
+        // ==========================================
+        // UI MANTIQI
+        // ==========================================
+
+        // 1. Kutubxonani chizish
+        function renderLibrary() {
+            els.grid.innerHTML = '';
+            allBooks.forEach((book, index) => {
+                let card = document.createElement('div');
+                card.className = 'book-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="card-number">QISM 0${Math.floor(index/5)+1} | KITOB ${index+1}</div>
+                        <div class="card-title">${book.title.replace(/^\d+\.\s*/, '')}</div>
+                    </div>
+                    <div class="card-btn">O'qishni Boshlash</div>
+                `;
+                
+                card.onclick = () => {
+                    vibrate(40); // Haptic feedback
+                    openBook(index);
+                };
+                els.grid.appendChild(card);
+            });
+        }
+
+        // 2. Kitobni ochish (Gipnoz rejimi)
+        function openBook(index) {
+            currentBookIndex = index;
+            const book = allBooks[index];
+            
+            els.title.innerText = book.title;
+            els.content.innerHTML = book.content;
+            
+            // TTS ga xatboshilarni berish
+            const domPars = Array.from(els.content.querySelectorAll('p'));
+            tts.loadText(domPars);
+
+            // Ekranlarni almashtirish
+            screens.library.style.opacity = '0';
+            setTimeout(() => {
+                screens.library.style.display = 'none';
+                screens.reader.classList.add('active');
+                els.content.scrollTop = 0;
+            }, 300);
+        }
+
+        // 3. Orqaga qaytish
+        els.backBtn.onclick = () => {
+            vibrate(30);
+            tts.stop();
+            updatePlayButtonUI(false);
+            
+            screens.reader.classList.remove('active');
+            screens.library.style.display = 'flex';
+            setTimeout(() => {
+                screens.library.style.opacity = '1';
+            }, 100);
+        };
+
+        // 4. Play/Pause bosilganda
+        els.playBtn.onclick = () => {
+            vibrate(50);
+            if(tts.isPlaying) {
+                tts.pause();
+                updatePlayButtonUI(false);
+            } else {
+                tts.play();
+                updatePlayButtonUI(true);
+            }
+        };
+
+        // Dasturni ishga tushirish
+        renderLibrary();
+
+        // PWA O'rnatish
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(()=>{});
+            });
+        }
+    </script>
+</body>
+</html>
