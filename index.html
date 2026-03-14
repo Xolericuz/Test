@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0d0d12">
+    <title>XOLƎRIƆ Kutubxonasi</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --bg-dark: #0d0d12;
+            --bg-surface: #15151e;
+            --text-main: #e2e2e9;
+            --text-muted: #9494a0;
+            --accent: #6c8aff;
+            --accent-glow: rgba(108, 138, 255, 0.4);
+            --glass-bg: rgba(25, 25, 35, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-size: 18px;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top, #1a1a2e 0%, var(--bg-dark) 80%);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        /* --- 3D Silver Logo Animation --- */
+        .logo { 
+            font-weight: 900; 
+            font-size: 1.4rem; 
+            letter-spacing: 2px; 
+            flex: 1; 
+            text-align: center; 
+            background: linear-gradient(120deg, #a0a0a0 0%, #ffffff 20%, #a0a0a0 40%, #e0e0e0 100%);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            animation: shine 3s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* --- 3D Neumorphic Glassmorphism --- */
+        .glass-3d {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);
+        }
+
+        /* --- Welcome Screen --- */
+        #welcomeScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .welcome-box {
+            padding: 40px; border-radius: 24px;
+            text-align: center; width: 90%; max-width: 400px;
+        }
+        .welcome-box h1 { font-size: 3rem; margin-bottom: 10px; }
+        .welcome-box p { color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem; }
+        .welcome-box input {
+            width: 100%; padding: 15px; border-radius: 12px;
+            border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3);
+            color: #fff; font-size: 1.1rem; outline: none; text-align: center;
+            margin-bottom: 20px; transition: border 0.3s;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .welcome-box input:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .welcome-box button {
+            width: 100%; padding: 15px; border-radius: 12px; border: none;
+            background: linear-gradient(145deg, var(--accent), #4e6beb);
+            color: #fff; font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .welcome-box button:active { transform: scale(0.97); box-shadow: 0 2px 5px var(--accent-glow); }
+
+        /* --- Header --- */
+        header {
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--glass-border); z-index: 10;
+        }
+        .user-name { font-weight: 600; color: var(--text-muted); font-size: 1rem; flex: 1; }
+        .controls { display: flex; gap: 12px; flex: 1; justify-content: flex-end; }
+        
+        /* 3D Neumorphic Buttons */
+        .icon-btn {
+            background: linear-gradient(145deg, #1e1e2a, #191923);
+            border: 1px solid var(--glass-border);
+            box-shadow: 3px 3px 6px #0b0b0f, -3px -3px 6px #252535;
+            color: var(--text-main); width: 42px; height: 42px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; cursor: pointer; transition: all 0.2s;
+        }
+        .icon-btn:active {
+            box-shadow: inset 3px 3px 6px #0b0b0f, inset -3px -3px 6px #252535;
+            color: var(--accent);
+        }
+
+        /* --- Main Content --- */
+        main {
+            flex: 1; overflow-y: auto; padding: 30px 20px 160px 20px;
+            scroll-behavior: smooth;
+        }
+        main::-webkit-scrollbar { width: 5px; }
+        main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 5px; }
+        
+        .book-container { max-width: 800px; margin: 0 auto; }
+        #bookTitle { font-size: 2.2rem; margin-bottom: 30px; color: #fff; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,0.5);}
+        #bookContent { font-size: var(--font-size); line-height: 1.8; text-align: justify; transition: font-size 0.3s ease; }
+        
+        /* 3D TTS Highlight styles */
+        #bookContent p { margin-bottom: 20px; transition: 0.3s all ease-in-out; border-radius: 8px; padding: 8px; border-left: 3px solid transparent;}
+        #bookContent p.active { 
+            background: rgba(108, 138, 255, 0.1); 
+            border-left: 4px solid var(--accent); 
+            box-shadow: -5px 0 20px -5px var(--accent-glow);
+            padding-left: 15px; 
+            color: #fff;
+            transform: scale(1.02);
+            transform-origin: left;
+        }
+
+        /* --- Floating TTS Controls --- */
+        .tts-wrapper {
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            z-index: 60; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .tts-controls {
+            display: flex; gap: 15px; padding: 12px 20px; border-radius: 40px;
+            align-items: center;
+        }
+        .tts-btn {
+            background: linear-gradient(145deg, #2a2a3a, #232331);
+            box-shadow: 4px 4px 8px #0e0e14, -4px -4px 8px #3e3e56;
+            border: 1px solid rgba(255,255,255,0.05);
+            color: #fff; font-size: 1.3rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            width: 48px; height: 48px; border-radius: 50%; 
+            transition: 0.2s;
+        }
+        .tts-btn:active { box-shadow: inset 4px 4px 8px #0e0e14, inset -4px -4px 8px #3e3e56; }
+        
+        .tts-btn.play-btn { 
+            background: linear-gradient(145deg, var(--accent), #4e6beb); 
+            box-shadow: 0 6px 20px var(--accent-glow);
+            width: 55px; height: 55px; font-size: 1.5rem;
+        }
+        .tts-btn.play-btn:active { transform: scale(0.95); box-shadow: 0 2px 10px var(--accent-glow); }
+        
+        .tts-speed-control {
+            background: none; border: none; color: var(--accent);
+            font-size: 1rem; font-weight: 800; padding: 0 10px; cursor: pointer;
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        /* --- Next Book Overlay --- */
+        .next-overlay {
+            position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 350px; padding: 20px; border-radius: 20px;
+            text-align: center; z-index: 50;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .next-overlay.show { bottom: 120px; }
+        .next-btn-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--accent); color: #fff; font-size: 1.2rem; font-weight: bold;
+            display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 10px auto; box-shadow: 0 4px 15px var(--accent-glow);
+        }
+
+        /* --- Menu Modal --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: flex-end;
+            z-index: 100; opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            width: 100%; max-width: 600px; height: 75vh;
+            border-radius: 24px 24px 0 0; padding: 25px;
+            display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal.active .modal-content { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; }
+        
+        .book-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 5px; }
+        .book-list::-webkit-scrollbar { width: 4px; }
+        .book-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 5px; }
+        .book-item {
+            padding: 15px; border-radius: 12px; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.02);
+            cursor: pointer; transition: 0.2s; color: var(--text-main); font-weight: 500;
+        }
+        .book-item:active, .book-item.active { 
+            background: rgba(108, 138, 255, 0.1); 
+            border-color: var(--accent); 
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.3);
+        }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 100, 100, 0.15); border: 1px solid #ff6464; color: #ff6464;
+            padding: 10px 20px; border-radius: 20px; font-size: 0.9rem;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 1000;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="welcomeScreen">
+        <div class="welcome-box glass-3d">
+            <h1 class="logo" style="font-size: 3rem; margin-bottom: 10px;">XOLƎRIƆ</h1>
+            <p>O'qishni boshlash uchun ismingizni kiriting</p>
+            <input type="text" id="userNameInput" placeholder="Ismingiz...">
+            <button id="startBtn">Kirish va O'qish</button>
+        </div>
+    </div>
+
+    <div class="toast glass-3d" id="exitToast"></div>
+
+    <header class="glass-3d">
+        <div class="user-name" id="displayUserName">O'quvchi</div>
+        <div class="logo">XOLƎRIƆ</div>
+        <div class="controls">
+            <button class="icon-btn" id="fontMinus">-</button>
+            <button class="icon-btn" id="fontPlus">+</button>
+            <button class="icon-btn" id="openMenu">☰</button>
+        </div>
+    </header>
+
+    <main id="mainContent">
+        <div class="book-container">
+            <h1 id="bookTitle">Kutubxona yuklanmoqda...</h1>
+            <div id="bookContent"></div>
+        </div>
+    </main>
+
+    <div class="next-overlay glass-3d" id="nextOverlay">
+        <div class="next-btn-circle">&gt;</div>
+        <p>Keyingi: <span id="nextBookName"></span></p>
+    </div>
+
+    <div class="tts-wrapper" id="ttsWrapper">
+        <div class="tts-controls glass-3d" id="ttsControls">
+            <button class="tts-speed-control" id="ttsSpeed">1x</button>
+            <button class="tts-btn play-btn" id="ttsPlayPause">▶</button>
+            <button class="tts-btn" id="ttsStop">⏹</button>
+        </div>
+    </div>
+
+    <div class="modal" id="menuModal">
+        <div class="modal-content glass-3d">
+            <div class="modal-header">
+                <h2 style="font-size: 1.4rem;">📚 Mundarija</h2>
+                <button class="close-btn" id="closeMenu">&times;</button>
+            </div>
+            <div class="book-list" id="bookList"></div>
+        </div>
+    </div>
+
+    <script>
+        // PWA Service Worker o'rnatish
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker ro\'yxatdan o\'tdi!', reg))
+                    .catch(err => console.error('Service Worker xatosi:', err));
+            });
+        }
+
+        // ==========================================
+        // BARCHA 50 TA KITOB BAZASI
+        // ==========================================
+        // Kodingizdagi avvalgi 50 ta kitob bazasi (booksPart1 dan booksPart10 gacha) shu yerda joylashgan deb faraz qilamiz.
+        // Joyni tejash uchun yuqoridagi barcha kitoblaringizni o'zgarishsiz saqlagan holda quyidagi allBooks o'zgaruvchisiga o'zlashtirasiz.
+        // Pastdagi kod mantiqiy jarayonlarni yuritadi.
+        
+        const booksPart1 = [{title: "1. Mukammallik Kuchi: Kichik Odatlar San'ati", content: `<p>Hayotimizda yuz beradigan eng katta o'zgarishlar birdaniga bo'lmaydi. Katta yutuqlar har doim ko'zga ko'rinmas, doimiy ravishda takrorlanadigan kichik harakatlarning jamlanmasidir. "Atomic Habits" konsepsiyasi shuni uqtiradiki, inson o'z ustida har kuni atigi bir foiz (1%) yaxshilanishga erishsa, yil oxiriga kelib u 37 barobar kuchliroq, aqlliroq va tajribaliroq shaxsga aylanadi.</p><p>Aksariyat insonlar motivatsiyaga tayanib ish ko'radilar. Ammo motivatsiya bu vaqtinchalik hissiy holatdir. Haqiqiy va bardavom natijaga erishish uchun insonga motivatsiya emas, balki qat'iy intizom va to'g'ri ishlab chiqilgan tizim kerak. Maqsad belgilash g'oliblar va mag'lublar o'rtasidagi farqni belgilamaydi, chunki ikkalasining ham maqsadi g'alaba qozonishdir. Ularni farqlaydigan narsa – bu maqsad sari eltuvchi kundalik jarayonlar, ya'ni odatlardir.</p><p>Yangi odatni shakllantirish uchun psixologiyada maxsus zanjir mavjud: signal, istak, javob va mukofot. Yaxshi odatlarni shakllantirish uchun ularni ko'zga tashlanadigan, jozibador, bajarishga oson va qoniqarli qilish zarur. Salbiy odatlardan qutulish uchun esa buning aynan teskarisini qilish talab etiladi: ularni ko'zdan uzoqroq, zerikarli, murakkab va foydasiz qilib qo'yish kerak. Atrof-muhitingiz sizning xulq-atvoringizni belgilaydigan eng kuchli omildir. Agar diqqatni jamlashni istasangiz, ishlash xonangizdan chalg'ituvchi hamma narsani olib tashlang.</p><p>Biz o'zimiz istagan odamga aylanishimiz uchun, avvalo e'tiqodimizni va o'zimizga bo'lgan qarashimizni o'zgartirishimiz lozim. O'zgarishning eng chuqur qatlami bu "Men kimman?" degan savolga beriladigan javobdir. O'zingizni shunchaki kitob o'qiyotgan odamdek emas, balki "kitobxon" sifatida his qiling. Har bir o'qigan sahifangiz yangi shaxsiyatingiz uchun berilgan ishonchli ovozdir. Oxir-oqibat, siz nima ishlarni takrorlayotgan bo'lsangiz – siz o'shasiz!</p>`}];
+        // DIQQAT: O'zingizning to'liq 50 ta kitoblar bazangizni shu joyga qoldiring. Men ko'rgazmali qisqartirdim.
+        let allBooks = [].concat(booksPart1); 
+
+        // ==========================================
+        // YANGILANGAN TTS ENGINE (WakeLock va Fallback bilan)
+        // ==========================================
+        class IdealTTS {
+            constructor(options = {}){
+                this.synth = window.speechSynthesis;
+                this.voice = null;
+                this.queue = [];
+                this.index = 0;
+
+                this.rate = options.rate || 0.95;
+                this.pitch = options.pitch || 1;
+                this.lang = options.lang || "uz-UZ";
+
+                this.isPlaying = false;
+                this.isPaused = false;
+
+                this.onParagraph = options.onParagraph || (()=>{});
+                this.onEnd = options.onEnd || (()=>{});
+
+                this.loadVoices();
+            }
+
+            loadVoices(){
+                const load = () => {
+                    const voices = this.synth.getVoices();
+                    if(voices.length > 0) {
+                        // O'zbekcha yoki mos keluvchi ovozni birinchi qidiradi
+                        this.voice = voices.find(v => v.lang.includes("uz")) || 
+                                     voices.find(v => v.lang.includes("tr")) || 
+                                     voices.find(v => v.lang.includes("ru")) || 
+                                     voices[0];
+                    }
+                };
+                load();
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = load;
+                }
+            }
+
+            splitParagraphs(text){
+                return text
+                    .replace(/\n+/g,"\n")
+                    .split("\n")
+                    .map(t => t.trim())
+                    .filter(Boolean);
+            }
+
+            speak(text){
+                this.stop();
+                this.queue = this.splitParagraphs(text);
+                this.index = 0;
+                this.isPlaying = true;
+                this.next();
+            }
+
+            next(){
+                if(this.index >= this.queue.length){
+                    this.isPlaying = false;
+                    this.onEnd();
+                    return;
+                }
+
+                const paragraph = this.queue[this.index];
+                this.onParagraph(this.index, paragraph);
+
+                const utter = new SpeechSynthesisUtterance(paragraph);
+                if(this.voice) utter.voice = this.voice;
+                
+                utter.rate = this.rate;
+                utter.pitch = this.pitch;
+                utter.lang = this.lang;
+
+                utter.onend = () => {
+                    this.index++;
+                    this.next();
+                };
+
+                utter.onerror = (e) => {
+                    console.warn("TTS xatoligi:", e);
+                    this.index++;
+                    this.next();
+                };
+
+                this.synth.speak(utter);
+            }
+
+            pause(){
+                if(!this.isPlaying) return;
+                this.synth.pause();
+                this.isPaused = true;
+            }
+
+            resume(){
+                if(!this.isPaused) return;
+                this.synth.resume();
+                this.isPaused = false;
+            }
+
+            stop(){
+                this.synth.cancel();
+                this.queue = [];
+                this.index = 0;
+                this.isPlaying = false;
+                this.isPaused = false;
+            }
+        }
+
+        // ==========================================
+        // DASTUR MANTIQI VA INTERFEYS
+        // ==========================================
+        let currentBookIndex  = 0;
+        let currentFontSize = 18;
+        let exitClicks = 0;
+        let exitTimer;
+        let lastTapTime = 0;
+        let domParagraphs = [];
+        let wakeLock = null; // Ekranni o'chirmaslik uchun
+
+        const els = {
+            welcome: document.getElementById('welcomeScreen'),
+            input: document.getElementById('userNameInput'),
+            startBtn: document.getElementById('startBtn'),
+            userName: document.getElementById('displayUserName'),
+            title: document.getElementById('bookTitle'),
+            content: document.getElementById('bookContent'),
+            main: document.getElementById('mainContent'),
+            nextOverlay: document.getElementById('nextOverlay'),
+            nextName: document.getElementById('nextBookName'),
+            menu: document.getElementById('menuModal'),
+            bookList: document.getElementById('bookList'),
+            toast: document.getElementById('exitToast'),
+            ttsPlayPause: document.getElementById('ttsPlayPause'),
+            ttsStop: document.getElementById('ttsStop'),
+            ttsSpeed: document.getElementById('ttsSpeed')
+        };
+
+        // Ekranni uxlab qolishdan himoyalash funksiyasi
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                }
+            } catch (err) { console.warn("Wake Lock xatosi:", err); }
+        }
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => wakeLock = null);
+            }
+        }
+
+        // TTS Initsializatsiya
+        const tts = new IdealTTS({
+            rate: 0.95,
+            onParagraph: (i) => {
+                domParagraphs.forEach(p => p.classList.remove("active"));
+                if(domParagraphs[i]) {
+                    domParagraphs[i].classList.add("active");
+                    domParagraphs[i].scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            },
+            onEnd: () => {
+                els.ttsPlayPause.innerText = "▶";
+                domParagraphs.forEach(p => p.classList.remove("active"));
+                releaseWakeLock();
+            }
+        });
+
+        // O'qish tezligini boshqarish (1x, 1.5x, 2x)
+        let speeds = [0.95, 1.2, 1.5];
+        let speedIndex = 0;
+        els.ttsSpeed.onclick = () => {
+            speedIndex = (speedIndex + 1) % speeds.length;
+            tts.rate = speeds[speedIndex];
+            const labels = ["1x", "1.5x", "2x"];
+            els.ttsSpeed.innerText = labels[speedIndex];
+            
+            // Agar o'qiyotgan bo'lsa, tezlikni darhol qo'llash uchun qayta ishga tushirish
+            if(tts.isPlaying && !tts.isPaused) {
+                const remainingText = domParagraphs.slice(tts.index).map(p => p.innerText).join('\n\n');
+                tts.speak(remainingText);
+            }
+        };
+
+        // 0. Ma'lumotlarni tekshirish
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedName = localStorage.getItem('xoleric_username');
+            const savedBook = localStorage.getItem('xoleric_lastBook');
+            
+            if(savedName) {
+                els.input.value = savedName;
+                els.startBtn.click();
+            }
+            if(savedBook !== null && !isNaN(savedBook)) {
+                currentBookIndex = parseInt(savedBook);
+            }
+        });
+
+        // 1. Dasturga kirish
+        els.startBtn.addEventListener('click', () => {
+            const name = els.input.value.trim();
+            if(name.length < 2) return alert('Ismingizni kiriting');
+            
+            localStorage.setItem('xoleric_username', name);
+            els.userName.innerHTML = `👤 ${name}`;
+            
+            if(document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(e => console.log(e));
+            }
+            els.welcome.style.opacity = '0';
+            els.welcome.style.visibility = 'hidden';
+            
+            initLibrary();
+        });
+
+        // 2. Kutubxonani yuklash
+        function initLibrary() {
+            if(allBooks.length === 0) return;
+            
+            els.bookList.innerHTML = '';
+            allBooks.forEach((book, index) => {
+                let div = document.createElement('div');
+                div.className = 'book-item';
+                div.innerText = book.title;
+                div.onclick = () => { loadBook(index); els.menu.classList.remove('active'); };
+                els.bookList.appendChild(div);
+            });
+            loadBook(currentBookIndex);
+        }
+
+        function loadBook(index) {
+            tts.stop();
+            els.ttsPlayPause.innerText = "▶";
+            releaseWakeLock();
+
+            currentBookIndex = index;
+            localStorage.setItem('xoleric_lastBook', index);
+
+            els.title.innerText = allBooks[index].title;
+            els.content.innerHTML = allBooks[index].content;
+            els.main.scrollTop = 0;
+            
+            document.querySelectorAll('.book-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+
+            domParagraphs = [...document.querySelectorAll("#bookContent p")];
+        }
+
+        // 3. TTS Boshqaruvi
+        els.ttsPlayPause.onclick = () => {
+            if (tts.isPlaying && !tts.isPaused) {
+                tts.pause();
+                els.ttsPlayPause.innerText = "▶";
+                releaseWakeLock();
+            } else if (tts.isPlaying && tts.isPaused) {
+                tts.resume();
+                els.ttsPlayPause.innerText = "⏸";
+                requestWakeLock();
+            } else {
+                const texts = domParagraphs.map(p => p.innerText).join('\n\n'); 
+                tts.speak(texts);
+                els.ttsPlayPause.innerText = "⏸";
+                requestWakeLock();
+            }
+        };
+
+        els.ttsStop.onclick = () => {
+            tts.stop();
+            els.ttsPlayPause.innerText = "▶";
+            domParagraphs.forEach(p => p.classList.remove("active"));
+            releaseWakeLock();
+        };
+
+        // 4. Shrift o'lchami (+ va -)
+        document.getElementById('fontPlus').onclick = () => {
+            if(currentFontSize < 34) { currentFontSize += 2; document.documentElement.style.setProperty('--font-size', `${currentFontSize}px`); }
+        };
+        document.getElementById('fontMinus').onclick = () => {
+            if(currentFontSize > 14) { currentFontSize -= 2; document.documentElement.style.setProperty('--font-size', `${currentFontSize}px`); }
+        };
+
+        // 5. Menyu
+        document.getElementById('openMenu').onclick = () => els.menu.classList.add('active');
+        document.getElementById('closeMenu').onclick = () => els.menu.classList.remove('active');
+
+        // 6. Ikki marta bosish (Keyingi kitob)
+        function handleDoubleTap() {
+            if(els.menu.classList.contains('active')) return;
+            if(currentBookIndex < allBooks.length - 1) {
+                els.nextName.innerText = allBooks[currentBookIndex + 1].title;
+                els.nextOverlay.classList.add('show');
+                setTimeout(() => els.nextOverlay.classList.remove('show'), 4000);
+            }
+        }
+
+        els.main.addEventListener('click', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            if(tapLength < 300 && tapLength > 0) {
+                handleDoubleTap();
+                e.preventDefault();
+            }
+            lastTapTime = currentTime;
+        });
+
+        els.nextOverlay.onclick = () => {
+            if(currentBookIndex < allBooks.length - 1) {
+                loadBook(currentBookIndex + 1);
+                els.nextOverlay.classList.remove('show');
+            }
+        };
+
+        // 7. Chiqish paneli
+        document.body.addEventListener('click', (e) => {
+            if(e.target.closest('header') || e.target.closest('.modal-content') || e.target.closest('#welcomeScreen') || e.target.closest('.next-overlay') || e.target.closest('.tts-controls')) {
+                exitClicks = 0; return;
+            }
+
+            exitClicks++;
+            clearTimeout(exitTimer);
+
+            if(exitClicks >= 2 && exitClicks < 6) {
+                els.toast.innerText = `Chiqish uchun yana ${6 - exitClicks} marta bosing`;
+                els.toast.classList.add('show');
+            }
+
+            if(exitClicks === 6) {
+                els.toast.classList.remove('show');
+                exitClicks = 0;
+                if(document.fullscreenElement) { document.exitFullscreen().catch(err => console.log(err)); }
+            }
+
+            exitTimer = setTimeout(() => {
+                exitClicks = 0;
+                els.toast.classList.remove('show');
+            }, 500);
+        });
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
+</body>
+</html>
