@@ -1016,106 +1016,144 @@
 
         // ===== TTS ENGINE (ISHLAB TURIBDI) =====
         const synth = window.speechSynthesis;
-        let utterance = null;
+let utterance = null;
 
-        function updateProgress() {
-            if (!state.paragraphs.length) return;
-            const percent = state.paragraphs.length === 1 ? 0 : Math.floor((state.currentParagraph / (state.paragraphs.length - 1)) * 100);
-            dom.progressBar.style.width = percent + '%';
-            dom.progressText.textContent = percent + '%';
-        }
+// Ovozlar yuklanganini tekshirish uchun
+let voicesLoaded = false;
 
-        function highlightParagraph(index) {
-            state.paragraphs.forEach(p => p.classList.remove('active'));
-            if (state.paragraphs[index]) {
-                state.paragraphs[index].classList.add('active');
-                const p = state.paragraphs[index];
-                const container = dom.readerContent;
-                const offset = p.offsetTop - container.offsetTop - (container.clientHeight/2) + (p.clientHeight/2);
-                container.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
-            }
-        }
+function loadVoices(callback) {
+    let voices = synth.getVoices();
+    if (voices.length) {
+        voicesLoaded = true;
+        callback(voices);
+    } else {
+        synth.onvoiceschanged = () => {
+            voices = synth.getVoices();
+            voicesLoaded = true;
+            callback(voices);
+        };
+    }
+}
 
-        function playNext() {
-            if (!state.isPlaying) return;
-            if (state.currentParagraph >= state.paragraphs.length) {
-                stopTTS();
-                return;
-            }
-            highlightParagraph(state.currentParagraph);
-            const text = state.paragraphs[state.currentParagraph].textContent;
-            utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.95;
-            utterance.lang = 'uz-UZ';
-            const voices = synth.getVoices();
-            const uzVoice = voices.find(v => v.lang.includes('uz')) || voices[0];
-            if (uzVoice) utterance.voice = uzVoice;
-            utterance.onend = () => {
-                state.currentParagraph++;
-                updateProgress();
-                playNext();
-            };
-            utterance.onerror = () => {
-                state.currentParagraph++;
-                playNext();
-            };
-            synth.speak(utterance);
-        }
+function updateProgress() {
+    if (!state.paragraphs.length) return;
+    const percent = state.paragraphs.length === 1 ? 0 : Math.floor((state.currentParagraph / (state.paragraphs.length - 1)) * 100);
+    dom.progressBar.style.width = percent + '%';
+    dom.progressText.textContent = percent + '%';
+}
 
-        function togglePlay() {
-            if (!state.currentBook) return;
-            if (state.isPlaying) {
-                synth.pause();
-                state.isPlaying = false;
-                dom.playIcon.style.display = 'block';
-                dom.pauseIcon.style.display = 'none';
-            } else {
-                if (synth.paused) {
-                    synth.resume();
-                } else {
-                    playNext();
-                }
-                state.isPlaying = true;
-                dom.playIcon.style.display = 'none';
-                dom.pauseIcon.style.display = 'block';
-            }
-            vibrate(30);
-        }
+function highlightParagraph(index) {
+    state.paragraphs.forEach(p => p.classList.remove('active'));
+    if (state.paragraphs[index]) {
+        state.paragraphs[index].classList.add('active');
+        const p = state.paragraphs[index];
+        const container = dom.readerContent;
+        const offset = p.offsetTop - container.offsetTop - (container.clientHeight / 2) + (p.clientHeight / 2);
+        container.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
+    }
+}
 
-        function stopTTS() {
-            synth.cancel();
-            state.isPlaying = false;
-            state.currentParagraph = 0;
-            dom.playIcon.style.display = 'block';
-            dom.pauseIcon.style.display = 'none';
-            dom.progressBar.style.width = '0%';
-            dom.progressText.textContent = '0%';
-            state.paragraphs.forEach(p => p.classList.remove('active'));
-        }
+function playNext() {
+    if (!state.isPlaying) return;
+    if (state.currentParagraph >= state.paragraphs.length) {
+        stopTTS();
+        return;
+    }
 
-        function resetPlayer() {
-            stopTTS();
-            state.currentParagraph = 0;
-            updateProgress();
-        }
+    highlightParagraph(state.currentParagraph);
+    const text = state.paragraphs[state.currentParagraph].textContent;
 
-        dom.playBtn.addEventListener('click', togglePlay);
+    utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 0.95;
+    utterance.lang = 'en-US';
 
-        dom.progressTrack.addEventListener('click', (e) => {
-            if (!state.paragraphs.length) return;
-            const rect = dom.progressTrack.getBoundingClientRect();
-            const percent = ((e.clientX - rect.left) / rect.width) * 100;
-            const newIndex = Math.floor((percent / 100) * (state.paragraphs.length - 1));
-            state.currentParagraph = Math.min(newIndex, state.paragraphs.length - 1);
-            if (state.isPlaying) {
-                synth.cancel();
-                playNext();
-            } else {
-                highlightParagraph(state.currentParagraph);
-            }
-            updateProgress();
-            vibrate(20);
+    const enVoice = state.voices.find(v => v.lang.includes('en')) || state.voices[0];
+    if (enVoice) utterance.voice = enVoice;
+
+    utterance.onend = () => {
+        state.currentParagraph++;
+        updateProgress();
+        playNext();
+    };
+
+    utterance.onerror = () => {
+        state.currentParagraph++;
+        playNext();
+    };
+
+    synth.speak(utterance);
+}
+
+function togglePlay() {
+    if (!state.currentBook) return;
+
+    // Agar ovozlar hali yuklanmagan bo'lsa, yuklab olamiz
+    if (!voicesLoaded) {
+        loadVoices((voices) => {
+            state.voices = voices;
+            togglePlay(); // qayta chaqiramiz, endi ovozlar tayyor
         });
+        return;
+    }
+
+    if (state.isPlaying) {
+        synth.pause();
+        state.isPlaying = false;
+        dom.playIcon.style.display = 'block';
+        dom.pauseIcon.style.display = 'none';
+    } else {
+        if (synth.paused) {
+            synth.resume();
+        } else {
+            playNext();
+        }
+        state.isPlaying = true;
+        dom.playIcon.style.display = 'none';
+        dom.pauseIcon.style.display = 'block';
+    }
+
+    vibrate(30);
+}
+
+function stopTTS() {
+    synth.cancel();
+    state.isPlaying = false;
+    state.currentParagraph = 0;
+    dom.playIcon.style.display = 'block';
+    dom.pauseIcon.style.display = 'none';
+    dom.progressBar.style.width = '0%';
+    dom.progressText.textContent = '0%';
+    state.paragraphs.forEach(p => p.classList.remove('active'));
+}
+
+function resetPlayer() {
+    stopTTS();
+    state.currentParagraph = 0;
+    updateProgress();
+}
+
+dom.playBtn.addEventListener('click', togglePlay);
+
+dom.progressTrack.addEventListener('click', (e) => {
+    if (!state.paragraphs.length) return;
+    const rect = dom.progressTrack.getBoundingClientRect();
+    const percent = ((e.clientX - rect.left) / rect.width) * 100;
+    const newIndex = Math.floor((percent / 100) * (state.paragraphs.length - 1));
+    state.currentParagraph = Math.min(newIndex, state.paragraphs.length - 1);
+    if (state.isPlaying) {
+        synth.cancel();
+        playNext();
+    } else {
+        highlightParagraph(state.currentParagraph);
+    }
+    updateProgress();
+    vibrate(20);
+});
+
+// Boshlanganda ovozlarni yuklaymiz
+loadVoices((voices) => {
+    state.voices = voices;
+});
 
         // ===== DOUBLE TAP =====
         let lastTap = 0;
