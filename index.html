@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0d0d12">
+    <title>XOLƎRIƆ Kutubxonasi</title>
+    <style>
+        :root {
+            --bg-dark: #0d0d12;
+            --text-main: #e2e2e9;
+            --text-muted: #9494a0;
+            --accent: #6c8aff;
+            --glass-bg: rgba(25, 25, 35, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --font-size: 18px;
+            --font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at top, #1a1a2e 0%, var(--bg-dark) 80%);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /* --- Welcome Screen --- */
+        #welcomeScreen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .welcome-box {
+            padding: 40px; border-radius: 24px;
+            text-align: center; width: 90%; max-width: 400px;
+        }
+        .welcome-box h1 { font-size: 2rem; margin-bottom: 10px; color: #fff; }
+        .welcome-box p { color: var(--text-muted); margin-bottom: 25px; font-size: 0.95rem; }
+        .welcome-box input {
+            width: 100%; padding: 15px; border-radius: 12px;
+            border: 1px solid var(--glass-border); background: rgba(0,0,0,0.3);
+            color: #fff; font-size: 1.1rem; outline: none; text-align: center;
+            margin-bottom: 20px; transition: border 0.3s;
+        }
+        .welcome-box input:focus { border-color: var(--accent); }
+        .welcome-box button {
+            width: 100%; padding: 15px; border-radius: 12px; border: none;
+            background: var(--accent); color: #fff; font-size: 1.1rem; font-weight: 600;
+            cursor: pointer; transition: transform 0.2s, background 0.2s;
+        }
+        .welcome-box button:active { transform: scale(0.97); }
+
+        /* --- Header --- */
+        header {
+            padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--glass-border); z-index: 10;
+        }
+        .user-name { font-weight: 600; color: var(--accent); font-size: 1.1rem; }
+        .controls { display: flex; gap: 10px; }
+        .icon-btn {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border);
+            color: var(--text-main); width: 40px; height: 40px; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.2rem; cursor: pointer; transition: all 0.2s;
+        }
+        .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.1); }
+
+        /* --- Main Content --- */
+        main {
+            flex: 1; overflow-y: auto; padding: 30px 20px 100px 20px;
+            scroll-behavior: smooth;
+        }
+        main::-webkit-scrollbar { width: 5px; }
+        main::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 5px; }
+        
+        .book-container { max-width: 800px; margin: 0 auto; }
+        #bookTitle { font-size: 2.2rem; margin-bottom: 30px; color: #fff; text-align: center; }
+        #bookContent { font-size: var(--font-size); line-height: 1.8; text-align: justify; transition: font-size 0.3s ease; }
+        #bookContent p { margin-bottom: 20px; }
+
+        /* --- Next Book Overlay (Double Tap) --- */
+        .next-overlay {
+            position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 350px; padding: 20px; border-radius: 20px;
+            text-align: center; z-index: 50;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        .next-overlay.show { bottom: 30px; }
+        .next-btn-circle {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--accent); color: #fff; font-size: 1.2rem; font-weight: bold;
+            display: flex; justify-content: center; align-items: center;
+            margin: 0 auto 10px auto; box-shadow: 0 4px 15px rgba(108, 138, 255, 0.4);
+        }
+        .next-overlay p { font-size: 0.95rem; font-weight: 500; color: var(--text-main); }
+
+        /* --- Menu Modal (TOC) --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: flex-end;
+            z-index: 100; opacity: 0; visibility: hidden; transition: all 0.3s;
+        }
+        .modal.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            width: 100%; max-width: 600px; height: 75vh;
+            border-radius: 24px 24px 0 0; padding: 25px;
+            display: flex; flex-direction: column;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .modal.active .modal-content { transform: translateY(0); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 1.8rem; cursor: pointer; }
+        
+        .book-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 5px; }
+        .book-list::-webkit-scrollbar { width: 4px; }
+        .book-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+        .book-item {
+            padding: 15px; border-radius: 12px; border: 1px solid transparent;
+            cursor: pointer; transition: 0.2s; color: var(--text-main);
+        }
+        .book-item:active, .book-item.active { background: rgba(255,255,255,0.05); border-color: var(--accent); }
+
+        /* --- Toast --- */
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 100, 100, 0.15); border: 1px solid #ff6464; color: #ff6464;
+            padding: 10px 20px; border-radius: 20px; font-size: 0.9rem;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s; z-index: 1000;
+        }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <div id="welcomeScreen">
+        <div class="welcome-box glass">
+            <h1>Kutubxona</h1>
+            <p>O'qishni boshlash uchun ismingizni kiriting</p>
+            <input type="text" id="userNameInput" placeholder="Ismingiz...">
+            <button id="startBtn">Kirish va O'qish</button>
+        </div>
+    </div>
+
+    <div class="toast glass" id="exitToast"></div>
+
+    <header class="glass">
+        <div class="user-name" id="displayUserName">O'quvchi</div>
+        <div class="controls">
+            <button class="icon-btn" id="fontMinus">-</button>
+            <button class="icon-btn" id="fontPlus">+</button>
+            <button class="icon-btn" id="openMenu">⚙️</button>
+        </div>
+    </header>
+
+    <main id="mainContent">
+        <div class="book-container">
+            <h1 id="bookTitle">Kutubxona yuklanmoqda...</h1>
+            <div id="bookContent"></div>
+        </div>
+    </main>
+
+    <div class="next-overlay glass" id="nextOverlay">
+        <div class="next-btn-circle">&gt;</div>
+        <p>Keyingi: <span id="nextBookName"></span></p>
+    </div>
+
+    <div class="modal" id="menuModal">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h2>📚 Mundarija</h2>
+                <button class="close-btn" id="closeMenu">&times;</button>
+            </div>
+            <div class="book-list" id="bookList"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // KITOBLAR BAZASI SHU YERGA QO'SHILADI
+        const booksPart1 = [
+    {
+        title: "1. Mukammallik Kuchi: Kichik Odatlar San'ati",
+        content: `
+            <p>Hayotimizda yuz beradigan eng katta o'zgarishlar birdaniga bo'lmaydi. Katta yutuqlar har doim ko'zga ko'rinmas, doimiy ravishda takrorlanadigan kichik harakatlarning jamlanmasidir. "Atomic Habits" konsepsiyasi shuni uqtiradiki, inson o'z ustida har kuni atigi bir foiz (1%) yaxshilanishga erishsa, yil oxiriga kelib u 37 barobar kuchliroq, aqlliroq va tajribaliroq shaxsga aylanadi.</p>
+            <p>Aksariyat insonlar motivatsiyaga tayanib ish ko'radilar. Ammo motivatsiya bu vaqtinchalik hissiy holatdir. Haqiqiy va bardavom natijaga erishish uchun insonga motivatsiya emas, balki qat'iy intizom va to'g'ri ishlab chiqilgan tizim kerak. Maqsad belgilash g'oliblar va mag'lublar o'rtasidagi farqni belgilamaydi, chunki ikkalasining ham maqsadi g'alaba qozonishdir. Ularni farqlaydigan narsa – bu maqsad sari eltuvchi kundalik jarayonlar, ya'ni odatlardir.</p>
+            <p>Yangi odatni shakllantirish uchun psixologiyada maxsus zanjir mavjud: signal, istak, javob va mukofot. Yaxshi odatlarni shakllantirish uchun ularni ko'zga tashlanadigan, jozibador, bajarishga oson va qoniqarli qilish zarur. Salbiy odatlardan qutulish uchun esa buning aynan teskarisini qilish talab etiladi: ularni ko'zdan uzoqroq, zerikarli, murakkab va foydasiz qilib qo'yish kerak. Atrof-muhitingiz sizning xulq-atvoringizni belgilaydigan eng kuchli omildir. Agar diqqatni jamlashni istasangiz, ishlash xonangizdan chalg'ituvchi hamma narsani olib tashlang.</p>
+            <p>Biz o'zimiz istagan odamga aylanishimiz uchun, avvalo e'tiqodimizni va o'zimizga bo'lgan qarashimizni o'zgartirishimiz lozim. O'zgarishning eng chuqur qatlami bu "Men kimman?" degan savolga beriladigan javobdir. O'zingizni shunchaki kitob o'qiyotgan odamdek emas, balki "kitobxon" sifatida his qiling. Har bir o'qigan sahifangiz yangi shaxsiyatingiz uchun berilgan ishonchli ovozdir. Oxir-oqibat, siz nima ishlarni takrorlayotgan bo'lsangiz – siz o'shasiz!</p>
+        `
+    },
+    {
+        title: "2. Kiberxavfsizlik va Tarmoq Anatomiyasi",
+        content: `
+            <p>Zamonaviy raqamli dunyoda eng qimmatli resurs bu — neft yoki oltin emas, balki axborot va ma'lumotlardir. Kiberxavfsizlik butun boshli tarmoq arxitekturasini, serverlar va foydalanuvchilar o'rtasidagi maxfiy ma'lumotlar almashinuvini himoya qilishning murakkab va uzluksiz ilmiy tizimidir. Har bir soniyada dunyo bo'ylab millionlab zararli kodlar va xakerlik hujumlari tarmoqlarni sinovdan o'tkazmoqda.</p>
+            <p>Kiberhimoyaning asosi operatsion tizimlarning ichki tuzilishini chuqur tushunishdan boshlanadi. Tizimdagi ochiq portlar, zaif protokollar va kodlardagi kichik mantiqiy xatolar tajribali axloqiy xakerlar (ethical hackers) tomonidan doimiy ravishda penetratsion testlar (pentest) orqali tekshirilib boriladi. Ularning asosiy maqsadi – jinoyatchi xakerlardan (qora shlyapalar) oldin tizimdagi darchalarni topish va ularni yamashdir. Bu xuddi qasrdagi barcha eshik va derazalarni mustahkamligini har kuni tekshirib chiqishga o'xshaydi.</p>
+            <p>Ma'lumotlar bazasiga inyeksiya hujumlari (SQLi), saytlararo skriptlash (XSS) va ijtimoiy muhandislik kabi usullar bugungi kundagi eng keng tarqalgan tahdidlardan hisoblanadi. Ijtimoiy muhandislik texnologiyaga emas, to'g'ridan-to'g'ri inson psixologiyasiga hujum qiladi. Ya'ni, insonlarning ishonchuvchanligi, qo'rquvi yoki qiziqishlaridan foydalanib, tizim parollarini o'g'irlash usulidir. Shuning uchun ham axborot xavfsizligida eng zaif halqa bu kompyuter emas, insonning o'zidir.</p>
+            <p>Kriptografiya, ya'ni ma'lumotlarni shifrlash san'ati ushbu sohaning yadrosidir. Simmetrik va asimmetrik shifrlash algoritmlari orqali bizning yozishmalarimiz va bank amaliyotlarimiz xavfsiz holatda qoladi. Kiberxavfsizlik mutaxassisi bo'lish nafaqat yuqori texnik bilimlarni, balki nostandart fikrlash qobiliyatini va katta sabr-toqatni ham talab etadi. Bu ko'rinmas raqamli frontda har kuni jang boradi va xavfsizlik hech qachon 100% kafolatlanmaydi, u shunchaki doimiy xavfni minimallashtirish jarayonidir.</p>
+        `
+    },
+    {
+        title: "3. Moliyaviy Savodxonlik: Sarmoya va Erkinlik",
+        content: `
+            <p>Boylikning haqiqiy o'lchovi bu sizning qancha ko'p pul topishingiz bilan emas, balki o'sha topilgan pulni qanday boshqarishingiz va uni kelajak uchun saqlab qola olishingiz bilan o'lchanadi. Moliyaviy erkinlik insonning ishlash uchun emas, yashash uchun pul topish tizimini yo'lga qo'ygan holatidir. Buning asosiy siri moliyaviy savodxonlik, ya'ni aktiv va passiv tushunchalarini to'g'ri farqlashda yashirin.</p>
+            <p>Kambag'al va o'rta sinf insonlari o'zlariga asosan "passivlar" sotib olishadi va buni boylik deb o'ylashadi. Masalan, kreditga olingan qimmatbaho avtomobil, eng so'nggi rusumdagi telefon yoki hashamatli uy sizning cho'ntagingizdan har oy pul olib chiqib ketadi. Haqiqiy boylar esa "aktivlar" yig'adilar. Aktivlar — bu o'z-o'zidan cho'ntagingizga pul keltiruvchi narsalar: biznes, qimmatli qog'ozlar, intellektual mulk yoki ijaraga beriladigan ko'chmas mulkdir.</p>
+            <p>Murakkab foiz (compound interest) atamasi iqtisodiyotdagi sakkizinchi mo'jiza hisoblanadi. Agar siz yoshlikdan boshlab muntazam ravishda kichik summalarni sarmoya qilib borsangiz, yillar o'tib bu sarmoya o'zining foizlari hisobiga eksponensial tarzda o'sishni boshlaydi. Sarmoya kiritishda asosiysi — pulni vaqt bilan hamkorlikda ishlashiga imkon berishdir. Daromadingizning kamida 10 foizini o'zingizning kelajagingiz uchun saqlab qolish eng oltin moliyaviy qoidadir.</p>
+            <p>Moliyaviy xotirjamlik faqat raqamlarda emas, insonning hayotga munosabatida namoyon bo'ladi. Atrofdagilarga maqtanib yashash istagidan voz kechish, keraksiz xarajatlarni qisqartirish va byudjetni to'g'ri taqsimlash asab tizimingizni ham himoya qiladi. Har bir sarflanayotgan so'm sizning moliyaviy armiyangizning bir askaridir. Ularni behuda o'limga yo'llash o'rniga, ko'proq pul topib kelishi uchun jangga yuboring.</p>
+        `
+    },
+    {
+        title: "4. Chuqur Diqqat: Axborot Asrida Konsentratsiya",
+        content: `
+            <p>Hozirgi axborot texnologiyalari asrida chalg'ituvchi omillar shu qadar ko'pki, bitta vazifaga to'liq diqqatni jamlab ishlash noyob va o'ta qimmatbaho qobiliyatga aylanib bormoqda. Kardiologik operatsiya qilayotgan shifokor yoki murakkab tizim kodini yozayotgan dasturchi uchun diqqat – ularning eng asosiy qurolidir. "Chuqur ish" (Deep Work) tushunchasi insonning o'z aqliy sig'imini maksimal darajada ishlatib, hech qanday chalg'ishlarsiz murakkab qadriyat yaratish holatini anglatadi.</p>
+            <p>Aksariyat odamlar kunini elektron pochtalarga javob berish, ijtimoiy tarmoqlardagi tasmasini varaqlash va qisqa videolarni ko'rish bilan, ya'ni "yuzaki ishlar" (shallow work) bilan o'tkazadilar. Yuzaki ishlar odamga faqat bandlik hissini beradi, ammo iqtisodiy va shaxsiy jihatdan hech qanday katta qiymat yaratmaydi. Chuqur diqqat holatiga kirish uchun iroda kuchining o'zi yetarli emas, buning uchun raqamli gigiyena va maishiy tartibni o'rnatish lozim.</p>
+            <p>Inson miyasi ko'p vazifalilikni (multitasking) yoqtirmaydi. Bir vaqtning o'zida ham musiqa eshitish, ham xabar yozish, ham kitob o'qish aslo mumkin emas. Miya shunchaki bir vazifadan ikkinchisiga o'ta tezlik bilan sakraydi va bu jarayonda u juda ko'p energiya yo'qotadi, natijada ish sifati keskin pasayadi. Fokusni bitta nuqtaga qaratish miyadagi neyron aloqalarni mustahkamlaydi va miyelinizatsiya jarayonini tezlashtiradi.</p>
+            <p>Telefoningizdagi bildirishnomalarni (notifications) to'liq o'chirib qo'yish, ishlash uchun aniq soatlarni belgilash va vaqti-vaqti bilan butunlay zerikishga ruxsat berish diqqat mushaklarini chiniqtiradi. Ijodiy va aqliy mehnat bilan shug'ullanuvchilar o'z miyalariga xuddi professional sportchilar o'z tanalariga munosabatda bo'lgandek e'tibor qaratishlari kerak. Atrofdagi dunyodan uzilib qolishdan qo'rqmang, aslida eng muhim kashfiyotlar yolg'izlik va chuqur tafakkur mevasidir.</p>
+        `
+    },
+    {
+        title: "5. Kosmik Olam: Koinot va Qora Tuynuklar Sirlari",
+        content: `
+            <p>Koinot shu qadar ulkan va sirli ki, inson aqli uning o'lchamlarini to'liq tasavvur qilishga ojizdir. Biz tungi osmonga boqib ko'radigan yulduzlarning nuri bizgacha yetib kelishi uchun yillar, hatto millionlab yillar kerak bo'ladi. Bu degani, biz har safar yulduzlarga qaraganimizda aslida o'tmishni, ularning ming yillar oldingi holatini ko'rayotgan bo'lamiz. Koinot tinimsiz kengaymoqda va bu jarayon galaktikalar orasidagi masofani tobora uzoqlashtirmoqda.</p>
+            <p>Koinotdagi eng qiziqarli va haligacha to'liq o'rganilmagan obyektlardan biri bu — qora tuynuklardir (Black holes). Ular yulduzlar o'z hayotini yakunlab, ulkan portlashdan (o'ta yangi yulduz portlashi) so'ng o'z ichiga qulab tushishi natijasida hosil bo'ladi. Qora tuynukning tortishish kuchi shu qadar kuchliki, undan hatto eng tezkor narsa — yorug'lik ham qochib qutula olmaydi. Uning markaziga yaqinlashgan sari vaqt sekinlashadi, bu "vaqt diletatsiyasi" deb ataladi.</p>
+            <p>Biz yashayotgan Quyosh tizimi Somon Yo'li (Milky Way) galaktikasining faqatgina bitta kichik chekkasida joylashgan. Olimlarning kuzatishlariga ko'ra, koinotda yuz milliarddan ortiq galaktikalar mavjud. Bu bizga shu narsani anglatadiki, yerdan tashqarida, boshqa ekzosayyoralarda ham hayot bo'lish ehtimoli matematik jihatdan juda ham yuqori. Odamzotning Marsni o'zlashtirish va yulduzlararo sayohatga tayyorgarlik ko'rishi uning koinotdagi zaxira rejasidir.</p>
+            <p>Koinot sirlarini o'rganish nafaqat astrofizika, balki falsafiy ahamiyatga ham ega. Koinot miqyosida olib qaraganda, yer yuzidagi urushlar, tashvishlar va muammolar mutlaqo ahamiyatsiz, bitta kichik chang zarrasi ustidagi tartibsizlik bo'lib ko'rinadi. Yulduzlar ortidagi cheksizlik insonni tavoze'li bo'lishga va atrofidagi hayotning naqadar noyob mo'jiza ekanini qadrlashga o'rgatadi. Zero, bizning tanamizdagi har bir atom ham qachondir portlagan yulduzlarning qoldiqlaridan bunyod bo'lgan.</p>
+        `
+    }
+];
+
+        const booksPart2 = [
+    {
+        title: "6. Veb-Dasturlash: Raqamli Arxitektura",
+        content: `
+            <p>Zamonaviy veb-dasturlash shunchaki brauzerda ochiladigan oddiy sahifalar yaratishdan ancha uzoqlashgan. Bugungi kunda u insonlar hayotini osonlashtiruvchi, global miqyosda ishlovchi murakkab raqamli ilovalar qurish san'atidir. Har bir mukammal ishlangan veb-sayt ortida yuzlab soatlik mehnat, mantiqiy yechimlar va foydalanuvchi tajribasini (UX) yaxshilashga qaratilgan tinimsiz izlanishlar yotadi. Zamonaviy texnologiyalar shu qadar rivojlanganki, dasturlar to'g'ridan-to'g'ri internet orqali yuqori tezlikda uzluksiz ishlay oladi.</p>
+            <p>Frontend (foydalanuvchi ko'radigan qism) va Backend (server va mantiq qismi) o'rtasidagi uyg'unlik mukammal dastur ishlashining kafolatidir. Shisha effektlari (Glassmorphism), silliq animatsiyalar va hatto veb-ilovalar ichidagi terminal interfeyslari kabi innovatsion yechimlar foydalanuvchilarni o'ziga jalb qiladi. Orqa fonda ishlaydigan server qismi esa ma'lumotlarni xavfsiz saqlashi, minglab so'rovlarni bir vaqtning o'zida tezkorlik bilan qayta ishlashi kerak. Dasturlash tillari va freymvorklar dasturchilarga o'z g'oyalarini cheklovlarsiz amalga oshirish imkonini beradi.</p>
+            <p>Ilovalar yaratishda interaktivlik eng muhim omillardan biridir. Foydalanuvchining har bir bosgan tugmasi, kiritgan ma'lumoti zudlik bilan algoritm tomonidan tahlil qilinib, tegishli reaksiya qaytarilishi kerak. Shuningdek, loyihaning kelajakdagi kengayuvchanligi (scalability) uning poydevoriga bog'liq. Dastur kodlarini toza, tartibli va boshqalar tushunishi oson qilib yozish (Clean Code) chinakam muhandislik madaniyatidir.</p>
+            <p>Raqamli arxitekturada interfeys dizayni san'at bilan texnologiyaning birlashgan nuqtasidir. Qorong'i rejimlar (Dark Mode) va ko'zni charchatmaydigan ranglar palitrasi foydalanuvchining dasturdan uzoq vaqt qulay foydalanishini ta'minlaydi. Veb-dasturlash faqatgina texnik qoidalar to'plami emas, u ijodkor insonlar o'z dunyosini yaratishi va uni butun insoniyat bilan ulashishi uchun cheksiz maydondir.</p>
+        `
+    },
+    {
+        title: "7. Kiberhimoya: Tarmoq Sirlari va Tahlil",
+        content: `
+            <p>Bugungi kunda har qanday tashkilotning eng muhim boyligi bu uning ma'lumotlar bazasidir. Kiberxavfsizlik ana shu axborotlarni uchinchi shaxslar hujumidan himoya qiluvchi murakkab tizimdir. Tarmoq xavfsizligini ta'minlashda tizimning ichki mexanizmlarini chuqur anglash va zaifliklarni (vulnerabilities) oldindan aniqlash hal qiluvchi ahamiyatga ega. Buning uchun xavfsizlik mutaxassislari doimiy ravishda kod tahlili (Code Analysis) va tarmoq trafigini monitoring qilib borishlari talab etiladi.</p>
+            <p>Ushbu jarayonda maxsus tayyorlangan operatsion tizimlar va vositalar katta rol o'ynaydi. Xususan, tarmoq xavfsizligini tekshirish uchun mo'ljallangan platformalarda (masalan, penetratsion test tizimlarida) o'nlab maxsus dastalardan foydalaniladi. Mutaxassislar ushbu vositalar yordamida ochiq portlarni skanerlash, paketlarni ushlab qolish va veb-ilovalardagi mavjud bo'shliqlarni topish orqali "axloqiy xakerlik" (Ethical Hacking) amaliyotini o'taydilar. Maqsad – tizimni buzish emas, uning qalqonini mustahkamlashdir.</p>
+            <p>Veb xavfsizlik haqida gap ketganda, SQL inyeksiya va XSS (Cross-Site Scripting) kabi hujum turlari doim birinchi o'ringa chiqadi. Tajribali muhandislar har bir yozilgan kod qatorini ana shunday xavflarga qarshi tekshiradilar. Ilova va server o'rtasidagi ma'lumotlar almashinuvi to'liq shifrlangan (encrypted) bo'lishi va ruxsatsiz kirishlarga qattiq cheklov qo'yilishi shart.</p>
+            <p>Xavfsizlik sohasini o'rganish kishidan yuksak mantiqiy va tahliliy fikrlashni talab qiladi. Dastur kodlarining qanday ishlashini to'liq anglamasdan turib, uni himoya qilish imkonsizdir. Kiberxavfsizlik mutaxassisi nafaqat himoyachi, balki kiber-hujumchining psixologiyasini va texnikalarini tushuna oladigan strateg bo'lishi kerak. Bu jarayon zamonaviy texnologiyalarning eng qiziqarli va sirli yo'nalishlaridan biridir.</p>
+        `
+    },
+    {
+        title: "8. Ovoz Muhandisligi: Phonk va Instrumental San'at",
+        content: `
+            <p>Musiqa yaratish jarayoni bugungi kunda faqatgina cholg'u asboblarini chalish bilan cheklanmaydi; u to'liq raqamli muhandislik va fizika san'atiga aylangan. Ovoz to'lqinlarini boshqarish, chastotalarni o'zaro moslashtirish va tinglovchiga hissiy ta'sir ko'rsatish zamonaviy musiqaning asosidir. Xususan, elektron musiqa va so'nggi yillarda katta trendga chiqqan Phonk janri o'zining o'zgacha atmosferasi va kuchli basslari (808s) bilan ajralib turadi.</p>
+            <p>Phonk janrining ildizlari nostaljik vokal sempllari, sintezatorlar va o'ta ritmik zarbli (drum) partiyalarga tayanadi. Bu yo'nalishda trek yaratish (Beatmaking) ijodkordan nafaqat musiqiy did, balki dasturiy ta'minotlarni chuqur bilishni ham talab qiladi. Raqamli audio stansiyalarida (DAW) har bir tovush o'zining alohida yo'lagiga ega bo'lib, ular umumiy spektrda bir-biriga xalaqit bermasligi uchun ekvalayzer (EQ) yordamida sinchkovlik bilan tozalanadi.</p>
+            <p>Instrumental musiqa hech qanday so'zlarsiz ham inson ruhiyatiga kuchli ta'sir qila oladi. Kuchli bass ritmlari odamga energiya va motivatsiya bersa, sekinlashgan melodiya qismlari chuqur o'yga toldiradi. Miksing va mastering jarayonlarida kompressorlar va to'lqin saturatsiyasidan to'g'ri foydalanish trekni chinakam professional darajaga olib chiqadi. Tovush effekti shunchaki shovqin emas, u his-tuyg'ularning raqamli ko'rinishidir.</p>
+            <p>Bugungi kunda musiqiy prodyuserlar kuchli kompyuterlar va ochiq kodli muhitlarda ham bemalol ijod qila olishmoqda. Eng muhimi — g'oya va tovushlar arxitekturasini his qila olish. Ovoz to'lqinlari bilan ishlash matematika va san'atning ajoyib uchrashuv nuqtasidir va u ijodkorga o'zining ichki olamini butun dunyoga eshittirish imkonini beradi.</p>
+        `
+    },
+    {
+        title: "9. Raqamli Ta'lim: Interaktiv Savodxonlik",
+        content: `
+            <p>Kelajak avlodni tarbiyalashda an'anaviy usullarning o'rni beqiyos, biroq bugungi raqamli asr bolalarning e'tiborini jalb qilish uchun yangicha, interaktiv yondashuvlarni talab qiladi. Bolalarga o'qish va yozishni o'rgatuvchi zamonaviy dasturlar ularning qabul qilish xususiyatlariga to'liq moslashtirilgan bo'lishi kerak. Quruq matnlar va zerikarli qoidalardan voz kechib, jarayonni vizual o'yin darajasiga olib chiqish yuqori samaradorlikni ta'minlaydi.</p>
+            <p>Savodxonlikni oshirishga qaratilgan veb-ilovalar bolalar psixologiyasini inobatga olgan holda yaratiladi. Ularda ranglarning to'g'ri tanlanishi, harflarning animatsiyalar bilan harakatlanishi va to'g'ri javob uchun beriladigan rag'batlar bolaning miyasida ijobiy bog'lanishlarni shakllantiradi. Bolalar mantiqiy mashqlarni bajarish jarayonida o'zlarini imtihon topshirayotgandek emas, balki qiziqarli virtual sarguzashtda ishtirok etayotgandek his qiladilar.</p>
+            <p>Bunday dasturlarning eng kuchli tomoni shundaki, ular har bir foydalanuvchining o'zlashtirish tezligiga qarab avtomatik moslasha oladi. Algoritm bola qaysi harflar yoki bo'g'inlarda xato qilayotganini tahlil qiladi va xuddi shaxsiy ustoz kabi aynan shu bo'shliqlarni to'ldirishga qaratilgan vazifalarni taqdim etadi. Ovozli yordamchilar yordamida harflarning to'g'ri talaffuzini eshitish esa vizual va audio xotirani bir vaqtda ishga tushiradi.</p>
+            <p>Raqamli vositalar orqali ta'lim berish faqatgina maktabgacha ta'lim bilan cheklanib qolmaydi, balki mustaqil fikrlash, qaror qabul qilish va texnologiyalar bilan to'g'ri muloqot qilish ko'nikmalarini ham o'rgatadi. Yaratilayotgan har bir shunday ta'limiy platforma kelajak poydevoriga qo'yilgan ulkan hissadir. Ta'lim va texnologiya birlashganda, bilim olish eng sevimli mashg'ulotga aylanadi.</p>
+        `
+    },
+    {
+        title: "10. Sun'iy Intellekt: Mashinali O'rganish Asoslari",
+        content: `
+            <p>Sun'iy intellekt (AI) insoniyat tarixidagi eng ulug'vor kashfiyotlardan biriga aylanib ulgurdi. Bir necha o'n yillar oldin u faqatgina fantastika hisoblangan bo'lsa, bugun u kundalik hayotimizning ajralmas mexanizmi. Mashinali o'rganish (Machine Learning) va neyrotarmoqlar kompyuterlarga biz yozib bergan qat'iy qoidalarsiz ham ma'lumotlarni tahlil qilish va qaror qabul qilish imkonini bermoqda. Bu algoritmik inqilob iqtisodiyotdan tortib tibbiyotgacha bo'lgan barcha sohalarni o'zgartirmoqda.</p>
+            <p>Neyrotarmoqlar inson miyasidagi milliardlab neyronlarning ishlash prinsipiga asoslanadi. Dasturga millionlab tasvirlar, matnlar yoki ovozlar kiritilganda, u o'z-o'zidan qonuniyatlarni qidirib topadi. "Chuqur o'rganish" (Deep Learning) texnologiyasi orqali AI tizimlari xatolardan saboq chiqarishga va o'zining bashorat qilish qobiliyatini doimiy ravishda takomillashtirishga qodir. Bugun AI xuddi inson kabi rasm chizishi, murakkab matnlar yozishi va hatto dastur kodlarini optimallashtirishi mumkin.</p>
+            <p>Biroq bu imkoniyatlar katta mas'uliyatni ham talab qiladi. Sun'iy intellekt tizimlarining kiberxavfsizligi, shaxsiy ma'lumotlarning daxlsizligi kabi axloqiy va texnik masalalar olimlarni jiddiy o'ylantirmoqda. Agar algoritm noto'g'ri ma'lumotlar ustida o'qitilsa, uning qabul qiladigan qarorlari ham xato bo'ladi. Shu sababli, inson omili AI rivojlanishida doim nazorat rolini o'ynashi shart.</p>
+            <p>Texnologiyaning bu darajada tez rivojlanishi bizga shuni ko'rsatadiki, yaqin kelajakda inson mashinalar bilan raqobatlashmaydi, balki ular bilan hamkorlikda ishlashni o'rganadi. AI – inson aql-zakovatini almashtiruvchi vosita emas, balki uni ming karra kuchaytiruvchi eng mukammal quroldir. Biz raqamli evolyutsiyaning aynan markazida turibmiz va bu davrni o'rganish kishiga beqiyos ustunlik beradi.</p>
+        `
+    }
+];
+
+        const booksPart3 = [
+    {
+        title: "11. Kvant Fizikasi: Borliqning Ko'rinmas Asoslari",
+        content: `
+            <p>Kvant fizikasi — bu koinotning eng mitti zarrachalari qanday ishlashini o'rganuvchi fan bo'lib, u bizning voqelik haqidagi an'anaviy tasavvurlarimizni butunlay ost-ust qilib yuboradi. Klassik fizikadan farqli o'laroq, kvant olamida jismlar bir vaqtning o'zida ikkita joyda bo'lishi (superpozitsiya) yoki bir-biri bilan koinotning ikki chekkasida turib ham bir zumda aloqa qilishi (kvant chalkashligi) mumkin. Bu hodisalar inson aqliga sig'masdek ko'rinsa-da, bugungi kundagi barcha zamonaviy texnologiyalarning, xususan smartfonlar va lazerlarning ishlash asosi hisoblanadi.</p>
+            <p>Kvant olamining eng mashhur tajribalaridan biri "Ikki yoriqli tajriba" (Double-slit experiment) hisoblanadi. Bu tajriba shuni ko'rsatdiki, yorug'lik va elektronlar ham to'lqin, ham zarracha xususiyatiga ega. Eng qizig'i shundaki, zarrachaning o'zini qanday tutishi uni "kuzatuvchi" bor yoki yo'qligiga qarab o'zgaradi. Ya'ni, inson ongi yoki o'lchov asbobi koinotdagi subatomik darajadagi jarayonlarga bevosita ta'sir o'tkaza oladi. Bu fizika va falsafa o'rtasidagi chegaralarni xiralashtirib yuboradi.</p>
+            <p>Bugungi kunda olimlar kvant kompyuterlarini yaratish ustida qizg'in ish olib bormoqdalar. Oddiy kompyuterlar ma'lumotlarni 0 va 1 (bitlar) ko'rinishida qayta ishlasa, kvant kompyuterlari "kubit"lardan foydalanadi. Kubitlar bir vaqtning o'zida ham 0, ham 1 holatida bo'la olgani uchun, bunday kompyuterlarning hisoblash tezligi tasavvur qilib bo'lmaydigan darajada yuqori bo'ladi. Ular zamonaviy kriptografiyani buzib kirishga va murakkab kasalliklarga da'vo topish uchun kerakli kimyoviy birikmalarni soniyalar ichida hisoblab chiqishga qodir.</p>
+            <p>Kvant fizikasi bizga koinot qat'iy qoidalarga emas, balki ehtimolliklarga qurilganini o'rgatadi. Borliq faqat biz uni kuzatganimizdagina aniq bir holatga keladi. Bu sohani o'rganish insoniyatni nafaqat texnologik jihatdan, balki ruhiy va intellektual jihatdan ham mutlaqo yangi bosqichga olib chiqadi. Biz koinotning ko'rinmas matosini endigina tushuna boshladik.</p>
+        `
+    },
+    {
+        title: "12. Vaqtni Boshqarish: Samaradorlik San'ati",
+        content: `
+            <p>Vaqt — inson hayotidagi yagona qaytarib bo'lmaydigan va sotib olinmaydigan resursdir. Boy va kambag'al, yosh va qari — barchaga bir kunda aynan 24 soat beriladi. Ammo nima uchun ba'zilar bu vaqt ichida ulkan ishlarni amalga oshiradi-yu, boshqalar hatto kundalik yumushlariga ham ulgurmaydi? Buning siri vaqtning o'zida emas, balki diqqatni va ustuvorliklarni (priorities) to'g'ri taqsimlay olishdadir. Vaqtni boshqarish (Time Management) aslida o'z-o'zini boshqarish demakdir.</p>
+            <p>Samaradorlikning eng mashhur usullaridan biri bu Eyzenxauer matritsasidir. Bu tizim barcha ishlarni 4 toifaga ajratadi: muhim va shoshilinch, muhim lekin shoshilinch emas, muhim emas lekin shoshilinch, shuningdek, muhim ham, shoshilinch ham bo'lmagan ishlar. Insoniyatning eng katta xatosi shundaki, biz ko'pincha o'z kelajagimiz uchun eng foydali bo'lgan (muhim, lekin shoshilinch bo'lmagan) ishlarni ortga suramiz va kunimizni ahamiyatsiz, lekin "shoshilinch" bo'lib ko'ringan muammolarni hal qilishga sarflaymiz.</p>
+            <p>Miya bir vaqtning o'zida uzoq muddat diqqatni ushlab tura olmaydi. "Pomodoro" texnikasi aynan shu muammoni hal qiladi: 25 daqiqa to'liq diqqat bilan ishlash va 5 daqiqa qat'iy dam olish. Ushbu qisqa tanaffuslar miyani charchoqdan asraydi va kun davomida yuqori ishchanlikni saqlab qolishga yordam beradi. Ishlayotgan vaqtda barcha chalg'ituvchi omillarni (ijtimoiy tarmoqlar, telefon qo'ng'iroqlari) to'liq bloklash ushbu texnikaning asosiy shartidir.</p>
+            <p>Raqamli minimalizm ham zamonaviy vaqtni boshqarishning muhim qismiga aylandi. Telefon ekraniga tikilib o'tkazilgan har bir soat sizning orzularingizdan o'g'irlangan vaqtdir. Kuningizni oldindan rejalashtirish, katta maqsadlarni kichik va oson bajariladigan qadamlarga bo'lish o'zingizga bo'lgan ishonchni oshiradi. Vaqtni samarali boshqarish insonga hayotining haqiqiy egasi ekanligini his qilish imkonini beradi.</p>
+        `
+    },
+    {
+        title: "13. Psixologiya: Inson Ongi Sirlari",
+        content: `
+            <p>Inson miyasi koinotdagi eng murakkab va sirli obyektlardan biridir. Uning atigi 1.5 kilogramm keladigan biologik massasi butun boshli sivilizatsiyalarni yaratishga, hissiyotlarni boshdan kechirishga va borliqni anglashga qodir. Psixologiya ana shu ongli va ongsiz jarayonlarni o'rganuvchi fandir. Biz qabul qilayotgan har bir qaror, har bir xatti-harakatimiz ortida o'zimiz ham sezmaydigan chuqur psixologik sabablar yotadi.</p>
+            <p>Inson ongi ikkita asosiy qismdan iborat: ongli (ratsional) va ongsiz (subconscious) qism. Psixologlarning ta'kidlashicha, bizning kundalik hayotdagi harakatlarimizning qariyb 95% ongsiz ravishda, ya'ni avtopilot rejimida amalga oshiriladi. Bolalikda olingan tajribalar, qo'rquvlar va jamiyat tomonidan singdirilgan qarashlar aynan shu ongsiz qatlamda saqlanadi va hayotimizni ko'rinmas iplar orqali boshqaradi. O'z-o'zini anglash esa ana shu iplarni kesib tashlash va qarorlarni ochiq idrok bilan qabul qilish yo'lidagi ilk qadamdir.</p>
+            <p>Kognitiv xatolar (Cognitive Biases) miyamizning axborotni tezroq qayta ishlash uchun ishlatadigan "qisqa yo'llari" hisoblanadi. Masalan, inson har doim o'z fikrini tasdiqlovchi ma'lumotlarni qidiradi va bunga zid keladigan faktlarni inkor etadi (Tasdiqlash xatosi). Bunday mantiqiy xatolarni bilish va ularni nazorat qila olish insonni manipulyatsiyalardan, reklama hiylalaridan va noto'g'ri xulosalardan asraydi. Tanqidiy fikrlash bugungi axborot asrida qolish uchun eng zarur psixologik qalqondir.</p>
+            <p>Miya neyroplastiklik (Neuroplasticity) xususiyatiga ega. Bu shuni anglatadiki, bizning miyamiz qotib qolgan tosh emas; u inson hayoti davomida yangi narsalarni o'rganish, tajriba va xulq-atvor orqali o'zining fizik strukturasini o'zgartira oladi. Yomon odatlarni tashlash va yangi qobiliyatlarni o'zlashtirish har qanday yoshda ham mumkin. Inson o'z fikrlarini boshqarishni o'rganganda, butun hayoti uning nazoratiga o'tadi.</p>
+        `
+    },
+    {
+        title: "14. Kriptovalyuta va Blokcheyn Inqilobi",
+        content: `
+            <p>Iqtisodiyot tarixiga nazar tashlasak, pul tizimi doimiy ravishda evolyutsiya qilib kelganini ko'ramiz: tovar ayirboshlashdan tortib, oltin tangalarga, so'ngra qog'oz pullarga va elektron raqamlarga. Bugungi kunda esa moliyaviy dunyo navbatdagi katta inqilob — markazlashmagan raqamli pullar, ya'ni kriptovalyutalar davriga qadam qo'ydi. Bitcoin yaratilishi bilan markaziy banklarga va hukumatlarga qaram bo'lmagan, erkin va ochiq moliya tizimi g'oyasi haqiqatga aylandi.</p>
+            <p>Kriptovalyutalarning ishlash mexanizmi "Blokcheyn" (Blockchain) texnologiyasiga asoslanadi. Blokcheyn — bu axborotni saqlashning shunday usuliki, unda ma'lumotlar zanjir ko'rinishida, butun dunyodagi minglab kompyuterlarda bir vaqtning o'zida saqlanadi. Agar kimdir ma'lumotlar bazasini o'zgartirmoqchi yoki soxtalashtirmoqchi bo'lsa, tarmoqdagi qolgan barcha kompyuterlar buni darhol sezadi va rad etadi. Bu texnologiya har qanday tranzaksiyaning 100% xavfsiz, shaffof va o'zgartirib bo'lmasligini ta'minlaydi.</p>
+            <p>An'anaviy qog'oz pullar (fiat pullar) inflatsiya xavfi ostida bo'ladi, chunki davlatlar istalgan vaqtda ularni qo'shimcha chop etishi mumkin. Bitcoin kabi kriptovalyutalar esa algoritm orqali qat'iy cheklangan (masalan, Bitcoin faqat 21 million dona chiqarilishi mumkin). Shu sababli uni tez-tez raqamli oltinga qiyoslashadi. Odamlar endilikda vositachilarsiz (banklar va to'lov tizimlarisiz) dunyoning narigi chekkasidagi inson bilan to'g'ridan-to'g'ri savdo qilish imkoniyatiga ega.</p>
+            <p>Biroq kriptovalyuta bozori o'zining yuqori o'zgaruvchanligi (volatilligi) bilan ham ajralib turadi. Keskin ko'tarilishlar va pasayishlar sarmoyadorlardan kuchli psixologik tayyorgarlik va texnik tahlil bilimlarini talab qiladi. Blokcheyn texnologiyasi faqatgina pul tizimini emas, balki logistika, tibbiyot, saylov tizimlari va avallari ishonch muammosi bo'lgan barcha sohalarni o'zgartirish potensialiga ega. Kelajak aynan shaffoflik va raqamli erkinlik tamoyillariga quriladi.</p>
+        `
+    },
+    {
+        title: "15. Bionika: Tabiatdan Texnologiyaga",
+        content: `
+            <p>Bionika (yoki biomimetika) — tabiatdagi biologik mexanizmlarni va ularning ishlash prinsiplarini o'rganib, ularni zamonaviy texnologiyalarga tadbiq etuvchi kelajak fanidir. Tabiat millionlab yillik evolyutsiya davomida mukammal dizayn va yechimlarni yaratgan. Muhandislar va olimlar bugungi kunda bu tayyor "xaritalar" dan foydalanib, insoniyatning eng qiyin muammolariga innovatsion yechimlar topmoqdalar.</p>
+            <p>Eng mashhur bionik kashfiyotlardan biri bo'lmish "Velkro" (yopishtirgich lenta) oddiygina qariqiz o'simligining itlar va kiyimga yopishib qolish xususiyatini o'rganish natijasida kashf qilingan. Xuddi shuningdek, Yaponiyadagi eng tezkor poezdlarning (Bullet trains) tumshug'i baliqchi qushning (Kingfisher) tumshug'i shaklida dizayn qilingan. Bu shakl poezdga tunnellardan o'tayotganda havo qarshiligini yengish va shovqinni keskin kamaytirish imkonini berdi.</p>
+            <p>Bionikaning eng katta inqilobi tibbiyot sohasida yuz bermoqda. Hozirgi kunda yo'qotilgan qo'l yoki oyoqlar o'rniga o'rnatiladigan bionik protezlar oddiy plastik yoxud metall bo'laklari emas. Ular to'g'ridan-to'g'ri insonning asab tizimiga ulanadi va miyadan kelayotgan impulslarni o'qib, barmoqlarni xuddi tirik organdek harakatga keltiradi. Neuralink kabi neyro-interfeys loyihalari orqali esa kelajakda inson miyasini to'g'ridan-to'g'ri kompyuter va internet tarmog'iga ulash imkoniyati yaratilmoqda.</p>
+            <p>Tabiat aslo keraksiz energiya sarflamaydi, uning har bir yaratgan mavjudoti mukammal ekologik muvozanatda ishlaydi. Olimlar o'rgimchak to'ridan po'latdan besh barobar kuchliroq bo'lgan sintetik tolalar yaratmoqdalar, kapalaklarning qanot tuzilishidan esa o'z-o'zini tozalaydigan sirtlar va samarali quyosh panellari ixtiro qilinmoqda. Bionika bizga insoniyat o'zini tabiatning hokimi emas, balki uning o'quvchisi sifatida ko'rishi kerakligini isbotlab beradi.</p>
+        `
+    }
+];
+
+        const booksPart4 = [
+    {
+        title: "16. Nanotexnologiya: Ko'rinmas Olilmdagi Inqilob",
+        content: `
+            <p>Nanotexnologiya — bu moddalarni atom va molekula darajasida (1 dan 100 nanometrgacha bo'lgan o'lchamda) boshqarish va yangi xususiyatlarga ega materiallar yaratish fanidir. Tasavvur qilish uchun, bir nanometr soch tolasidan qariyb 100,000 marta yupqaroqdir. Bu o'lchamda moddalarning fizik va kimyoviy xususiyatlari butunlay o'zgaradi. Masalan, oddiy sharoitda elektr tokini o'tkazmaydigan materiallar nano-darajada ajoyib o'tkazgichlarga aylanishi mumkin.</p>
+            <p>Nanotexnologiyaning eng katta yutuqlaridan biri uglerod nanotrubkalari va grafenning kashf etilishidir. Grafen po'latdan 200 barobar kuchli, ammo undan bir necha barobar yengil va shaffof bo'lgan bir atom qalinligidagi uglerod qatlamidir. Ushbu material kelajakda bukiluvchan elektronika qurilmalari, o'ta yengil samolyotlar va hatto Yerdan koinotga olib chiquvchi kosmik liftlar (space elevator) qurish uchun asosiy xomashyo bo'lishi kutilmoqda.</p>
+            <p>Tibbiyot sohasida nanotexnologiya mutlaqo yangi davrni boshlab berdi. Nanorobotlar va aqlli dori tashuvchi nano-zarrachalar to'g'ridan-to'g'ri inson qon aylanish tizimiga kiritilib, faqatgina kasallangan (masalan, saraton) hujayralarni topib, ularga aniq zarba bera oladi. Bu an'anaviy kimyoterapiya kabi butun tanaga zarar yetkazuvchi usullarni tarixda qoldiradi. Kichik molekulyar mashinalar inson DNKsidagi xatolarni to'g'rilashgacha bo'lgan ishlarni bajarish imkoniyatiga ega.</p>
+            <p>Shu bilan birga, nanotexnologiyalar atrof-muhitni tozalashda ham muhim rol o'ynaydi. Suvni ifloslanishlardan tozalovchi nano-filtrlar va quyosh energiyasini deyarli 100% samaradorlik bilan elektrga aylantiruvchi panellar iqlim muammolariga yechim bo'lishi mumkin. Biroq, bu texnologiyaning xavfli tomonlari ham yo'q emas: nazoratdan chiqqan o'z-o'zini ko'paytiruvchi nanorobotlar (grey goo ssenariysi) xavfi olimlar tomonidan hamon jiddiy o'rganilmoqda.</p>
+        `
+    },
+    {
+        title: "17. Ekologiya va Iqlim Inqirozi: Sayyoramiz Kelajagi",
+        content: `
+            <p>Yer sayyorasi o'zining 4.5 milliard yillik tarixi davomida ko'plab iqlim o'zgarishlarini boshdan kechirgan. Biroq, so'nggi ikki asr ichida, xususan Sanoat inqilobidan keyin yuz berayotgan global isish jarayoni to'g'ridan-to'g'ri inson faoliyati bilan bog'liqdir. Qazib olinuvchi yoqilg'ilarning (ko'mir, neft, gaz) katta miqdorda yoqilishi oqibatida atmosferaga milliardlab tonna karbonat angidrid (CO2) va boshqa issiqxona gazlari ajralib chiqmoqda, bu esa sayyoramizni gigant issiqxonaga aylantirmoqda.</p>
+            <p>Global isishning oqibatlari nafaqat havo haroratining ko'tarilishida, balki butun ekotizimning buzilishida namoyon bo'lmoqda. Arktika va Antarktidadagi muzliklarning erishi dunyo okeani sathining ko'tarilishiga, qirg'oqbo'yi hududlari va orol davlatlarning suv ostida qolishiga olib keladi. Okeanlarning kislotalashuvi esa Yer yuzidagi kislorodning katta qismini ishlab chiqaruvchi fitoplanktonlar va marjon riflarining (coral reefs) ommaviy qirilishiga sabab bo'lmoqda.</p>
+            <p>Bu global inqirozdan chiqishning yagona yo'li qazib olinuvchi yoqilg'ilardan to'liq voz kechib, qayta tiklanuvchi energiya manbalariga (quyosh, shamol, geotermal va gidroenergetika) o'tishdir. Hozirgi kunda quyosh panellari va shamol turbinalarining narxi keskin arzonlashib, ularning samaradorligi ortib bormoqda. Shuningdek, o'rmonlarni qayta tiklash va sirkulyar iqtisodiyotga o'tish orqali tabiatdagi uglerod balansi tiklanishi mumkin.</p>
+            <p>Iqlim o'zgarishi faqatgina hukumatlar va yirik korporatsiyalarning muammosi emas, u har bir shaxsning kundalik tanlovlariga ham bog'liq. Sayyorani asrab qolish uchun iste'mol madaniyatini o'zgartirish, go'sht mahsulotlari iste'molini me'yorga keltirish, chiqindilarni qayta ishlash va resurslardan oqilona foydalanish zarur. Tabiat bizsiz ham mavjud bo'la oladi, ammo insoniyat tabiatning muvozanatisiz omon qola olmaydi.</p>
+        `
+    },
+    {
+        title: "18. Metaolam va Virtual Reallik (VR/AR)",
+        content: `
+            <p>Internetning evolyutsiyasi endilikda ikki o'lchamli ekranlardan chiqib, bizni to'liq qamrab oluvchi uch o'lchamli fazoga — Metaolamga (Metaverse) ko'chib o'tmoqda. Virtual reallik (VR) va To'ldirilgan reallik (AR) texnologiyalari orqali insonlar raqamli olamni xuddi jismoniy dunyodagidek his qilish imkoniyatiga ega bo'lmoqdalar. Agar hozirda biz internetga kompyuter yoki telefon orqali "qarasak", kelajakda biz maxsus ko'zoynaklar yordamida internetning "ichiga" kiramiz.</p>
+            <p>Virtual reallik (VR) sizni butunlay yangi, yopiq raqamli dunyoga olib kirsa, To'ldirilgan reallik (AR) jismoniy dunyo ustiga raqamli qatlamni tushiradi (masalan, ko'zoynagingiz ekranida ob-havo, navigatsiya yoki boshqa ma'lumotlarning real vaqtda ko'rinib turishi). Bu texnologiyalar avvaliga faqat video o'yinlar industriyasi uchun qiziqarli ko'ringan bo'lsa, bugungi kunda ular ta'lim, arxitektura, muhandislik va tibbiyot kabi sohalarda inqilob qilmoqda. Masalan, jarrohlar VR yordamida murakkab operatsiyalarni avval virtual bemorlarda mashq qilmoqdalar.</p>
+            <p>Metaolam kelajakdagi yangi raqamli iqtisodiyotning markaziga aylanadi. Odamlar o'zlarining virtual avatariga ega bo'lib, raqamli ofislarda ishlaydilar, virtual ko'chmas mulk va kiyim-kechaklar (NFT texnologiyasi asosida) sotib oladilar va virtual konsertlarda qatnashadilar. Masofadan ishlash endilikda zerikarli video qo'ng'iroqlar orqali emas, balki bir stolda o'tirgandek hissini beruvchi gologrammalar vositasida amalga oshiriladi.</p>
+            <p>Biroq, bu utopik ko'ringan texnologiyaning psixologik va ijtimoiy xatarlari ham yo'q emas. Insonlarning haqiqiy jismoniy dunyodan uzilib, to'liq virtual olamga qochib o'tishi (escapism) chuqur depressiya va yolg'izlikka olib kelishi mumkin. Texnologiya insonlarni bir-biriga yaqinlashtirishi kerak, ammo biz uni to'g'ri boshqara olmasak, u haqiqiy insonga xos bo'lgan mehr-oqibat va jonli muloqotni o'ldiruvchi omilga aylanishi hech gap emas.</p>
+        `
+    },
+    {
+        title: "19. Avtomobilsozlik Evolyutsiyasi: EV va Avtopilot",
+        content: `
+            <p>Yuz yildan ortiq vaqt davomida insoniyatning asosiy transport vositasi bo'lib kelgan ichki yonuv dvigatellari o'z o'rnini elektromobillarga (EV) bo'shatib bermoqda. Bu avtomobilsozlik tarixidagi eng katta va eng tezkor texnologik inqilobdir. Elektromobillarning asosiy ustunligi nafaqat ularning ekologik tozaligi, balki tuzilishining o'ta soddaligidadir. Oddiy avtomobilda minglab harakatlanuvchi mexanik qismlar bo'lsa, elektromobilda ular bir necha o'ntani tashkil etadi, bu esa avtomobilning ishonchliligini keskin oshiradi.</p>
+            <p>Hozirgi kunda bu sohaning eng muhim kurash maydoni akkumulyatorlar texnologiyasidir. Litiy-ion batareyalar o'rnini tez orada qattiq jismli (solid-state) batareyalar egallashi kutilmoqda. Ular orqali avtomobillar bir marta quvvatlanish bilan ming kilometrdan ortiq masofani bosa oladi va atigi 5-10 daqiqa ichida to'liq quvvatga to'ladi. Bu o'zgarishlar dunyo bo'ylab neftga bo'lgan qaramlikni yo'qotadi va geopolitik o'zgarishlarga sabab bo'ladi.</p>
+            <p>Avtomobil sanoatining navbatdagi katta sakrashi bu — Avtonom boshqaruv (Self-driving) texnologiyasidir. Kameralar, radarlar va LiDAR datchiklari yordamida atrof-muhitni o'ta aniqlik bilan skaner qiluvchi mashinalar sun'iy intellekt orqali insonlardan ko'ra xavfsizroq va tezroq qaror qabul qilmoqda. To'liq avtonom mashinalar ommalashgach, inson omili tufayli sodir bo'ladigan yo'l-transport hodisalari deyarli 99% ga qisqaradi.</p>
+            <p>Kelajakning transport tizimi biz tasavvur qilgandan ham farqli bo'ladi. Avtomobillarga shaxsiy mulk sifatida emas, balki xizmat sifatida (Mobility as a Service) qarash boshlanadi. Tungi vaqtda sizning aqlli mashinangiz o'z-o'zidan taksi sifatida ishlab, sizga pul topib kelishi yoki shahardagi tirbandliklar algoritmlar yordamida butunlay bartaraf etilishi mumkin. Mashinalar endi shunchaki temir ulov emas, balki g'ildirakli superkompyuterlarga aylandi.</p>
+        `
+    },
+    {
+        title: "20. Tibbiyotda Inqilob: Robot-Jarrohlar va DNK Tahriri",
+        content: `
+            <p>Tibbiyot sohasi inson umrini uzaytirish va hayot sifatini yaxshilashda doim eng ilg'or fan bo'lib kelgan, ammo bugungi kundagi texnologik integratsiya uni fantastika darajasiga olib chiqdi. An'anaviy jarrohlik o'rnini asta-sekin robot-jarrohlar (masalan, da Vinci jarrohlik tizimi) egallamoqda. Bu tizim orqali jarroh xonaning narigi chekkasida yoki hatto boshqa qit'ada turib ham joystiklar yordamida amaliyot o'tkazishi mumkin. Robot qo'llar inson qo'lida kuzatiladigan titroqlarni (tremor) yo'qotadi va o'ta murakkab mikroxirurgik ishlarni millimetr aniqlikda bajaradi.</p>
+            <p>Tibbiyotdagi eng katta biologik inqilob bu CRISPR-Cas9 — gendagi o'zgarishlarni tahrirlash texnologiyasidir. Bu texnologiya olimlarga DNK zanjiridagi xato yoki kasallikka sabab bo'luvchi qismni xuddi kompyuterdagi "qirqib olib, o'rniga yopishtirish" (cut and paste) funksiyasi kabi o'zgartirish imkonini beradi. Bu kashfiyot saraton, Altsgeymer va nasliy qon kasalliklari kabi minglab davosiz dardlarga butunlay chek qo'yish potensialiga ega.</p>
+            <p>Sun'iy intellektning tibbiyotga kirib kelishi diagnostika jarayonini tubdan o'zgartirdi. AI algoritmlari millionlab rentgen, MRT va KT suratlarini tahlil qilib, inson ko'zi ilg'ay olmaydigan eng kichik o'simtalar yoki anomaliyalarni dastlabki bosqichdayoq aniqlab bermoqda. Kasallikni uni davolash qiyinlashganidan so'ng emas, balki u paydo bo'lishidan avval prognoz qilish — zamonaviy profilaktik tibbiyotning asosiy maqsadiga aylandi.</p>
+            <p>Shaxsiylashtirilgan tibbiyot (Personalized medicine) davri boshlanmoqda. Endilikda hammaga bir xil dori yozib berilmaydi, balki har bir insonning shaxsiy genetik xaritasi tahlil qilinib, aynan uning organizmiga 100% mos keladigan davo usullari qo'llaniladi. Insoniyat qarish jarayonini sekinlashtirish va hatto to'xtatish (anti-aging) sirlarini ochish ostonasida turibdi, bu esa yaqin kelajakda insonning o'rtacha umr ko'rish ko'rsatkichini yuz yoshdan osongina oshirishini anglatadi.</p>
+        `
+    }
+];
+
+        const booksPart5 = [
+    {
+        title: "21. Sotsiologiya: Ommaviy Ong va Jamiyat",
+        content: `
+            <p>Sotsiologiya insonlarning o'zaro munosabatlarini, jamiyat qanday shakllanishini va uning qanday qonuniyatlar asosida rivojlanishini o'rganuvchi fandir. Biz ko'pincha o'z qarorlarimizni mutlaqo mustaqil qabul qilamiz deb o'ylaymiz, ammo sotsiologik tadqiqotlar shuni ko'rsatadiki, bizning didimiz, e'tiqodimiz va hatto kelajakdagi maqsadlarimiz ham biz yashayotgan jamiyat tomonidan oldindan dasturlashtirilgan bo'ladi. Jamiyat — bu ko'rinmas qoidalar va ijtimoiy normalar ustiga qurilgan ulkan mexanizmdir.</p>
+            <p>Ommaviy ong (Mass consciousness) tushunchasi axborot asrida ayniqsa dolzarb ahamiyat kasb etmoqda. Odamlar guruh bo'lib harakat qilganda, ularning individual mantiqiy fikrlashi susayib, hissiyotlarga asoslangan "stada" (poda) instinkti ishga tushadi. Tarixdagi eng katta inqiloblar ham, eng fojiali xatolar ham aynan ommaviy ongning manipulyatsiya qilinishi natijasida yuz bergan. Propaganda va ommaviy axborot vositalari insonlar miyasiga muayyan g'oyalarni xuddi ularning o'z shaxsiy fikridek qilib singdira oladi.</p>
+            <p>Konformizm — ko'pchilikning fikriga ko'r-ko'rona ergashish psixologiyasi jamiyatning barqarorligini ta'minlasa-da, uning rivojlanishiga eng katta to'siq hamdir. Mashhur Asch eksperimenti shuni isbotlaganki, agar xonadagi ko'pchilik oq narsani "qora" deb tursa, oddiy inson ham o'z ko'ziga ishonmay, ko'pchilikka qo'shilishga majbur bo'ladi. Jamiyatdan ajralib qolish qo'rquvi inson tabiatidagi eng kuchli biologik qo'rquvlardan biridir.</p>
+            <p>Bugungi kunda ijtimoiy tarmoqlar ommaviy ongni shakllantiruvchi eng qudratli qurolga aylandi. Algoritmlar bizga faqat bizning fikrimizni tasdiqlovchi ma'lumotlarni ko'rsatib, "aks-sado xonalari" (echo chambers) ni yaratadi. Natijada, jamiyat turli xil qarama-qarshi qutblarga ajralib qoladi. Haqiqiy intellektual erkinlik — bu o'z guruhining ishonchlarini shubha ostiga ola bilish va xolis axborot asosida mustaqil fikr yurita olish qobiliyatidir.</p>
+        `
+    },
+    {
+        title: "22. Kino San'ati: Kadrlarga Muhrlangan Tarix",
+        content: `
+            <p>Kino — bu insoniyat kashf etgan san'at turlarining eng yoshi, ammo eng ta'sirchanidir. XIX asr oxirida aka-uka Lyumyerlar tomonidan namoyish etilgan "Poyezdning yetib kelishi" nomli qisqa metrajli ovozsiz videodan tortib, bugungi kundagi milliard dollarlik byudjetga ega Gollivud blokbasterlarigacha bo'lgan yo'l — texnologiya va inson xayolotining ajoyib evolyutsiyasidir. Kino faqatgina vaqtichog'lik vositasi emas, u davrning ruhiyatini, madaniyatini va muammolarini aks ettiruvchi vizual oynadir.</p>
+            <p>Kinematografiyaning haqiqiy sehri montaj jarayonida yashiringan. Mashhur "Kuleshov effekti" shuni ko'rsatadiki, ikkita bir-biriga bog'liq bo'lmagan kadrni ketma-ket qo'yish orqali tomoshabinda mutlaqo uchinchi, yangi ma'no va hissiyot uyg'otish mumkin. Masalan, aktyorning neytral yuz ifodasidan so'ng issiq sho'rva ko'rsatilsa, tomoshabin uni "och qolgan" deb o'ylaydi, agar bolaning jasadi ko'rsatilsa, "qayg'urmoqda" deb qabul qiladi. Rejissyorlar va operatorlar yorug'lik, kamera burchaklari va ranglar palitrasi orqali bizning ongosti tuyg'ularimizni boshqaradilar.</p>
+            <p>Ovoz va musiqaning kinoga kirib kelishi uning ta'sir kuchini o'n barobar oshirdi. Filmdagi vizual qism bizning aql-idrokimizga murojaat qilsa, uning saundtreki va audio effektlari (Foley san'ati) to'g'ridan-to'g'ri yuragimizga nishonga uradi. Ko'pincha, filmdagi eng qo'rqinchli yoki hayajonli sahnalar ekranda nima ko'rsatilayotgani bilan emas, balki orqa fonda qanday musiqa yangrayotgani bilan belgilanadi.</p>
+            <p>Raqamli texnologiyalar va CGI (kompyuter grafikasi) kino sarhadlarini cheksizlikkacha kengaytirdi. Endilikda rejissyorlar o'z tasavvuridagi istalgan g'ayritabiiy olamni o'ta realistik tarzda ekranga olib chiqa oladilar. Strining xizmatlarining (Netflix, HBO) ommalashuvi kino sanoatini inqirozga uchratadi, degan xavotirlarga qaramay, odamlar haligacha yirik ekranlarda, ommaviy tarzdagi hissiy tajribani his qilish uchun kinoteatrlarga borishda davom etmoqdalar. Kino — g'oyalar bilan bo'lishishning eng universal tilidir.</p>
+        `
+    },
+    {
+        title: "23. Arxitektura: Muzlagan Musiqa va Dizayn",
+        content: `
+            <p>Arxitektura shunchaki odamlarni sovuqdan yoki yomg'irdan himoya qiluvchi to'rt devor va tomdan iborat emas. U muhandislik, san'at va psixologiyaning mukammal kesishuv nuqtasidir. Qadimgi faylasuflar arxitekturani "muzlagan musiqa" deb atashgan, chunki undagi proporsiyalar, ritm va garmoniya xuddi musiqiy asardek inson ruhiyatiga sokinlik yoxud jo'shqinlik baxsh eta oladi. Biz qanday binolarda yashashimiz va ishlashimiz bizning fikrlash tarzimizga to'g'ridan-to'g'ri ta'sir ko'rsatadi.</p>
+            <p>Arxitektura tarixi insoniyat sivilizatsiyasining tarixidir. Qadimgi Misr ehromlarining ulug'vorligi fir'avnlarning ilohiy kuchini namoyish etishga qaratilgan bo'lsa, Gotika cherkovlarining osmonga sanchilgan uchli gumbazlari insonni Yaratganga yaqinroq bo'lish intilishini aks ettirgan. XX asrga kelib, "Shakl funksiyaga ergashadi" degan tamoyil o'rtaga chiqdi va ortiqcha bezaklardan xoli, shisha hamda betondan iborat zamonaviy osmono'par binolar arxitekturasi dunyo shaharlarining qiyofasini butunlay o'zgartirib yubordi.</p>
+            <p>Urbanistika — shaharlarni loyihalash fani bugungi kunning eng dolzarb masalalaridan biridir. O'tgan asrda shaharlar asosan avtomobillar uchun loyihalashtirilgan bo'lsa, endilikda zamonaviy arxitektorlar "odamlar uchun shaharlar" konsepsiyasiga qaytmoqdalar. Yashil bog'lar, keng piyodalar yo'laklari, velosiped infratuzilmasi va jamoat joylari shahar aholisining baxt darajasini va ijtimoiy faolligini belgilab beruvchi asosiy faktorlarga aylandi.</p>
+            <p>Kelajak arxitekturasi barqarorlik va ekologiya tamoyillariga asoslanadi. Karbonat angidrid yutuvchi betonlar, 3D printerlarda chop etiladigan uylar va tabiat bilan uyg'unlashgan "biofilik dizayn" (Biophilic design) texnologiyalari faol qo'llanilmoqda. Bino endilikda shunchaki jonsiz obyekt emas, balki o'zining energiyasini o'zi ishlab chiqaruvchi, ob-havoga qarab haroratni moslashtiruvchi va tabiat bilan nafas oluvchi aqlli organizmga aylanib bormoqda.</p>
+        `
+    },
+    {
+        title: "24. Global Logistika: Iqtisodiyotning Qon Tomirlari",
+        content: `
+            <p>Siz ushbu matnni o'qib turgan smartfoningiz qanday yaratilgani haqida hech o'ylab ko'rganmisiz? Uning ekrani Koreyada ishlangan, protsessori Tayvanda yasalgan, akkumulyatoridagi litiy Afrikadan qazib olingan, dizayni AQShda chizilgan va yakunda Xitoyda yig'ilib, sizning qo'lingizga yetib kelgan. Bu murakkab zanjir — global logistika va savdo tizimining mo'jizasi hisoblanadi. Logistika jahon iqtisodiyotining ko'rinmas qon tomirlari bo'lib, uning bir soniya to'xtab qolishi butun dunyo bozorlarini falaj qiladi.</p>
+            <p>Zamonaviy globallashuvning eng katta qahramoni bu internet emas, balki oddiy metall konteynerdir (Shipping container). 1950-yillarda standartlashtirilgan yuk konteynerlarining kashf qilinishi yuklarni kemadan poyezdga, u yerdan esa yuk mashinalariga ortish jarayonini yuz barobar tezlashtirdi va arzonlashtirdi. Aynan shu ixtiro sababli, Xitoyda ishlab chiqarilgan buyumni Yevropaga olib borish uning tannarxiga deyarli ta'sir qilmaydigan darajaga keldi.</p>
+            <p>Zamonaviy yetkazib berish zanjirlari "Just-in-Time" (Ayni vaqtida) falsafasiga qurilgan. Zavodlar o'z omborlarida oylik zaxiralarni saqlamaydilar, ehtiyot qismlar konveyerga aynan kerak bo'lgan daqiqalardagina yetib keladi. Bu tizim o'ta samarali bo'lsa-da, uning qanchalik zaif ekanligini Suvaysh kanalida bitta kemaning (Ever Given) tiqilib qolishi va global savdoga kuniga milliardlab dollar zarar keltirishi yaqqol ko'rsatib berdi.</p>
+            <p>Kelajak logistikasi to'liq avtomatlashtirishga qarab ketmoqda. Odamlarsiz ishlaydigan ulkan robotlashtirilgan portlar, yuklarni havoda tashiydigan dronlar va ob-havo hamda tirbandliklarni hisobga olib eng maqbul yo'nalishni chizib beruvchi sun'iy intellekt tizimlari joriy qilinmoqda. Savdo yo'llari faqatgina iqtisodiyot emas, balki global geosiyosiy qudratni ham belgilab beradi. Kim savdo yo'llarini nazorat qilsa, dunyo o'shaning qoidalari asosida o'ynaydi.</p>
+        `
+    },
+    {
+        title: "25. Diplomatiya va Siyosat: Yumshoq Kuch San'ati",
+        content: `
+            <p>Insoniyat tarixi qonli urushlar bilan to'la bo'lsa-da, bugungi kunda dunyoni ushlab turgan narsa qurol emas, balki so'z va kelishuvlardir. Diplomatiya — bu davlatlar o'rtasidagi manfaatlarni tinch yo'l bilan hal etish, nizo va ziddiyatlarning oldini olish san'ati hisoblanadi. Usta diplomat uchinchi Jahon urushini bitta to'g'ri tashkil etilgan muzokara stoli atrofida to'xtatib qolishga qodir. Siyosat bu kimning haqligini aniqlash emas, balki mumkin bo'lgan natijalarga erishish mahoratidir.</p>
+            <p>Xalqaro munosabatlarda "Qattiq kuch" (Harbiy va iqtisodiy bosim) va "Yumshoq kuch" (Soft power) tushunchalari mavjud. Zamonaviy dunyoda davlatning qudrati uning tanklari soni bilan emas, balki madaniyati, ta'lim tizimi, texnologiyalari va qadriyatlari qanchalik jozibador ekanligi bilan o'lchanadi. Bir davlatning musiqasi, kinosi, kiyinish uslubi va brendlarining butun dunyoda sevib iste'mol qilinishi — eng kuchli diplomatik g'alabadir.</p>
+            <p>BMT (Birlashgan Millatlar Tashkiloti), Jahon Savdo Tashkiloti kabi xalqaro institutlar va minglab ikki tomonlama shartnomalar dunyo tartibotini (World Order) saqlab turuvchi ko'rinmas arqonlardir. Xalqaro siyosatda O'yinlar Nazariyasi (Game Theory) keng qo'llaniladi. Bu shunday matematik modelki, unda bir davlatning qarori boshqa davlatning ehtimoliy javob reaksiyasini hisobga olgan holda qabul qilinadi va optimal muvozanat izlanadi (masalan, Yadroviy tiyib turish tamoyili).</p>
+            <p>Axborot asrida diplomatiya o'z shaklini o'zgartirdi. Maxfiy yozishmalar va yopiq eshiklar ortidagi suhbatlar o'rnini endilikda "Raqamli diplomatiya" (Twitter diplomatiyasi) egallamoqda. Davlat rahbarlari o'z xabarlarini bevosita butun dunyo aholisiga yetkazish imkoniyatiga ega. Siyosat qanchalik murakkab va ba'zan shafqatsiz ko'rinmasin, uning tub maqsadi bitta — tsivilizatsiyaning barqarorligini va xavfsiz rivojlanishini ta'minlashdir.</p>
+        `
+    }
+];
+
+        const booksPart6 = [
+    {
+        title: "26. Mifologiya: Qadimgi Dunyo Sirlari",
+        content: `
+            <p>Insoniyat o'zining butun tarixi davomida atrof-muhitdagi tushunarsiz hodisalarni anglashga intilgan. Qadimgi dunyo odamlari uchun chaqmoq, zilzila yoki quyosh tutilishi shunchaki tabiat hodisasi emas, balki ilohiy kuchlarning g'azabi yoki ishorasi bo'lib tuyulgan. Mifologiya — qadimgi insonlarning koinot, hayot va o'lim haqidagi ibtidoiy, ammo o'ta murakkab tasavvurlari majmuasidir. Yunon, Skandinaviya va Misr mifologiyalari bugungi kungacha jahon madaniyati va adabiyotining ajralmas qismi bo'lib qolmoqda.</p>
+            <p>Qadimgi Yunoniston afsonalaridagi Zevs, Poseydon va Afina kabi xudolar shunchaki ilohlar emas, balki insoniy nuqsonlar va ehtiroslarga ega bo'lgan obrazlardir. Ular orqali yunonlar adolat, qasos, jasorat va xiyonat kabi axloqiy tushunchalarni tushuntirishgan. Gomerning "Iliada" va "Odisseya" dostonlari og'zaki ijodning eng yuksak cho'qqisi bo'lib, ular orqali biz qadimgi davr odamlarining qahramonlik va fojia haqidagi tasavvurlarini o'rganamiz. Miflar bu shunchaki ertak emas, u insoniyatning kollektiv ongosti xotirasidir.</p>
+            <p>Skandinaviya mifologiyasi esa o'zining qattiqqo'lligi va fojiali oxiri (Ragnarok — dunyoning oxiri) bilan ajralib turadi. Odin, Tor va Loki kabi xudolar doimiy muzliklar va qattiq iqlim sharoitida yashovchi vinkinglar madaniyatining yaqqol aksidir. Ular qismatdan qochib qutulib bo'lmasligiga va haqiqiy jangchi jang maydonida halok bo'libgina Valxallaga tushishiga ishonishgan. Bu e'tiqod ularni dunyodagi eng qo'rqmas dengizchilarga aylantirgan.</p>
+            <p>Bugungi kunda mifologik obrazlar kino, adabiyot va video o'yinlar sanoatida faol qo'llanilmoqda. Psixolog Karl Yungning ta'kidlashicha, barcha madaniyatlarning afsonalarida uchraydigan o'xshash arxetiplar (Masalan: Dono qariya, Qahramon, Yovuz maxluq) inson miyasining chuqur qatlamlariga kodlangan universal tushunchalardir. Qadimgi dunyo sirlarini o'rganish bizga zamonaviy inson psixologiyasini yaxshiroq tushunishga yordam beradi.</p>
+        `
+    },
+    {
+        title: "27. Biologik Xilma-xillik: Tabiat Muvozanati",
+        content: `
+            <p>Yer sayyorasi koinotdagi hozircha bizga ma'lum bo'lgan yagona tiriklik maskanidir. Bu tiriklikning eng katta mo'jizasi uning cheksiz xilma-xilligidadir. Biologik xilma-xillik (Biodiversitet) — bu mikroskopik bakteriyalardan tortib, bahaybat ko'k kitlargacha bo'lgan barcha tirik organizmlarning va ular yashaydigan ekotizimlarning o'zaro murakkab tarmog'idir. Tabiatdagi hech bir tur ortiqcha emas, ularning har biri bu ulkan biologik zanjirda o'zining o'rnini to'ldirib turadi.</p>
+            <p>Ekotizimlar xuddi jenga (Jenga) o'yiniga o'xshaydi. Agar siz bitta kichik yog'och bo'lagini sug'urib olsangiz, butun minora qulab tushishi mumkin. Masalan, asalarilar va boshqa changlatuvchi hasharotlarning qirilib ketishi insoniyatning oziq-ovqat xavfsizligiga to'g'ridan-to'g'ri tahdid soladi, chunki biz iste'mol qiladigan meva va sabzavotlarning uchdan bir qismi aynan ularga bog'liq. Bo'rilarning Yelloustoun milliy parkiga qaytarilishi u yerdagi daryolar oqimini va butun flora va faunani qanday ijobiy tomonga o'zgartirgani tabiat muvozanatining ajoyib namunasidir.</p>
+            <p>Afsuski, inson faoliyati natijasida bugungi kunda turlarning qirilib ketish sur'ati tabiiy holatdan minglab barobar tezlashgan. O'rmonlarning kesilishi, okeanlarning plastik bilan ifloslanishi va iqlim o'zgarishi sayyoramizning oltinchi ommaviy qirilish davriga (Sixth Mass Extinction) kirganidan dalolat bermoqda. Har kuni o'nlab o'simlik va hayvon turlari ilm-fanga ma'lum bo'lishga ham ulgurmasdan yer yuzidan yo'qolib bormoqda.</p>
+            <p>Biologik xilma-xillikni asrab qolish nafaqat tabiatga nisbatan axloqiy burchimiz, balki o'zimizning yashab qolishimiz uchun asosiy shartdir. Zamonaviy tibbiyotdagi ko'plab dorilar, jumladan, antibiotiklar va saratonga qarshi vositalar aynan yovvoyi tabiatdan (o'simliklar va zamburug'lardan) olinadi. Tabiat bizning eng katta dorixonamiz va ilhom manbayimizdir. Uni vayron qilish — o'zimiz o'tirgan shoxga bolta urish bilan tengdir.</p>
+        `
+    },
+    {
+        title: "28. Koinotni O'zlashtirish: Yulduzlar Sari",
+        content: `
+            <p>Odamzot qadim zamonlardan beri osmonga boqib, yulduzlar ortida nima borligiga qiziqib kelgan. XX asrning o'rtalariga kelib, texnologik taraqqiyot bu azaliy orzuni haqiqatga aylantirdi. 1957-yilda Yerning birinchi sun'iy yo'ldoshi uchirilishi va ko'p o'tmay insonning fazoga parvozi insoniyat tarixidagi eng buyuk sakrashlardan biri bo'ldi. Bugungi kunda esa koinotni o'zlashtirish faqatgina davlatlarning harbiy-siyosiy raqobati emas, balki xususiy kompaniyalarning ochiq kosmik poygasiga aylandi.</p>
+            <p>Marsni o'zlashtirish va u yerda inson koloniyasini barpo etish zamonaviy kosmonavtikaning eng asosiy maqsadlaridan biridir. Qizil sayyora o'zining sharoitlari bilan Yerga eng o'xshash joy bo'lib, kelajakda insoniyat uchun zaxira sayyora vazifasini o'tashi mumkin. SpaceX kabi kompaniyalar ko'p marta ishlatiladigan raketalarni (Reusable rockets) yaratish orqali koinotga yuk va odam tashish narxini keskin arzonlashtirmoqda, bu esa yaqin o'n yilliklarda Marsga ilk parvozlarni amalga oshirish imkonini beradi.</p>
+            <p>Xalqaro Kosmik Stansiya (XKS) insoniyatning dushmanlik va siyosiy kelishmovchiliklarni chetga surib, ilm-fan yo'lida birlasha olishining eng go'zal namunasidir. Bu yerda tortishish kuchi yo'q sharoitda o'tkaziladigan noyob tibbiy va biologik tajribalar Yerdagi ko'plab kasalliklarga davo topishga yordam bermoqda. Shuningdek, Jeyms Uebb (James Webb) kabi yangi avlod kosmik teleskoplari bizga Katta Portlashdan keyin yaranuvchi ilk galaktikalarni ko'rish va koinotning paydo bo'lish sirlarini anglash imkonini bermoqda.</p>
+            <p>Koinotni o'zlashtirishning iqtisodiy ahamiyati ham beqiyosdir. Asteroidlardan noyob metallarni qazib olish, orbitada quyosh elektr stansiyalarini qurish va kosmik turizmni rivojlantirish kelajakning trillion dollarlik industriyalaridir. Insoniyatning beshigi Yer sayyorasi hisoblanadi, ammo taniqli olim Konstantin Tsiolkovskiy aytganidek: "Inson abadiy beshikda yashay olmaydi". Koinot sari intilish bizning evolyutsion qismatimizdir.</p>
+        `
+    },
+    {
+        title: "29. Xotirani Kuchaytirish: Aql Saroylari",
+        content: `
+            <p>Inson xotirasi shunchaki ma'lumotlarni saqlovchi passiv arxiv emas, balki uzluksiz ishlaydigan va o'zgarib turadigan o'ta murakkab neyrobiologik jarayondir. Biz ko'pincha "mening xotiram yomon" deb nolishga odatlanganmiz, ammo zamonaviy neyrobiologiya shuni isbotlaydiki, sog'lom insonning miyasi deyarli cheksiz miqdordagi axborotni saqlash salohiyatiga ega. Muammo xotiraning hajmida emas, balki uni to'g'ri "kataloglashtirish" va kerakli vaqtda qayta chaqirib olish (recall) usullarida yashirin.</p>
+            <p>Axborotni uzoq muddatli xotiraga o'tkazishning eng samarali usullaridan biri bu "Mnemonika" san'atidir. Mnemonika quruq raqamlar yoki yodlash qiyin bo'lgan so'zlarni yorqin, his-tuyg'ularga boy va hatto kulgili vizual obrazlarga aylantirishga asoslanadi. Miya abstrakt matndan ko'ra aniq tasvirlar va hikoyalarni ming karra yaxshiroq eslab qoladi. Masalan, "Xotira saroyi" (Mind Palace) texnikasi orqali siz o'zingiz yaxshi biladigan bino (masalan, o'z uyingiz) bo'ylab xayolan sayr qilib, yodlashingiz kerak bo'lgan ma'lumotlarni xonalardagi buyumlarga "birlashtirib" chiqishingiz mumkin.</p>
+            <p>Takrorlashning ham o'z qonun-qoidalari bor. "Intervalli takrorlash" (Spaced Repetition) usuli Ebbingauzning "Unutish egri chizig'i" nazariyasiga asoslangan bo'lib, axborotni aynan u miyadan o'chib ketishni boshlagan vaqtdagina qayta takrorlashni taqozo etadi. Ya'ni, ma'lumotni o'rgangach 1 soat, so'ngra 1 kun, 1 hafta va 1 oydan keyin takrorlash orqali uni bir umrga eslab qolish kafolatlanadi. Bugungi kunda ushbu algoritm asosida ishlovchi aqlli dasturlar tillarni va kodlarni yodlashda katta yordam bermoqda.</p>
+            <p>Xotiraning eng katta dushmani — diqqatsizlik va surunkali uyqusizlikdir. Ma'lumot qisqa muddatli xotiradan uzoq muddatli qismga asosan inson uxlayotgan vaqtda, chuqur uyqu (REM-faza) bosqichida o'tkaziladi. O'qish bilan bir qatorda sog'lom ovqatlanish, sport bilan shug'ullanish orqali miyani kislorod bilan ta'minlash va yangi qobiliyatlarni o'rganish neyronlar o'rtasidagi aloqalarni mustahkamlab, xotirani qariganda ham o'tkir saqlashga xizmat qiladi.</p>
+        `
+    },
+    {
+        title: "30. Kriptografiya va Sirli Kodlar: Maxfiylik Ilmi",
+        content: `
+            <p>Axborotni yashirish va uni faqat kerakli odam o'qiy olishini ta'minlash ehtiyoji insoniyat yozuvni kashf qilgan ilk davrlardanoq paydo bo'lgan. Kriptografiya — maxfiy kodlar va shifrlash san'ati bo'lib, u shohlar, sarkardalar va josuslar o'rtasidagi yozishmalarni himoya qilishda asrlar davomida hal qiluvchi rol o'ynagan. Qadimgi Rimda Yuliy Sezar o'zining harbiy xabarlarini harflarni alifboda uchta o'ringa surish orqali shifrlagan (Sezar shifri). Bu oddiy usul o'sha paytda xabarlarni himoyalash uchun mukammal ishlagan.</p>
+            <p>Ikkinchi Jahon urushi davrida kriptografiya haqiqiy axborot jangiga aylandi. Nemislarning mashhur "Enigma" shifrlash mashinasi har bir bosilgan harf uchun millionlab kombinatsiyalar yaratib, kodi buzib bo'lmas deb hisoblangan. Biroq, Alan Tyuring boshchiligidagi britaniyalik matematiklar va muhandislar jamoasi maxsus hisoblash mashinasini yaratib, Enigma kodini sindirishga muvaffaq bo'lishdi. Ushbu kriptografik g'alaba urushning muddatini kamida ikki yilga qisqartirgan va millionlab odamlar hayotini saqlab qolgan deb hisoblanadi.</p>
+            <p>Kompyuterlarning paydo bo'lishi bilan kriptografiya murakkab matematik funksiyalarga ko'chdi. Zamonaviy dunyoda, hatto tarmoq ichida ham, biz har kuni internetga kirganimizda, ijtimoiy tarmoqlardan xabar yuborganimizda yoki karta orqali to'lov qilganimizda, o'zimiz sezmagan holda o'ta kuchli shifrlash algoritmlaridan (masalan, RSA yoki AES) foydalanamiz. "Asimmetrik shifrlash" texnologiyasida ma'lumotni qulflash uchun ochiq kalit, uni ochish uchun esa faqat qabul qiluvchida bo'ladigan yopiq kalit ishlatiladi. Bu zamonaviy axborot xavfsizligi va kiberhimoyaning tayanchi hisoblanadi.</p>
+            <p>Kriptografiya bugungi kunda faqatgina ma'lumotni yashirish emas, balki uning yaxlitligini va jo'natuvchining shaxsini tasdiqlash vazifasini ham bajarmoqda. Shu bilan birga, Blokcheyn kabi inqilobiy tizimlar to'liq ushbu ilmiy soha ustiga qurilgan. Kvant kompyuterlarining yaratilishi hozirgi shifrlash algoritmlari uchun xavf tug'dirayotgan bo'lsa-da, ilm-fan unga javoban "Kvant kriptografiyasi"ni — fizika qonunlariga asoslangan, xakerlik hujumlari mutlaqo imkonsiz bo'lgan yangi tizimni tayyorlamoqda.</p>
+        `
+    }
+];
+
+        const booksPart7 = [
+    {
+        title: "31. Bio-xaking: Tana va Ongni Dasturlash",
+        content: `
+            <p>Inson tanasi xuddi murakkab operatsion tizimga o'xshaydi. Vaqt o'tishi bilan uning kodlarida (DNK) xatolar to'planadi, energiyasi pasayadi va tizim eskirishni (qarishni) boshlaydi. Bio-xaking (Biohacking) — bu tana va ongni turli xil tibbiy, genetik va texnologik usullar orqali "dasturlash", uning resurslarini maksimal darajaga chiqarish va qarish jarayonini sekinlashtirishga qaratilgan harakatdir. Bio-xakerlar uchun tana — bu ustida tajriba o'tkazish va doimiy ravishda takomillashtirib borish mumkin bo'lgan mexanizmdir.</p>
+            <p>Eng oddiy bio-xaking usullari kundalik odatlarimiz bilan bog'liq. To'g'ri uyqu rejimi, intervalli ochlik (Intermittent fasting) va ozuqaviy qo'shimchalar (masalan, nootroplar) orqali inson o'z miya faoliyatini va energiyasini sezilarli darajada oshirishi mumkin. Intervalli ochlik hujayralardagi "autofagiya" jarayonini ishga tushiradi — bu jarayonda tana o'zining ichidagi eskirgan va shikastlangan oqsillarni yeb, o'rniga yangilarini yaratadi. Bu hujayra darajasida o'z-o'zini tozalash demakdir.</p>
+            <p>Murakkab bio-xaking esa bevosita qonga genetik va kimyoviy aralashuvni o'z ichiga oladi. DNK tahlillari orqali bio-xakerlar o'zlarining genetik zaifliklarini (qaysi kasalliklarga moyilligi borligini) aniqlaydilar va shunga mos individual parhez hamda jismoniy mashqlar rejasini tuzadilar. Ba'zilar esa o'z tanalariga RFID chiplarini joylashtirishgacha bormoqda, buning natijasida ular qo'llarini tekkizish orqaligina eshiklarni ochishi yoki bank to'lovlarini amalga oshirishi mumkin (Kiborgizatsiya).</p>
+            <p>Bio-xakingning yakuniy maqsadi — inson evolyutsiyasini tezlashtirish va kasalliklardan xoli, uzoq umr ko'ruvchi (ehtimol, yuzlab yillar) yangi inson turini yaratishdir. Biroq, bu soha hali to'liq tibbiy nazoratga olinmaganligi sababli, uning ortida ko'plab xavflar ham yashiringan. Tana uzoq yillik tabiat qonunlariga asoslangan murakkab va nozik tizimdir. Uni sun'iy ravishda qistovga olish kutilmagan salbiy oqibatlarga (masalan, saraton hujayralarining tezlashishi) ham olib kelishi mumkin.</p>
+        `
+    },
+    {
+        title: "32. Minimalizm Falsafasi: Ozida Ko'pni Ko'rish",
+        content: `
+            <p>Biz doimo ko'proq narsaga ega bo'lish poygasida yashaymiz: kattaroq uy, qimmatroq mashina, so'nggi rusumdagi telefon, to'lib toshgan shkaflar. Iste'molchilik madaniyati bizga baxt sotib olingan buyumlarning soniga bog'liq degan yolg'onni singdirgan. Ammo psixologik tadqiqotlar shuni ko'rsatadiki, buyumlar faqat vaqtinchalik dopamin chaqnashini beradi. Minimalizm — bu o'zingizni keraksiz narsalardan ixtiyoriy ravishda xalos qilish va haqiqatan ham muhim bo'lgan narsalar (munosabatlar, tajribalar, bilim) uchun hayotingizda bo'shliq yaratish falsafasidir.</p>
+            <p>Minimalizm hech narsaga ega bo'lmaslik degani emas. Minimalizm — o'z atrofingizdagi har bir narsaga ataylab munosabatda bo'lish va faqatgina sizga qadr-qimmat yoki quvonch keltiradigan buyumlarnigina saqlab qolishdir. "Marie Kondo usuli" aynan shu printsipga asoslanadi: Agar biror buyum sizda quvonch uchqunini (spark joy) uyg'otmasa, unga rahmat aytib, u bilan xayrlashing. Atrof-muhitingiz qanchalik toza va tartibli bo'lsa, ongingiz ham shunchalik tiniq bo'ladi.</p>
+            <p>Bu falsafa faqatgina moddiy narsalar bilan cheklanmaydi. Raqamli minimalizm (telefoningizdagi ilovalar va yozishmalarni tozalash), vaqt minimalizmi (keraksiz uchrashuvlar va vazifalarga "yo'q" deya olish) ham uning ajralmas qismidir. Ko'p vazifalilik (multitasking) zamonaviy jamiyatning afsonasidir, minimalizm bizga o'z diqqatimizni faqat bitta, ammo eng muhim maqsadga yo'naltirishni o'rgatadi.</p>
+            <p>Minimalizm insonni erkinlashtiradi. Sizning xarajatlaringiz qisqaradi, demak, sizga kamroq pul topish va kamroq ishlash kifoya qiladi. Bu ortib qolgan vaqtni esa sayohatlarga, oilangizga yoki sevimli hobbingizga sarflashingiz mumkin. Boylik — bu ko'p narsaga ega bo'lish emas, balki kam narsaga ehtiyoj sezishdir. Narsalar sizni emas, siz narsalarni boshqaradigan nuqtaga yetishish haqiqiy psixologik erkinlikdir.</p>
+        `
+    },
+    {
+        title: "33. Kvant Ruhiyati: Fikrning Moddiylashuvi",
+        content: `
+            <p>Asrlar davomida inson ongi va moddiy dunyo bir-biridan mutlaqo ajratilgan ikki xil tushuncha deb hisoblanib kelingan. Ya'ni fikr – bu shunchaki miyadagi elektr signallari, voqelik esa aniq va o'zgarmas fizika qonunlariga bo'ysunuvchi moddiy materiya. Biroq, zamonaviy kvant fizikasi va neyropsixologiyaning kesishuvida paydo bo'lgan yangi g'oyalar bizning koinotdagi o'rnimiz haqidagi tasavvurlarni tubdan o'zgartirmoqda. Kvant tajribalari (masalan, mashhur "Kuzatuvchi effekti") zarrachalarning o'zini qanday tutishi bevosita ularni kuzatayotgan ong (qurilma yoki inson) borligiga bog'liqligini ko'rsatib berdi.</p>
+            <p>Bu ilmiy faktga tayangan holda, "Kvant ruhiyati" tushunchasi bizning o'ylarimiz shunchaki passiv aks-sado emas, balki fizika olamiga, voqelikka faol ta'sir o'tkazuvchi kuch ekanligini ilgari suradi. Insonning hissiyotlari va e'tiqodlari (ayniqsa chuqur ishonchi) o'ziga xos elektromagnit maydon yaratib, atrof-muhitdagi kvant ehtimolliklarini aynan kutilyotgan voqelik ssenariysi tomon qulashiga (collapse of the wave function) sabab bo'lishi mumkinligi nazariy jihatdan o'rganilmoqda.</p>
+            <p>Tibbiyotdagi "Platsebo effekti" ushbu nazariyaning eng yorqin dalilidir. Bemorda ichayotgan dorisi oddiy shirin suv ekanligini bilmasa ham, lekin uning shifo bo'lishiga chuqur ishonsa, uning miyasi haqiqiy shifobaxsh kimyoviy moddalarni ishlab chiqara boshlaydi va o'zini-o'zi tuzatadi. Ya'ni, insonning e'tiqodi fizika qonunlarini chetlab o'tib, to'g'ridan-to'g'ri hujayralarni qayta tuzadi. Fikr – bu haqiqatning qoralamasi (eskizi)dir.</p>
+            <p>Biroq buni sehrgar yoki ertak qahramoni bo'lishdek tushunmaslik kerak. Fikr kuchi ishlashi uchun u qat'iy harakat bilan uyg'unlashishi shart. O'z diqqatini doimiy ravishda yechimga (muammoga emas) qaratgan insonning miyasi o'sha yechimga eltuvchi yo'llarni, imkoniyatlarni va to'g'ri insonlarni atrofidan "ilg'ab olish" (Retikulyar faollashtiruvchi tizim yordamida) qobiliyatini ishga tushiradi. Biz koinotdagi voqealarning shunchaki kuzatuvchilari emasmiz, biz ularning birgalikdagi hammualliflarimiz.</p>
+        `
+    },
+    {
+        title: "34. Axborot Urushi: Haqiqat Inqirozi",
+        content: `
+            <p>Tarixda urushlar hududlarni, suv havzalarini va tilla konlarini egallash uchun olib borilgan bo'lsa, XXI asrdagi eng murosasiz urushlar insonlarning ongini va ularning diqqatini egallash uchun olib borilmoqda. Axborot urushi — bu qurolsiz urush. Unda o'qlar o'rnini feyk (soxta) yangiliklar, tanklar o'rnini trollar fabrikasi va bombardimonchi samolyotlar o'rnini ijtimoiy tarmoq algoritmlari egallagan. Bugungi kunda butun bir davlatni bosib olish uchun uning chegarasidan o'tish shart emas; uning aholisi ongini ichkaridan parchalash va bir-biriga qarama-qarshi qo'yishning o'zi yetarlidir.</p>
+            <p>Axborot urushining asosiy quroli bu — emotsiyalarni qo'zg'atuvchi sarlavhalar va maqsadli qutblashish (polarization) hisoblanadi. Jamiyatni "biz" va "ular" degan ikkita keskin guruhga ajratish orqali propaganda o'zining eng yuqori cho'qqisiga chiqadi. Insonning tabiati shundayki, u doimiy ravishda o'z fikrini tasdiqlovchi axborotlarni qidiradi va bunga qarshi bo'lgan har qanday faktni rad etadi. Algoritmlar bu psixologik zaiflikni bilgan holda, foydalanuvchini axborot "aks-sado xonasi" (echo chamber) ichiga qamab qo'yadi va radikallashtirib boradi.</p>
+            <p>Deepfake (sun'iy intellekt yordamida yaratilgan o'ta aniq soxta video va ovozlar) texnologiyasining rivojlanishi voqelikni farqlash imkoniyatini deyarli yo'qqa chiqardi. Biror davlat rahbari umuman aytmagan so'zlarini aytayotgandek yasalgan video orqali bir necha soat ichida global vahima yoki iqtisodiy inqirozni keltirib chiqarish mumkin. "Post-haqiqat" (Post-truth) davrida faktlarning o'zi muhim emas, balki o'sha faktlarning qanday his-tuyg'ular bilan taqdim etilishi muhimroqdir.</p>
+            <p>Bu ko'rinmas jangda omon qolishning yagona qalqoni — tanqidiy fikrlash (Critical thinking) va media savodxonlikdir. Har qanday yorqin sarlavhali xabarga duch kelganda uning manbasini, yozilish ohangini (juda hissiyotlimi?) va undan kim manfaatdor ekanligini tahlil qila olish kerak. Miyaga kirayotgan ma'lumotni filtrlash huddi iste'mol qilinayotgan suvni tozalashdek hayotiy muhim gigiyenaga aylanib ulgurdi.</p>
+        `
+    },
+    {
+        title: "35. Mikrobiom: Sizdagi Koinot",
+        content: `
+            <p>Biz o'zimizni yaxlit, yagona inson sifatida tasavvur qilamiz. Biroq biologik nuqtai nazardan biz yakka organizm emas, balki trillionlab mikroorganizmlar (bakteriyalar, viruslar va zamburug'lar) yashaydigan ulkan sayyoramiz. Inson tanasidagi o'zimizning hujayralarimiz sonidan ko'ra, biz bilan hamjihatlikda (simbiozda) yashovchi mikroblar soni o'n barobar ko'proqdir. Ularning umumiy yig'indisi inson mikrobiomi (Microbiome) deb ataladi va uning markazi bizning ichaklarimizda joylashgan.</p>
+            <p>Uzoq yillar davomida biz bakteriyalarni faqat kasallik keltirib chiqaruvchi dushman deb bilib keldik va ularni antibiotiklar yordamida yo'q qilishga urindik. Ammo zamonaviy ilm-fan shuni isbotladiki, sog'lom ichak mikrobiomi inson immunitetining 70 foizini tashkil qiladi. Ular oziq-ovqatlarni hazm qilishga, vitaminlarni ishlab chiqarishga yordam beradi va tashqaridan kelgan patogen (xavfli) mikroblarga qarshi armiya vazifasini o'taydi.</p>
+            <p>Eng hayratlanarlisi, mikrobiom nafaqat bizning tana salomatligimizni, balki kayfiyatimizni, xulq-atvorimizni va psixikamizni ham boshqaradi. Ichaklarimiz va miyamiz o'rtasida to'g'ridan-to'g'ri va o'ta kuchli neyron tarmog'i (Gut-brain axis) mavjud. Baxt gormoni bo'lmish serotoninning taxminan 90 foizi miyada emas, aynan ichaklarimizda ishlab chiqariladi. Nosog'lom ovqatlanish, ko'p miqdorda shakar iste'mol qilish mikrobiom muvozanatini buzib, depressiya, doimiy charchoq, hatto autizm kabi holatlarga sabab bo'lishi mumkinligi tasdiqlanmoqda.</p>
+            <p>O'z "ichki aholimiz"ga e'tibor qaratish zamonaviy tibbiyotning eng yangi va muhim yo'nalishiga aylandi. Rasionni xilma-xil qilish, probiotiklar va klechatkaga (meva, sabzavotlar, dukkaklilar) boy oziq-ovqatlarni ko'proq iste'mol qilish bizning ichkimizda yashovchi shu mittivoy qahramonlarni oziqlantiradi va ko'paytiradi. Siz nimani yesangiz o'shasiz emas, siz o'zingizdagi mikrobiom nimani hazm qila olsa, o'shasiz. Sog'lom ruh doimo sog'lom mikrobiom ustiga quriladi.</p>
+        `
+    }
+];
+
+        const booksPart8 = [
+    {
+        title: "36. Xalqaro Huquq: Dunyo Tartiboti Asoslari",
+        content: `
+            <p>Xalqaro huquq — bu mustaqil davlatlar o'rtasidagi munosabatlarni tartibga soluvchi, global xaos (tartibsizlik) va yadroviy urushlarning oldini olib turuvchi ko'rinmas qoidalar majmuasidir. Agar milliy huquq bitta davlat ichidagi fuqarolar o'rtasidagi munosabatlarni boshqarsa, xalqaro huquq Yer yuzidagi barcha suveren davlatlarni yagona o'yin qoidalariga bo'ysundirishga harakat qiladi. Birlashgan Millatlar Tashkiloti (BMT) va Gaagadagi Xalqaro Sud bu tizimning asosiy institutlari hisoblanadi.</p>
+            <p>Ushbu tizimning eng muhim yutuqlaridan biri Jeneva konvensiyalaridir. Garchi urush insoniyatning eng shafqatsiz harakati bo'lsa-da, xalqaro huquq unga ham insoniylik chegaralarini o'rnatgan. Tinch aholini nishonga olmaslik, asirlarni qiynamaslik va kimyoviy qurollardan foydalanmaslik kabi qoidalar aynan shu konvensiyalar orqali tasdiqlangan. Shuningdek, xalqaro huquq global savdo, inson huquqlari va ekologik shartnomalar (masalan, Parij iqlim kelishuvi) kabi sohalarni ham qamrab oladi.</p>
+            <p>Biroq, xalqaro huquqning eng katta muammosi uning ijro etilish mexanizmidagi zaiflikdir. Biror davlat xalqaro qonunlarni buzganda, uni jazolash uchun global politsiya yo'q. BMT Xavfsizlik Kengashidagi 5 ta doimiy a'zoning "Veto" huquqi ko'pincha adolatli qarorlar qabul qilinishiga to'sqinlik qiladi. Davlatlar o'z milliy manfaatlari va suverenitetini xalqaro majburiyatlardan ustun qo'ygan holatlarda, huquq o'z kuchini yo'qotib, o'rnini geosiyosiy kuchlar muvozanati egallaydi.</p>
+            <p>Kelajakda xalqaro huquq oldida mutlaqo yangi chaqiriqlar turibdi. Koinotni harbiylashtirish, sun'iy intellekt orqali qilinadigan kiberhujumlar va iqlim qochqinlari maqomi kabi masalalar hali o'zining aniq huquqiy yechimini topgani yo'q. Siyosatchilar va huquqshunoslar sayyoramiz xavfsizligini ta'minlash uchun qonunlarni texnologik va global o'zgarishlarga moslashtirib borishlari, shuningdek, huquq faqatgina kuchlilarning emas, barchaning manfaatini himoya qilishiga erishishlari shart.</p>
+        `
+    },
+    {
+        title: "37. O'z-o'zini Rivojlantirish: Kaizen Falsafasi",
+        content: `
+            <p>O'z-o'zini rivojlantirish shunchaki motivatsion kitoblar o'qish yoki ijtimoiy tarmoqlardagi chiroyli iqtiboslarni yodlash emas. Bu — insonning o'z ongosti to'siqlarini yengib o'tish, eski odatlarni buzish va shaxsiyatni muntazam ravishda qayta qurishdan iborat bo'lgan mashaqqatli psixologik jarayondir. Yaponlarning mashhur "Kaizen" (Uzluksiz takomillashuv) falsafasi shuni uqtiradiki, inson birdaniga katta o'zgarishlar qilishga urinmasdan, har kuni o'z ustida atigi 1 foizlik ijobiy o'zgarish qilsa, yakunda beqiyos natijalarga erishadi.</p>
+            <p>Psixolog Kerol Dvekning (Carol Dweck) "O'sish fikrlash tarzi" (Growth Mindset) nazariyasiga ko'ra, insonlar ikki xil fikrlashga ega bo'ladilar. Qotib qolgan fikrlash tarziga ega insonlar iste'dod va aql tug'ma bo'ladi deb hisoblab, qiyinchiliklardan qochadilar. O'sish fikrlash tarziga ega insonlar esa har qanday qobiliyatni mehnat va o'rganish orqali rivojlantirish mumkinligiga ishonadilar. Ular uchun xato va mag'lubiyatlar — fojea emas, balki ma'lumot va tajriba yig'ishning bir usulidir.</p>
+            <p>Rivojlanish yo'lidagi eng katta dushman — bu kechiktirish, ya'ni prokrastinatsiyadir. Miyaning limbik tizimi (hissiyotlar va qisqa muddatli rohat uchun javobgar qism) doimo prefrontal korteks (mantiq va uzoq muddatli rejalashtirish uchun javobgar qism) bilan kurashadi. Intizom — bu hissiyotlarga qaramay, rejalashtirilgan ishni bajarish qobiliyatidir. O'zingizni zo'riqtirmaslik uchun katta maqsadlarni miya qabul qila oladigan o'ta kichik qismlarga (mikro-qadamlarga) bo'lish prokrastinatsiyani yengishning eng zo'r usulidir.</p>
+            <p>Shaxsiy rivojlanishda o'z-o'zini tahlil qilish (Refleksiya) va kundalik tutish juda muhim. Inson o'z fikrlarini qog'ozga tushirganda, miyadagi xaotik o'ylar tizimlashtiriladi va obyektiv haqiqat yuzaga chiqadi. O'zingizni kechagi o'zingiz bilan solishtirishga odatlaning, boshqalar bilan emas. Chunki har kimning start chizig'i, sharoiti va hayotiy resurslari turlichadir. O'z-o'zini rivojlantirish bu manzil emas, u butun umr davom etadigan marofondir.</p>
+        `
+    },
+    {
+        title: "38. Musiqa va Miya: Neyrobiologik Simfoniya",
+        content: `
+            <p>Musiqa insoniyatning eng qadimiy va universal tilidir. Hatto nutq paydo bo'lmasidan avval ham ota-bobolarimiz ritm va ohanglar orqali o'zaro aloqa qilishgan. Neyrobiologlar musiqaning inson miyasiga ta'sirini o'rganganda hayratlanarli xulosaga keldilar: musiqa eshitish yoki cholg'u asbobini chalish miyaning faqatgina bitta qismini emas, balki deyarli barcha hududlarini (xotira, harakat, hissiyot, ko'rish va eshitish markazlarini) bir vaqtning o'zida faollashtiruvchi yagona mashg'ulotdir.</p>
+            <p>Sevimli musiqangizni eshitganingizda tanangizda jimirlash (titroq) paydo bo'lishini sezganmisiz? Bu jarayon miyada dopamin — baxt va rohat gormonining kuchli ajralib chiqishi bilan bog'liq. Musiqa asari o'zida ma'lum bir mantiqiy ketma-ketlikni saqlaydi va miya keyingi notani taxmin qilishga urinadi. Ohang kutilmagan, ammo yoqimli tomonga o'zgarganda miya o'zini dopamin bilan mukofotlaydi. Musiqa to'g'ridan-to'g'ri hissiyotlar markazi bo'lmish amigdalaga ta'sir o'tkaza oladi.</p>
+            <p>Neyroplastiklik (Neuroplasticity) nuqtai nazaridan, professional musiqachilarning miyasi oddiy odamlarnikidan farq qiladi. Ularning miya yarim sharlarini bog'lab turuvchi "qadoqsimon tana" (corpus callosum) ancha qalinroq va rivojlangan bo'ladi, bu esa mantiqiy va ijodiy fikrlash o'rtasidagi aloqani favqulodda tezlashtiradi. Cholg'u asbobini chalishni o'rganish miya uchun xuddi butun tana uchun qilinadigan murakkab krossfit mashg'ulotiga o'xshaydi.</p>
+            <p>Bugungi kunda musiqa terapiyasi tibbiyotda keng qo'llanilmoqda. U Altsgeymer va demensiya kasalligiga chalingan bemorlarning yo'qolgan xotiralarini qayta tiklashda, Parkinson kasalligida motorika (harakat) funksiyalarini yaxshilashda mo'jizaviy ta'sir ko'rsatmoqda. Hatto operatsiyadan keyingi og'riqlarni qoldirishda ham maxsus tanlangan musiqalar analgetik (og'riq qoldiruvchi) dori vositalari o'rnini bosmoqda. Musiqa — bu to'g'ridan-to'g'ri asab tizimimizga yozilgan shifobaxsh koddir.</p>
+        `
+    },
+    {
+        title: "39. Ijtimoiy Tarmoqlar: Raqamli Dopamin",
+        content: `
+            <p>Ijtimoiy tarmoqlar insoniyat aloqa vositalari tarixidagi eng katta inqilob bo'ldi. Dastlab odamlarni bir-biri bilan masofadan bog'lash va do'stlashish vositasi sifatida yaratilgan bu platformalar bugungi kunda "Diqqat iqtisodiyoti" (Attention Economy) deb ataluvchi trillion dollarlik ulkan biznesga aylandi. Biz ushbu platformalarga tekin kiryapmiz deb o'ylaymiz, ammo aslida eng qimmat valyuta — o'z vaqtimiz va diqqatimiz bilan to'lov qilyapmiz. Agar mahsulot tekin bo'lsa, demak mahsulotning o'zi sizsiz!</p>
+            <p>Ijtimoiy tarmoqlar dizayni tasodifan yaratilmagan; ular inson psixologiyasi va qimor o'yinlari (kazinolar) ishlash prinsiplaridan ilhomlangan holda qurilgan. Cheksiz varaqlash (Infinite scroll), "layk" bosish va bildirishnomalar (notifications) miyada o'zgaruvchan mukofotlash tizimini ishga tushiradi. Siz har safar telefon ekranini yangilaganingizda miyangiz qanday xabar chiqishini kutib qisqa dopamin porsiyasini oladi. Bu mexanizm narkotik qaramlik bilan deyarli bir xil ishlaydi.</p>
+            <p>Raqamli olamning eng xavfli oqibatlaridan biri bu — solishtirish madaniyatidir (Comparison culture). Insonlar ijtimoiy tarmoqlarda o'z hayotlarining faqat eng chiroyli, tahrirlangan (filtrdan o'tgan) va baxtli onlarini joylaydilar. Buni ko'rgan oddiy foydalanuvchi o'zining real, oddiy hayotini o'zgalarning "mukammal" sahifaviy hayoti bilan solishtiradi. Bu esa yoshlar o'rtasida depressiya, o'ziga ishonchsizlik va FOMO (Yangi narsalardan quruq qolish qo'rquvi) sindromini keskin oshirib yubordi.</p>
+            <p>Bu qaramlikdan qutulishning yo'li barcha qurilmalarni uloqtirish emas, balki Raqamli minimalizm falsafasini qo'llashdir. Ilovalar bildirishnomalarini o'chirish, telefon ekranini oq-qora rejimga o'tkazish, kunning ma'lum qismini "ekransiz vaqt" deb e'lon qilish asab tizimini qayta tiklashga yordam beradi. Texnologiyalar hayotimizni osonlashtiruvchi vosita bo'lishi kerak, bizning kimligimizni va nima qilishimizni belgilab beruvchi xo'jayin emas.</p>
+        `
+    },
+    {
+        title: "40. Startaplar Anatomiyasi: G'oyadan Unicorngacha",
+        content: `
+            <p>Startap – bu shunchaki yangi ochilgan kichik biznes emas. Startap – bu o'ta yuqori noaniqlik sharoitida innovatsion mahsulot yoki xizmatni yaratish va qisqa muddat ichida global miqyosda tezkor o'sishga (scaling) erishish uchun mo'ljallangan vaqtinchalik tashkilotdir. Oddiy novvoyxona yoki qahvaxona ochish biznes bo'lsa, butun dunyo novvoyxonalarini bitta platformada birlashtiruvchi va sun'iy intellekt orqali xaridorlarni topib beruvchi ilova yaratish – bu startapdir. Ularning asosiy maqsadi – yirik muammoga yangicha yechim topishdir.</p>
+            <p>Startap dunyosida "Tejamkor startap" (Lean Startup) metodologiyasi eng oltin qoida hisoblanadi. Ko'pchilik tadbirkorlar mukammal mahsulot yarataman deb yillab vaqtini va pulini sarflaydi, bozorga chiqqanda esa bu mahsulot hech kimga kerak emasligi ma'lum bo'ladi. Tejamkor startap asosida MVP (Minimum Viable Product – Minimal Ishchi Mahsulot) yaratiladi. Ya'ni, g'oyaning eng oddiy, arzon versiyasi yasaladi va zudlik bilan xaridorlarga taqdim etiladi. Mijozlarning fikri (Feedback) olinib, mahsulot doimiy ravishda takomillashtirib boriladi.</p>
+            <p>Moliyalashtirish startap qon tomiridir. Aksariyat loyihalar dastlab o'z yonidan yoki oila a'zolari (Bootstrapping) hisobidan moliyalashtiriladi. Keyinchalik, loyiha ishlashni boshlagach, "Farishta investorlar" (Angel investors) va venchur fondlari (Venture Capital) jalb qilinadi. Ular katta riskka borib, loyihaning ma'lum bir ulushi (equity) evaziga millionlab dollar sarmoya kiritadilar. Agar startap qiymati 1 milliard dollardan oshsa, u "Unicorn" (Yakkashox) maqomini oladi.</p>
+            <p>G'oyaning o'zi hech qanday qadr-qimmatga ega emas; hamma narsani uning qanday ijro etilishi (Execution) hal qiladi. Dunyodagi eng zo'r g'oya ham noto'g'ri va tajribasiz jamoa qo'lida halokatga uchraydi, o'rtacha g'oya esa kuchli jamoa bilan dunyoni zabt etishi mumkin. Mahsulot va bozor o'rtasidagi mukammal moslikni (Product-Market Fit) topmaguncha taslim bo'lmaslik, kerak paytda yo'nalishni keskin o'zgartira olish (Pivot) xususiyati muvaffaqiyatli asoschilarning eng ajralib turadigan xislatidir.</p>
+        `
+    }
+];
+
+        
+        const booksPart9 = [
+    {
+        title: "41. Muvaffaqiyatsizlik Saboqlari: Mag'lubiyat San'ati",
+        content: `
+            <p>Muvaffaqiyat haqidagi kitoblar juda ko'p, ammo muvaffaqiyatsizlikning asl mohiyati va uning shaxs shakllanishidagi o'rni ko'pincha e'tibordan chetda qoladi. Aslida, har bir buyuk g'alaba – bu o'nlab, ba'zan yuzlab xatolar va mag'lubiyatlar ustiga qurilgan poydevordir. Muvaffaqiyatsizlik bu yo'lning oxiri emas, balki tizimning qayerida xato borligini ko'rsatib beruvchi eng aniq axborot (feedback) manbayidir.</p>
+            <p>Psixologiyada "Xatolardan qo'rqish" insonni yangi narsalarni sinab ko'rishdan to'xtatib turuvchi eng katta to'siq hisoblanadi. Kremniy vodiysida (Silicon Valley) esa "Fail fast, fail often" (Tezroq va ko'proq xato qil) degan tamoyil mavjud. Bu shuni anglatadiki, siz qanchalik tez xato qilsangiz, nima ishlamasligini shunchalik tez tushunasiz va to'g'ri yo'lni topishga yaqinlashasiz. Eng asosiysi – bitta xatoni ikki marta takrorlamaslik va har bir mag'lubiyatdan so'ng tahliliy xulosa chiqarishdir.</p>
+            <p>Tarixdagi eng buyuk ixtirochilar ham bir urinishda muvaffaqiyatga erishmagan. Tomas Edison lampochkani ixtiro qilishdan avval 10,000 marta muvaffaqiyatsizlikka uchragan. U o'z tajribalariga "Men 10,000 marta xato qilmadim, shunchaki ishlamaydigan 10,000 ta yo'lni topdim" deb baho bergan. Bunday yondashuv insonni ruhiy tushkunlikdan saqlaydi va unga cheksiz sabr-toqat baxsh etadi.</p>
+            <p>Muvaffaqiyatsizlikka munosabatni o'zgartirish – bu shaxsiy o'sishning eng yuqori cho'qqisidir. O'zingizni xatolaringiz bilan tenglashtirmang. Siz qilgan ish xato bo'lishi mumkin, lekin bu sizning "xato odam" ekanligingizni anglatmaydi. Mag'lubiyatni qabul qilish va undan saboq olib qayta oyoqqa turish qobiliyati (resilience) inson xarakterining haqiqiy quvvatini belgilaydi.</p>
+        `
+    },
+    {
+        title: "42. Loyiha Boshqaruvi: Agile va Scrum Falsafasi",
+        content: `
+            <p>Zamonaviy dunyoda ishlar shu qadar tez o'zgaradiki, bir necha yil oldin tuzilgan reja bugun o'z kuchini yo'qotishi mumkin. An'anaviy loyiha boshqaruvi (Waterfall) endilikda o'z o'rnini egiluvchan va moslashuvchan metodologiyalarga bo'shatib bermoqda. Agile (Egiluvchan) – bu shunchaki ish uslubi emas, balki jamoaviy fikrlash tarzi bo'lib, u mijoz ehtiyojlarini birinchi o'ringa qo'yish va mahsulotni kichik-kichik qismlar bilan muntazam ravishda topshirishga asoslanadi.</p>
+            <p>Agile ichidagi eng mashhur freymvorklardan biri – Scrum hisoblanadi. Scrumda ishlar "Sprint" deb ataluvchi qisqa muddatli (odatda 2 hafta) davrlarga bo'linadi. Har bir sprint yakunida tayyor, ishlaydigan mahsulot bo'lagi namoyish etilishi shart. Bu usul jamoaga doimiy ravishda o'z faoliyatini tahlil qilish (Retrospective) va xatolarni zudlik bilan to'g'rilash imkonini beradi. Ierarxiya o'rniga jamoaviy mas'uliyat va o'z-o'zini boshqarish tamoyillari ustunlik qiladi.</p>
+            <p>Ushbu metodologiyaning asosi – ochiqlik va shaffoflikdir. Kundalik 15 daqiqalik yig'ilishlar (Daily Stand-up) orqali har bir a'zo nima ish qilayotgani va qanday to'siqlarga duch kelayotganini ochiq aytadi. Bu esa muammolarni yashirilishini oldini oladi va jamoa ruhini mustahkamlaydi. Agile nafaqat IT sohasida, balki bugungi kunda marketing, qurilish va hatto davlat boshqaruvida ham samaradorlikni oshirish uchun keng qo'llanilmoqda.</p>
+            <p>Loyihani boshqarishda eng muhim narsa – bu "mukammallik" ketidan quvish emas, balki "foydalilik"ka erishishdir. Agile bizga o'zgarishlardan qo'rqmaslikni, balki ularni imkoniyat sifatida qabul qilishni o'rgatadi. Muvaffaqiyatli loyiha – bu qat'iy rejaga amal qilgan loyiha emas, balki o'zgarayotgan bozor va mijoz ehtiyojlariga eng yaxshi moslashgan loyihadir.</p>
+        `
+    },
+    {
+        title: "43. Zamonaviy San'at: Ma'no va Estetika",
+        content: `
+            <p>Ko'pchilik odamlar zamonaviy san'at asarlariga qaraganda: "Buni men ham chiza olardim-ku!" degan fikrga borishadi. Biroq zamonaviy san'atda asosiy qadriyat – bu rasmning qanchalik realistik chizilganida (texnikada) emas, balki uning ortida yotgan g'oyada (konseptda) va u uyg'otadigan hissiyotda yashirin. San'at endilikda dunyoni shunchaki nusxalamaydi, balki dunyoga savol beradi va odatiy narsalarga yangicha nazar bilan qarashga undaydi.</p>
+            <p>Abstraksionizm, minimalizm va kontseptualizm kabi yo'nalishlar XX asr boshlarida paydo bo'lib, san'at haqidagi barcha qoliplarni parchalab tashladi. Marsel Dyushanning oddiy "Pissuar"ni ko'rgazma zaliga qo'yishi san'at tarixidagi eng katta inqiloblardan biri bo'ldi. U shu orqali: "Nima san'at deb atalishini rassom emas, balki konteks belgilaydi" degan g'oyani isbotladi. Bugungi kunda instalyatsiyalar va performanslar san'atni galereya devorlaridan chiqarib, hayotning ichiga olib kirdi.</p>
+            <p>Raqamli san'at va NFT (Non-Fungible Tokens) davri boshlanishi bilan san'atning mulkchilik va qadr-qimmat tushunchalari ham o'zgardi. Endilikda san'at asari fizik shaklda bo'lishi shart emas, u blokcheyn tarmog'idagi noyob kod bo'lishi ham mumkin. Bu esa rassomlarga o'z ijodlarini butun dunyo bo'ylab vositachilarsiz sotish va o'z mualliflik huquqlarini himoya qilish imkonini bermoqda.</p>
+            <p>San'atni tushunish uchun nafaqat ko'z, balki chuqur bilim va ochiq ong kerak. Har bir asar – bu rassomning dunyoqarashi, u yashayotgan davrning muammolari va insoniyatning og'riqli nuqtalariga ishoradir. San'at bizni kundalik maishiy hayotdan yuqoriga ko'taradi, miyamizdagi qotib qolgan neyronlarni harakatga keltiradi va bizni "insoniylik" mohiyatini chuqurroq his qilishga o'rgatadi.</p>
+        `
+    },
+    {
+        title: "44. Raqamli Minimalizm: Diqqatni Qutqarish",
+        content: `
+            <p>Biz axborot to'lqinlari ichida suzayotgan emas, balki ularning ostida qolib g'arq bo'layotgan avlodmiz. Har kuni o'rtacha inson o'z telefonini 2,500 martadan ortiq bosadi va yuzlab bildirishnomalarni qabul qiladi. Raqamli minimalizm – bu texnologiyalardan butunlay voz kechish emas, balki ularni hayotingizga qat'iy va ongli ravishda kiritish falsafasidir. Bu sizning eng qimmatli resursingiz – diqqatingizni yirik korporatsiyalar nazoratidan tortib olish demakdir.</p>
+            <p>Diqqat – bu cheklangan resurs. Har safar telefoningiz "vizillab" qo'yganda yoki ekranda yangi xabar paydo bo'lganda, miyangiz o'z fokusini yo'qotadi. Tadqiqotlarga ko'ra, bitta jiddiy chalg'ishdan so'ng avvalgi konsentratsiya holatiga qaytish uchun miyaga o'rtacha 23 daqiqa vaqt kerak bo'ladi. Agar siz kuniga 10 marta chalg'isangiz, demak butun ish kuningiz samaradorligini boy beryapsiz. Raqamli minimalizm bizga "Online" bo'lish majburiyatidan xalos bo'lishni o'rgatadi.</p>
+            <p>Bu jarayonni boshlash uchun "Raqamli tozalash" (Digital Declutter) o'tkazish tavsiya etiladi. Bir oy davomida hayotingiz uchun hayotiy zarur bo'lmagan barcha ilovalar va ko'ngilochar platformalardan voz kechib ko'ring. Shunda siz haqiqatda nima siz uchun qadrli ekanini va nimalar shunchaki vaqtingizni o'g'irlayotganini tushunib yetasiz. Ijtimoiy tarmoqlardagi "do'stlar" o'rnini jonli muloqot, virtual o'yinlar o'rnini esa kitobxonlik va sport egallashi ruhiy xotirjamlik garovidir.</p>
+            <p>Minimalist bo'lish – bu oz narsaga ega bo'lish emas, balki bor narsadan eng yuqori foyda olishdir. Texnologiya sizga xizmat qilishi kerak, siz texnologiyaga emas. Telefoningizni asbob sifatida ishlating (xuddi bolta yoki pichoq kabi), lekin uni hayotingizning markaziga qo'ymang. Diqqatni boshqarish qobiliyati – bu XXI asrning eng katta super-kuchi hisoblanadi.</p>
+        `
+    },
+    {
+        title: "45. Xalqaro Munosabatlar: Yangi Geosiyosat",
+        content: `
+            <p>Dunyo endilikda bitta yoki ikkita super-qudratli davlat atrofida aylanmaydi. Biz "Ko'p qutbli dunyo" (Multipolar world) davriga qadam qo'ydik, unda turli mintaqaviy kuchlar va iqtisodiy markazlar o'z so'zini aytishga intilmoqda. Xalqaro munosabatlar shunchaki diplomatiya emas, bu – resurslar, texnologiyalar va g'oyalar uchun kurash maydonidir. Geosiyosat endilikda faqat yer ustidagi chegaralar uchun emas, balki internet hududi va koinotni nazorat qilish uchun ham kurashmoqda.</p>
+            
+            <p>Zamonaviy geosiyosatda "Iqtisodiy qurol" (Economic weapon) tushunchasi harbiy kuchdan ko'ra ko'proq ishlatilmoqda. Sanksiyalar, savdo cheklovlari va energetika resurslari bilan bosim o'tkazish orqali davlatlar bir-birining siyosiy qarorlariga ta'sir o'tkazishga harakat qilmoqdalar. Shuningdek, yarimo'tkazgichlar (chiplar) ishlab chiqarish va litiy kabi noyob metallar zaxiralariga egalik qilish yangi texnologik davrdagi qudratning asosiy belgisiga aylandi.</p>
+            <p>Sun'iy intellekt va kiber-qurollar xalqaro xavfsizlik arxitekturasini o'zgartirib yubordi. Endilikda urushni boshlash uchun chegarani buzib o'tish shart emas, bitta kuchli kiberhujum butun bir davlatning elektr tarmog'ini yoki bank tizimini izdan chiqarishi mumkin. "Gibrid urushlar" davrida axborot va propaganda – haqiqiy raketalardan ko'ra ko'proq vayronagarchilik keltirishi, jamiyatlarni ichkaridan parchalab tashlashi mumkinligi isbotlandi.</p>
+            <p>Bunday murakkab vaziyatda xalqaro tashkilotlar (BMT, ShHT, YeI) o'zgarishlarga moslashishi va nizo o'choqlarini bartaraf etishda yangi mexanizmlarni topishi shart. Dunyo xalqlari bir-biri bilan iqtisodiy jihatdan shunchalik bog'lanib ketganki, bitta mintaqadagi muammo zanjir reaksiyasi kabi butun dunyoga ta'sir qiladi. Bizning kelajagimiz raqobatdan ko'ra, global muammolarni (iqlim, epidemiya, xavfsizlik) birgalikda hal qilish qobiliyatimizga bog'liq.</p>
+        `
+    }
+];
+
+        
+        const booksPart10 = [
+    {
+        title: "46. Kiber-Psixologiya: Raqamli Shaxsiyat",
+        content: `
+            <p>Kiber-psixologiya — bu insonning texnologiyalar, internet va virtual olam bilan o'zaro ta'sirini o'rganuvchi zamonaviy fan yo'nalishidir. Biz real hayotda bitta shaxsiyatga ega bo'lsak, raqamli dunyoda mutlaqo boshqacha, ko'pincha "idealizatsiya qilingan" obrazda namoyon bo'lamiz. Bu ikki dunyo o'rtasidagi tafovut inson ruhiyatida yangi turdagi ziddiyatlarni va "Raqamli ikkilanish" holatlarini keltirib chiqarmoqda.</p>
+            <p>Anonimlik — internetning eng kuchli va ayni paytda eng xavfli xususiyatidir. Inson o'z ismini yashirgan holda, real hayotda hech qachon aytishga jur'at etmaydigan fikrlarini ochiq bayon qiladi. Bu "Onlayn disinhibitsiya effekti" (Online disinhibition effect) deb ataladi. U ijobiy ma'noda odamlarga o'z ichki kechinmalarini ochishga yordam bersa, salbiy ma'noda kiber-bulling (onlayn haqorat) va agressiyaning kuchayishiga sabab bo'ladi. Ekran ortidagi inson o'z so'zlarining jismoniy oqibatini ko'rmagani uchun mas'uliyat hissi susayadi.</p>
+            <p>Ijtimoiy tasdiqlashga bo'lgan ehtiyoj bizning raqamli odatlarimizni boshqaradi. Har bir "layk" yoki ijobiy sharh miyada dopamin ajralishini rag'batlantiradi va bizni yanada ko'proq ma'lumot ulashishga undaydi. Bu jarayonda bizning "Diqqat markazimiz" tashqi dunyodan o'z ekranimizga ko'chadi. Raqamli dunyodagi muvaffaqiyat yoki muvaffaqiyatsizlik insonning o'ziga bo'lgan ishonchiga (self-esteem) real hayotdagi voqealardan ko'ra ko'proq ta'sir qila boshladi.</p>
+            <p>Kelajakda kiber-psixologiya virtual reallik (VR) va sun'iy intellekt bilan yanada chuqurroq bog'lanadi. Odamlarning virtual olamda o'z "avatar"lari bilan yashashi va u yerda hissiy aloqalarni o'rnatishi jamiyatning ijtimoiy strukturasini butunlay o'zgartirishi mumkin. Bizning vazifamiz — texnologiyalar ichida yashab, insoniy tabiatimizni, his-tuyg'ularimizni va jonli muloqot qadriyatlarini yo'qotib qo'ymaslikdir.</p>
+        `
+    },
+    {
+        title: "47. Smart City: Kelajak Shaharlari",
+        content: `
+            <p>2050-yilga kelib dunyo aholisining 70 foizdan ortig'i shaharlarda yashashi bashorat qilinmoqda. Bu ulkan o'sish an'anaviy shahar infratuzilmalariga juda katta bosim o'tkazadi. Yechim — "Aqlli shahar" (Smart City) konsepsiyasidir. Aqlli shahar — bu barcha tizimlari (transport, energiya, suv, chiqindi, xavfsizlik) yagona raqamli tarmoqqa bog'langan va sensorlar yordamida real vaqtda boshqariladigan yashash muhitidir.</p>
+            
+            <p>Bunday shaharlarda tirbandliklar deyarli bo'lmaydi, chunki sun'iy intellekt svetoforlarni va avtonom jamoat transportlarini real vaqtda oqimga qarab boshqaradi. Energiya sarfi minimal darajaga tushiriladi: ko'cha chiroqlari faqat odam o'tayotganda yonadi, binolar esa o'zining energiyasini quyosh panellari orqali o'zi ishlab chiqaradi. IoT (Buyumlar interneti) sensorlari quvurlardagi suv sizishini yoki chiqindi idishlarining to'lganini masofadan xabar qiladi, bu esa resurslarni tejashga yordam beradi.</p>
+            <p>Aqlli shaharning markazida "Katta ma'lumotlar" (Big Data) turadi. Har bir fuqaroning harakati, xaridlari va ehtiyojlari tahlil qilinib, shahar xizmatlari aynan o'sha ehtiyojlarga moslashtiriladi. Masalan, tez yordam yoki o't o'chirish mashinalari uchun yo'llar avtomatik ravishda ochib beriladi. Bu tizim hayotni oson va xavfsiz qilsa-da, shaxsiy ma'lumotlarning maxfiyligi va doimiy kuzatuv (surveillance) masalasi katta bahslarga sabab bo'lmoqda.</p>
+            <p>Kelajak shaharlari nafaqat texnologik, balki ekologik ham bo'lishi shart. Binolar devorlarida vertikal bog'lar qurish, shahar ichida o'z-o'zini ta'minlovchi mini-fermalar yaratish va chiqindini 100% qayta ishlash — yashil iqtisodiyotning asosidir. Aqlli shahar — bu texnologiya va tabiatning uyg'unligi bo'lib, u insoniyatning eng yuqori darajadagi tashkilotchilik qobiliyatini namoyon etadi.</p>
+        `
+    },
+    {
+        title: "48. Neyro-interfeys: Fikr Kuchi Bilan Boshqarish",
+        content: `
+            <p>Inson miyasi va kompyuter o'rtasida to'g'ridan-to'g'ri aloqa o'rnatish uzoq vaqt fantastik filmlar mavzusi bo'lib kelgan. Ammo bugun BCI (Brain-Computer Interface) texnologiyalari bu chegarani buzib o'tdi. Neyro-interfeys — bu miyadagi neyronlarning elektr signallarini o'qib, ularni raqamli buyruqlarga aylantiruvchi tizimdir. Bu degani, biz yaqin kelajakda kompyuter yoki smartfonni qo'llarimiz bilan emas, balki shunchaki fikr kuchi bilan boshqarishimiz mumkin bo'ladi.</p>
+            
+            <p>Ushbu texnologiyaning birinchi navbatdagi maqsadi — tibbiy yordamdir. Falaj bo'lib qolgan yoki nutq qobiliyatini yo'qotgan insonlar neyro-interfeyslar yordamida yana muloqot qilish, virtual klaviaturalarda yozish va hatto robotlashtirilgan oyoq-qo'llarni boshqarish imkoniyatiga ega bo'lmoqdalar. Ilon Maskning "Neuralink" loyihasi miyaga mitti chiplarni o'rnatish orqali ko'rlarni ko'rish, karlarni eshitish qobiliyatini tiklashni va xotirani kuchaytirishni va'da qilmoqda.</p>
+            <p>BCI texnologiyasi ta'lim va ish faoliyatini ham o'zgartiradi. Ma'lumotni kitob o'qib yoki dars eshitib o'rganish o'rniga, uni to'g'ridan-to'g'ri miyaga "yuklab olish" (upload) nazariy jihatdan imkonli bo'lib bormoqda. Bu inson intellektini sun'iy intellekt bilan birlashtirishga (Simbioz) olib keladi. Biz o'z miyamizning hisoblash quvvatini bulutli serverlar yordamida millionlab marta oshirishimiz mumkin bo'ladi.</p>
+            <p>Biroq, miyaga kirish huquqi eng katta etik savolni tug'diradi: "Miya xakerligi". Agar kimdir sizning fikrlaringizni o'qiy olsa yoki sizning ongingizga begona fikrlarni joylashtirsa nima bo'ladi? Fikrlar erkinligi va shaxsiy daxlsizlikning yakuniy chegarasi — bizning miyamizdir. Neyro-interfeyslar davrida inson bo'lib qolish va o'z "Men"ini saqlab qolish eng murakkab vazifaga aylanadi.</p>
+        `
+    },
+    {
+        title: "49. Kvant Kompyuterlari va Koinot Fizikasi",
+        content: `
+            <p>Biz hozirda foydalanayotgan eng kuchli superkompyuterlar ham kvant olamining murakkabliklarini hisoblashda ojizdir. Kvant kompyuterlari bitlar o'rniga kubitlardan (quantum bits) foydalanishi orqali hisoblash quvvatini fantastik darajaga ko'taradi. Bu texnologiya nafaqat yangi dori vositalarini yaratishda, balki koinotning eng qadimiy sirlarini — Katta portlashdan keyingi ilk soniyalarda nima sodir bo'lganini simulyatsiya qilishda yagona yo'ldir.</p>
+            <p>Kvant fizikasi va kosmologiya bir-biri bilan chambarchas bog'liq. Koinotning 95 foizi biz ko'ra olmaydigan "Qorong'u materiya" va "Qorong'u energiya"dan iborat. Bizning hozirgi fizik qonunlarimiz qora tuynuklarning markazida (Singulyarlik nuqtasida) ishlamay qoladi. Kvant gravitatsiyasi nazariyasini yaratish — zamonaviy ilm-fanning "Muqaddas kosasi" hisoblanadi. Bu nazariya mikrodunyo (kvantlar) va makrodunyo (yulduzlar va galaktikalar) o'rtasidagi farqni yo'qotadi.</p>
+            <p>Kvant chalkashligi (Quantum entanglement) hodisasi shuni ko'rsatadiki, ikkita zarracha orasidagi masofa qanchalik uzoq bo'lmasin, ular bir lahzada ma'lumot almasha oladilar. Eynshteyn buni "uzoqdagi g'ayritabiiy harakat" deb atagan edi. Bu hodisadan foydalanib, kelajakda "Kvant interneti" va "Kvant teleportatsiyasi" (ma'lumotni soniya ulushida koinotning bir nuqtasidan ikkinchisiga o'tkazish) amalga oshirilishi mumkin.</p>
+            <p>Koinot — bu ulkan kvant kompyuteridir. Biz esa o'sha kompyuter ichidagi ongli kuzatuvchilarmiz. Fizika qonunlarini o'rganish orqali biz nafaqat atrofimizdagi dunyoni, balki o'zimizning bu cheksizlikdagi o'rnimizni ham anglaymiz. Har bir yangi ilmiy kashfiyot bizni koinotning yaratilish kodi — "Hamma narsa nazariyasi" (Theory of Everything) ga bir qadam yaqinlashtiradi.</p>
+        `
+    },
+    {
+        title: "50. Insoniyatning Yakuniy Taqdiri",
+        content: `
+            <p>Biz ushbu 50 ta kitoblik sayohatimizning so'nggi nuqtasiga yetib keldik. Insoniyatning kelajagi nima bo'ladi? Biz qayerga ketyapmiz? Bu savollar har bir ongli mavjudotni o'ylantirishi tabiiy. Biz hozirda "Kardashev shkalasi" bo'yicha 0-tur sivilizatsiyasidan 1-tur sivilizatsiyasiga o'tish arafasidamiz. Ya'ni, biz o'z sayyoramizning barcha resurslarini to'liq boshqarishni endigina o'rganyapmiz.</p>
+            
+            <p>Kelajakda bizni ikki xil yo'l kutishi mumkin: yo biz o'z texnologiyalarimiz qurboniga aylanamiz (ekologik halokat, kiber-urushlar, AI qo'zg'oloni), yoki biz "Transhumanizm" davriga o'tib, o'z biologik chegaralarimizdan chiqib ketamiz. Inson va texnologiyaning birlashishi, ongimizning raqamli shaklga o'tishi va koinotning boshqa nuqtalariga kolonizatsiya qilish — bu shunchaki vaqt masalasidir.</p>
+            <p>Koinot milliardlab yillar yashashda davom etadi. Quyoshimiz so'nganidan keyin ham insoniyat (yoki uning raqamli avlodlari) boshqa yulduz tizimlarida hayot kechirishi mumkin. Bizning eng katta yutug'imiz — bu bizning intilishimiz va qiziquvchanligimizdir. Insoniyat — bu koinotning o'zini o'zi anglashga bo'lgan urinishidir. Biz koinotning bir qismimiz va koinot biz orqali o'z go'zalligini ko'radi.</p>
+            <p>Bu kutubxona sizga dunyoni tushunishda kichik bir chiroq bo'ldi degan umiddamiz. Bilim — bu chegara bilmas kuchdir. Har doim o'rganishda, izlanishda va savol berishda davom eting. Zero, insoniyatning haqiqiy buyukligi uning jismoniy kuchida emas, balki uning cheksiz tafakkurida va ezgulikka bo'lgan ishonchidadir. Sayohatimiz tugadi, lekin sizning bilimlar olamidagi shaxsiy yo'lingiz endi boshlanmoqda.</p>
+        `
+    }
+];
+
+        // ==========================================
+        
+        // Barcha kitoblarni birlashtiruvchi massiv
+        let allBooks = [];
+        
+        // Agar siz pastda booksPart1 ni qo'shsangiz, u avtomatik bu yerga ulanadi
+        if(typeof booksPart1 !== 'undefined') allBooks = allBooks.concat(booksPart1);
+        if(typeof booksPart2 !== 'undefined') allBooks = allBooks.concat(booksPart2);
+        if(typeof booksPart3 !== 'undefined') allBooks = allBooks.concat(booksPart3);
+        if(typeof booksPart4 !== 'undefined') allBooks = allBooks.concat(booksPart4);
+        if(typeof booksPart5 !== 'undefined') allBooks = allBooks.concat(booksPart5);
+        if(typeof booksPart6 !== 'undefined') allBooks = allBooks.concat(booksPart6);
+        if(typeof booksPart7 !== 'undefined') allBooks = allBooks.concat(booksPart7);
+        if(typeof booksPart8 !== 'undefined') allBooks = allBooks.concat(booksPart8);
+        if(typeof booksPart9 !== 'undefined') allBooks = allBooks.concat(booksPart9);
+        if(typeof booksPart10 !== 'undefined') allBooks = allBooks.concat(booksPart10);
+
+        let currentBookIndex  = 0;
+        let currentFontSize = 18;
+        let exitClicks = 0;
+        let exitTimer;
+        let lastTapTime = 0; // Mobil dblclick uchun
+
+        // DOM Elementlar
+        const els = {
+            welcome: document.getElementById('welcomeScreen'),
+            input: document.getElementById('userNameInput'),
+            startBtn: document.getElementById('startBtn'),
+            userName: document.getElementById('displayUserName'),
+            title: document.getElementById('bookTitle'),
+            content: document.getElementById('bookContent'),
+            main: document.getElementById('mainContent'),
+            nextOverlay: document.getElementById('nextOverlay'),
+            nextName: document.getElementById('nextBookName'),
+            menu: document.getElementById('menuModal'),
+            bookList: document.getElementById('bookList'),
+            toast: document.getElementById('exitToast')
+        };
+
+        // 1. Dasturga kirish va Fullscreen
+        els.startBtn.addEventListener('click', () => {
+            if(els.input.value.trim().length < 2) return alert('Ismingizni kiriting');
+            els.userName.innerHTML = `👤 ${els.input.value.trim()}`;
+            
+            if(document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(e => console.log(e));
+            }
+            els.welcome.style.opacity = '0';
+            els.welcome.style.visibility = 'hidden';
+            
+            initLibrary();
+        });
+
+        // 2. Kutubxonani yuklash
+        function initLibrary() {
+            if(allBooks.length === 0) {
+                els.title.innerText = "Hozircha kitoblar yo'q";
+                els.content.innerHTML = "Iltimos, JS kod ichiga booksPart... massivlarini joylashtiring.";
+                return;
+            }
+            
+            els.bookList.innerHTML = '';
+            allBooks.forEach((book, index) => {
+                let div = document.createElement('div');
+                div.className = 'book-item';
+                div.innerText = book.title;
+                div.onclick = () => { loadBook(index); els.menu.classList.remove('active'); };
+                els.bookList.appendChild(div);
+            });
+            loadBook(0);
+        }
+
+        function loadBook(index) {
+            currentBookIndex = index;
+            els.title.innerText = allBooks[index].title;
+            els.content.innerHTML = allBooks[index].content;
+            els.main.scrollTop = 0;
+            
+            document.querySelectorAll('.book-item').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+        }
+
+        // 3. Shrift o'lchami (+ va -)
+        document.getElementById('fontPlus').onclick = () => {
+            if(currentFontSize < 34) { currentFontSize += 2; document.documentElement.style.setProperty('--font-size', `${currentFontSize}px`); }
+        };
+        document.getElementById('fontMinus').onclick = () => {
+            if(currentFontSize > 14) { currentFontSize -= 2; document.documentElement.style.setProperty('--font-size', `${currentFontSize}px`); }
+        };
+
+        // 4. Menyu (⚙️)
+        document.getElementById('openMenu').onclick = () => els.menu.classList.add('active');
+        document.getElementById('closeMenu').onclick = () => els.menu.classList.remove('active');
+
+        // 5. Ikki marta bosish (Keyingi kitob)
+        function handleDoubleTap() {
+            if(els.menu.classList.contains('active')) return;
+            if(currentBookIndex < allBooks.length - 1) {
+                els.nextName.innerText = allBooks[currentBookIndex + 1].title;
+                els.nextOverlay.classList.add('show');
+                setTimeout(() => els.nextOverlay.classList.remove('show'), 4000);
+            }
+        }
+
+        els.main.addEventListener('click', (e) => {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            if(tapLength < 300 && tapLength > 0) {
+                handleDoubleTap(); // Custom double tap for mobile reliability
+                e.preventDefault();
+            }
+            lastTapTime = currentTime;
+        });
+
+        els.nextOverlay.onclick = () => {
+            if(currentBookIndex < allBooks.length - 1) {
+                loadBook(currentBookIndex + 1);
+                els.nextOverlay.classList.remove('show');
+            }
+        };
+
+        // 6. 6 marta bosib chiqish (Tasodifiy chiqish bloklangan)
+        document.body.addEventListener('click', (e) => {
+            // Agar menyu, button yoki header bossa sanamaydi
+            if(e.target.closest('header') || e.target.closest('.modal-content') || e.target.closest('#welcomeScreen') || e.target.closest('.next-overlay')) {
+                exitClicks = 0; return;
+            }
+
+            exitClicks++;
+            clearTimeout(exitTimer);
+
+            if(exitClicks >= 2 && exitClicks < 6) {
+                els.toast.innerText = `Chiqish uchun yana ${6 - exitClicks} marta bosing`;
+                els.toast.classList.add('show');
+            }
+
+            if(exitClicks === 6) {
+                els.toast.classList.remove('show');
+                exitClicks = 0;
+                if(document.fullscreenElement) { document.exitFullscreen().catch(err => console.log(err)); }
+            }
+
+            exitTimer = setTimeout(() => {
+                exitClicks = 0;
+                els.toast.classList.remove('show');
+            }, 500);
+        });
+
+        // O'ng tugmani bloklash
+        document.addEventListener('contextmenu', e => e.preventDefault());
+    </script>
+</body>
+</html>
