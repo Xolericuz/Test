@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#050505">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22XOLERIC%22%2C%22short_name%22%3A%22XOLERIC%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22fullscreen%22%2C%22background_color%22%3A%22%23050505%22%2C%22theme_color%22%3A%22%23050505%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data:image%2Fpng%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAABr0lEQVR4nO2ZMU4DMRBFZ5EWiZSW0hYh0aagSHsgKR2i5AYpN0i5AUeg5wZwA8oUaJCCkCBSJFLY3R9pFke7xuu1Zz2j0Ugj2bLlz7P2jJ2N0pRSSimllP4Do5T2k0EP4D6lPM5y3UspHwG8zHLdWynfU0oPAH5nue5tSvmZUrpPKZ1muW5KKd2nlO5TSg9ZrjuX8jWl9JRSus9yXZfSd0rpIaV0nuW6S0rpK6X0mFK6yHLdJaX0lVJ6SilNs1x3KeVPSuk5pXSW5bpLKT+mlKZZrruU8i2l9JxSOs9y3aWUbymlWZbrLqV8Sym9pJTmWa77bylfU0ovKaXzLNf9l/I1pXSR5boopZRS+u+ylPIF4F2W666U8i2l9A7gI8t1V0r5nlJ6l1K6zHLdlVJ+pJSupZRuAcwBfGW57kopX1JKVwA+BfgG8JPluiulfEkpXQD4BvCT5borpXxJKZ0D+A7wm+W6K6V8SSmdAfgB8Jvluv+U8jWldA7gJ8Bfluv+SylfUkoXAH6zXPffUr6mlGYAfgH8Y7nuSinfUkoXAH6zXPdfKd9SSnMpX1JKp1K+APiU8gXAp5QvAD6lfAHwKZ3WU5qmaZqmf5A/6j0HbcCkEa4AAAAASUVORK5CYII%3D%22%2C%22sizes%22%3A%2248x48%22%2C%22type%22%3A%22image%2Fpng%22%7D%5D%7D">
+    <title>XOLERIC · SILVER PREMIUM</title>
+    <style>
+        /* ===== RESET & VARIABLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            /* Qora fon */
+            --bg-deep: #050505;
+            --bg-darker: #000000;
+            --bg-card: #0a0a0a;
+            
+            /* Kumush ranglar */
+            --silver-100: #ffffff;
+            --silver-200: #e0e0e0;
+            --silver-300: #c0c0c0;
+            --silver-400: #a0a0a0;
+            --silver-500: #808080;
+            --silver-600: #606060;
+            
+            /* Kumush glow */
+            --silver-glow: 0 0 30px rgba(192, 192, 192, 0.2);
+            --silver-glow-hover: 0 0 40px rgba(192, 192, 192, 0.4);
+            
+            /* Qora glass */
+            --glass-bg: rgba(10, 10, 10, 0.8);
+            --glass-border: rgba(192, 192, 192, 0.15);
+            --glass-border-hover: rgba(192, 192, 192, 0.4);
+            
+            /* Font */
+            --font-size: 18px;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Transitions */
+            --transition-smooth: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --transition-hover: all 0.3s ease;
+        }
+
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            background-color: var(--bg-deep);
+            background-image: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000000 100%);
+            color: var(--silver-300);
+            font-family: var(--font-family);
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
+            user-select: none;
+        }
+
+        /* ===== SILVER ANIMATIONS ===== */
+        .silver-text-animated {
+            background: linear-gradient(120deg,
+                #a0a0a0 0%,
+                #ffffff 20%,
+                #a0a0a0 40%,
+                #e0e0e0 60%,
+                #c0c0c0 80%,
+                #ffffff 100%
+            );
+            background-size: 300% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            font-weight: 900;
+            text-shadow: 0 0 20px rgba(192, 192, 192, 0.2);
+            animation: silverShine 4s linear infinite;
+            letter-spacing: 2px;
+        }
+
+        @keyframes silverShine {
+            0% { background-position: 0% center; }
+            100% { background-position: 300% center; }
+        }
+
+        .silver-text {
+            background: linear-gradient(135deg, 
+                var(--silver-400) 0%,
+                var(--silver-200) 50%,
+                var(--silver-300) 100%
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+
+        /* ===== SILVER CARD ===== */
+        .silver-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px;
+            transition: var(--transition-hover);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .silver-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(192, 192, 192, 0.05), 
+                transparent
+            );
+            transition: left 0.8s ease;
+        }
+
+        .silver-card:hover::before {
+            left: 100%;
+        }
+
+        .silver-card:hover {
+            border-color: var(--silver-300);
+            box-shadow: var(--silver-glow-hover);
+            transform: translateY(-4px);
+        }
+
+        .silver-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        /* ===== SILVER BUTTON ===== */
+        .silver-btn {
+            background: linear-gradient(135deg, 
+                var(--silver-500) 0%,
+                var(--silver-300) 50%,
+                var(--silver-200) 100%
+            );
+            border: none;
+            border-radius: 60px;
+            padding: 16px 24px;
+            color: #000000;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(192, 192, 192, 0.1);
+        }
+
+        .silver-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 255, 255, 0.6),
+                transparent
+            );
+            transition: left 0.5s ease;
+        }
+
+        .silver-btn:hover::before {
+            left: 100%;
+        }
+
+        .silver-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 30px var(--silver-glow);
+        }
+
+        /* ===== SCREENS ===== */
+        .screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
+            will-change: transform, opacity;
+        }
+
+        #splashScreen {
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000000;
+            opacity: 1;
+            transition: opacity 0.8s;
+        }
+
+        #splashScreen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #welcomeScreen {
+            z-index: 9000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000000;
+            transition: opacity 0.6s, visibility 0.6s;
+        }
+
+        #welcomeScreen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #mainScreen {
+            transform: translateX(0);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-deep);
+        }
+
+        #mainScreen.hide {
+            transform: translateX(-100%);
+        }
+
+        #readerScreen {
+            transform: translateX(100%);
+            z-index: 2000;
+            background: #000000;
+        }
+
+        #readerScreen.show {
+            transform: translateX(0);
+        }
+
+        /* ===== SPLASH SCREEN ===== */
+        .splash-content {
+            text-align: center;
+            animation: silverPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes silverPulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        .splash-title {
+            font-size: 5rem;
+            font-weight: 900;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+        }
+
+        .splash-sub {
+            color: var(--silver-600);
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+        }
+
+        /* ===== WELCOME SCREEN ===== */
+        .welcome-container {
+            width: 90%;
+            max-width: 440px;
+            animation: silverFloat 1s;
+        }
+
+        @keyframes silverFloat {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-box {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 48px;
+            padding: 48px 32px;
+            text-align: center;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+        }
+
+        .welcome-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.3));
+        }
+
+        .welcome-title {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .welcome-sub {
+            color: var(--silver-600);
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .input-silver {
+            width: 100%;
+            padding: 18px 24px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 60px;
+            color: var(--silver-200);
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+            margin-bottom: 20px;
+            transition: var(--transition-hover);
+        }
+
+        .input-silver:focus {
+            border-color: var(--silver-300);
+            box-shadow: 0 0 0 4px rgba(192, 192, 192, 0.1);
+        }
+
+        /* ===== MAIN SCREEN ===== */
+        .main-header {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+        }
+
+        .user-badge {
+            background: rgba(192, 192, 192, 0.03);
+            border: 1px solid var(--glass-border);
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--silver-300);
+            transition: var(--transition-hover);
+        }
+
+        .user-badge:active {
+            border-color: var(--silver-300);
+            background: rgba(192, 192, 192, 0.05);
+        }
+
+        /* ===== SEARCH ===== */
+        .search-section {
+            padding: 16px 24px 8px;
+        }
+
+        .search-container {
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid var(--glass-border);
+            border-radius: 60px;
+            color: var(--silver-200);
+            font-size: 1rem;
+            outline: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: var(--transition-hover);
+        }
+
+        .search-input:focus {
+            border-color: var(--silver-300);
+            box-shadow: 0 0 0 4px rgba(192, 192, 192, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--silver-600);
+            font-size: 1.2rem;
+        }
+
+        /* ===== CATEGORIES ===== */
+        .categories-section {
+            padding: 16px 24px;
+        }
+
+        .categories-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            padding-bottom: 4px;
+        }
+
+        .categories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-chip {
+            padding: 10px 24px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--silver-400);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: var(--transition-hover);
+        }
+
+        .category-chip.active {
+            background: linear-gradient(135deg, var(--silver-500), var(--silver-300));
+            border-color: var(--silver-200);
+            color: #000000;
+            font-weight: 800;
+            box-shadow: 0 0 20px rgba(192, 192, 192, 0.3);
+        }
+
+        .category-chip:active {
+            transform: scale(0.94);
+        }
+
+        /* ===== BOOKS GRID ===== */
+        .books-section {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 24px 100px;
+            scrollbar-width: none;
+        }
+
+        .books-section::-webkit-scrollbar {
+            display: none;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .book-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            padding: 28px 24px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 0%, 
+                rgba(192, 192, 192, 0.1), 
+                transparent 70%
+            );
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .book-card:hover::after {
+            opacity: 1;
+        }
+
+        .book-card.last-read {
+            border-color: var(--silver-300);
+            box-shadow: var(--silver-glow);
+        }
+
+        .book-card:active {
+            transform: scale(0.97);
+            border-color: var(--silver-200);
+        }
+
+        .book-number {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--silver-500);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .book-number.last {
+            color: var(--silver-300);
+        }
+
+        .book-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--silver-200);
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .book-badge {
+            background: linear-gradient(135deg, var(--silver-500), var(--silver-300));
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #000000;
+            text-align: center;
+            margin-top: auto;
+            transition: var(--transition-hover);
+        }
+
+        .book-badge:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== READER SCREEN ===== */
+        .reader-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 2100;
+        }
+
+        .reader-back {
+            width: 48px;
+            height: 48px;
+            border-radius: 48px;
+            background: rgba(192, 192, 192, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--silver-300);
+            font-size: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-hover);
+        }
+
+        .reader-back:active {
+            background: rgba(192, 192, 192, 0.1);
+            border-color: var(--silver-300);
+            transform: scale(0.92);
+        }
+
+        .reader-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--silver-400);
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .reader-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .reader-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 48px;
+            background: rgba(192, 192, 192, 0.03);
+            border: 1px solid var(--glass-border);
+            color: var(--silver-300);
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-hover);
+        }
+
+        .reader-btn:active {
+            background: rgba(192, 192, 192, 0.1);
+            border-color: var(--silver-300);
+            transform: scale(0.92);
+        }
+
+        /* ===== FONT PANEL ===== */
+        .font-panel {
+            position: fixed;
+            top: 90px;
+            right: 24px;
+            width: 280px;
+            background: #0a0a0a;
+            border: 1px solid var(--glass-border);
+            border-radius: 48px;
+            padding: 28px;
+            z-index: 2500;
+            transform: translateY(-20px);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-smooth);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+        }
+
+        .font-panel.show {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .font-value {
+            color: var(--silver-300);
+            font-size: 3rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(192, 192, 192, 0.3);
+        }
+
+        .font-slider {
+            width: 100%;
+            height: 60px;
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        .font-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 60px;
+            background: 
+                repeating-linear-gradient(90deg, 
+                    #333 0px, #333 2px, 
+                    transparent 2px, transparent 15px
+                ),
+                repeating-linear-gradient(90deg, 
+                    #555 0px, #555 1px, 
+                    transparent 1px, transparent 7px
+                );
+            background-position: center;
+            background-repeat: repeat-x;
+            background-size: 100% 40px, 100% 20px;
+            border-bottom: 1px solid #444;
+        }
+
+        .font-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 8px;
+            height: 60px;
+            background: var(--silver-300);
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 30px var(--silver-300);
+        }
+
+        /* ===== READER CONTENT ===== */
+        .reader-content {
+            position: fixed;
+            top: 80px;
+            bottom: 120px;
+            left: 0;
+            right: 0;
+            overflow-y: auto;
+            padding: 24px 24px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+
+        .reader-content::-webkit-scrollbar {
+            display: none;
+        }
+
+        #readTitle {
+            font-size: 2.2rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 48px;
+            padding: 0 20px;
+            line-height: 1.4;
+        }
+
+        #readContent {
+            font-size: var(--font-size);
+            line-height: 2;
+            color: var(--silver-200);
+        }
+
+        #readContent p {
+            margin-bottom: 32px;
+            padding: 20px 28px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.01);
+            border-left: 3px solid transparent;
+            transition: all 0.5s ease;
+            cursor: pointer;
+        }
+
+        #readContent p.active {
+            background: rgba(192, 192, 192, 0.02);
+            border-left: 3px solid var(--silver-300);
+            box-shadow: -5px 0 30px rgba(192, 192, 192, 0.1);
+            color: var(--silver-100);
+            transform: translateX(5px);
+        }
+
+        /* ===== AUDIO PLAYER ===== */
+        .audio-player {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 520px;
+            background: #0a0a0a;
+            border: 1px solid var(--glass-border);
+            border-radius: 100px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(192, 192, 192, 0.1);
+            z-index: 2200;
+        }
+
+        .audio-progress-text {
+            color: var(--silver-300);
+            font-weight: 800;
+            font-size: 0.9rem;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .audio-progress-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .audio-progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, 
+                var(--silver-400), 
+                var(--silver-200), 
+                var(--silver-300)
+            );
+            width: 0%;
+            border-radius: 8px;
+            box-shadow: 0 0 20px var(--silver-300);
+            transition: width 0.2s;
+        }
+
+        .audio-play-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 56px;
+            background: linear-gradient(135deg, 
+                var(--silver-500), 
+                var(--silver-300), 
+                var(--silver-200)
+            );
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            flex-shrink: 0;
+            box-shadow: 0 0 30px rgba(192, 192, 192, 0.3);
+        }
+
+        .audio-play-btn:active {
+            transform: scale(0.9);
+        }
+
+        .audio-play-btn svg {
+            width: 24px;
+            height: 24px;
+            fill: #000000;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0a0a0a;
+            border: 1px solid var(--silver-300);
+            border-radius: 60px;
+            padding: 14px 28px;
+            color: var(--silver-200);
+            font-weight: 700;
+            font-size: 0.9rem;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s;
+            white-space: nowrap;
+            box-shadow: 0 0 30px rgba(192, 192, 192, 0.2);
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== UTILITIES ===== */
+        .hide {
+            display: none !important;
+        }
+
+        /* ===== HAPTIC FEEDBACK (mocked) ===== */
+        .vibrate {
+            animation: vibrate 0.1s;
+        }
+
+        @keyframes vibrate {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- SPLASH SCREEN -->
+    <div id="splashScreen" class="screen">
+        <div class="splash-content">
+            <div class="splash-title silver-text-animated">XOLERIC</div>
+            <div class="splash-sub">SILVER PREMIUM</div>
+        </div>
+    </div>
+
+    <!-- WELCOME SCREEN -->
+    <div id="welcomeScreen" class="screen">
+        <div class="welcome-container">
+            <div class="welcome-box silver-card">
+                <div class="welcome-icon">📚</div>
+                <h1 class="welcome-title silver-text">KUTUBXONA</h1>
+                <div class="welcome-sub">50+ KITOB · SILVER EDITION</div>
+                <input type="text" id="userNameInput" class="input-silver" placeholder="Ismingizni kiriting" autocomplete="off">
+                <button class="silver-btn" id="startBtn">KIRISH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN SCREEN -->
+    <div id="mainScreen" class="screen">
+        <header class="main-header">
+            <div class="logo silver-text-animated">XOLERIC</div>
+            <div class="user-badge" id="displayUserName">MEHMAN</div>
+        </header>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Kitob qidirish...">
+                <span class="search-icon">⌕</span>
+            </div>
+        </div>
+
+        <div class="categories-section">
+            <div class="categories-scroll" id="categoriesContainer">
+                <div class="category-chip active" data-category="all">BARCHASI</div>
+                <div class="category-chip" data-category="1">1-10</div>
+                <div class="category-chip" data-category="2">11-20</div>
+                <div class="category-chip" data-category="3">21-30</div>
+                <div class="category-chip" data-category="4">31-40</div>
+                <div class="category-chip" data-category="5">41-50</div>
+            </div>
+        </div>
+
+        <div class="books-section" id="booksSection">
+            <div class="books-grid" id="booksGrid"></div>
+        </div>
+    </div>
+
+    <!-- READER SCREEN -->
+    <div id="readerScreen" class="screen">
+        <div class="reader-header">
+            <div class="reader-back" id="backBtn">←</div>
+            <div class="reader-title" id="readerHeaderTitle">Kitob nomi</div>
+            <div class="reader-controls">
+                <div class="reader-btn" id="fontBtn">Aa</div>
+            </div>
+        </div>
+
+        <!-- Font Panel -->
+        <div class="font-panel" id="fontPanel">
+            <div class="font-value" id="fontValue">18</div>
+            <input type="range" class="font-slider" id="fontSlider" min="14" max="36" value="18" step="1">
+        </div>
+
+        <!-- Reader Content -->
+        <div class="reader-content" id="readerContent">
+            <h1 id="readTitle" class="silver-text-animated"></h1>
+            <div id="readContent"></div>
+        </div>
+
+        <!-- Audio Player -->
+        <div class="audio-player">
+            <span class="audio-progress-text" id="progressText">0%</span>
+            <div class="audio-progress-track" id="progressTrack">
+                <div class="audio-progress-bar" id="progressBar"></div>
+            </div>
+            <button class="audio-play-btn" id="playBtn">
+                <svg id="playIcon" viewBox="0 0 24 24">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <svg id="pauseIcon" viewBox="0 0 24 24" style="display: none;">
+                    <rect x="6" y="4" width="4" height="16"></rect>
+                    <rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== 50 KITOB - TO'LIQ MAZMUN =====
+        const BOOKS = [
+            // 1-10
+            { id: 0, title: "1. Mukammallik Kuchi: Kichik Odatlar San'ati", category: 1, 
+              content: `<p>Hayotimizda yuz beradigan eng katta o'zgarishlar birdaniga bo'lmaydi. Katta yutuqlar har doim ko'zga ko'rinmas, doimiy ravishda takrorlanadigan kichik harakatlarning jamlanmasidir. "Atomic Habits" konsepsiyasi shuni uqtiradiki, inson o'z ustida har kuni atigi bir foiz (1%) yaxshilanishga erishsa, yil oxiriga kelib u 37 barobar kuchliroq, aqlliroq va tajribaliroq shaxsga aylanadi.</p><p>Aksariyat insonlar motivatsiyaga tayanib ish ko'radilar. Ammo motivatsiya bu vaqtinchalik hissiy holatdir. Haqiqiy va bardavom natijaga erishish uchun insonga motivatsiya emas, balki qat'iy intizom va to'g'ri ishlab chiqilgan tizim kerak. Maqsad belgilash g'oliblar va mag'lublar o'rtasidagi farqni belgilamaydi, chunki ikkalasining ham maqsadi g'alaba qozonishdir. Ularni farqlaydigan narsa – bu maqsad sari eltuvchi kundalik jarayonlar, ya'ni odatlardir.</p><p>Yangi odatni shakllantirish uchun psixologiyada maxsus zanjir mavjud: signal, istak, javob va mukofot. Yaxshi odatlarni shakllantirish uchun ularni ko'zga tashlanadigan, jozibador, bajarishga oson va qoniqarli qilish zarur. Salbiy odatlardan qutulish uchun esa buning aynan teskarisini qilish talab etiladi: ularni ko'zdan uzoqroq, zerikarli, murakkab va foydasiz qilib qo'yish kerak. Atrof-muhitingiz sizning xulq-atvoringizni belgilaydigan eng kuchli omildir.</p><p>Biz o'zimiz istagan odamga aylanishimiz uchun, avvalo e'tiqodimizni va o'zimizga bo'lgan qarashimizni o'zgartirishimiz lozim. O'zgarishning eng chuqur qatlami bu "Men kimman?" degan savolga beriladigan javobdir. O'zingizni shunchaki kitob o'qiyotgan odamdek emas, balki "kitobxon" sifatida his qiling. Har bir o'qigan sahifangiz yangi shaxsiyatingiz uchun berilgan ishonchli ovozdir.</p>` },
+            
+            { id: 1, title: "2. Kiberxavfsizlik va Tarmoq Anatomiyasi", category: 1,
+              content: `<p>Zamonaviy raqamli dunyoda eng qimmatli resurs bu — neft yoki oltin emas, balki axborot va ma'lumotlardir. Kiberxavfsizlik butun boshli tarmoq arxitekturasini, serverlar va foydalanuvchilar o'rtasidagi maxfiy ma'lumotlar almashinuvini himoya qilishning murakkab va uzluksiz ilmiy tizimidir. Har bir soniyada dunyo bo'ylab millionlab zararli kodlar va xakerlik hujumlari tarmoqlarni sinovdan o'tkazmoqda.</p><p>Kiberhimoyaning asosi operatsion tizimlarning ichki tuzilishini chuqur tushunishdan boshlanadi. Tizimdagi ochiq portlar, zaif protokollar va kodlardagi kichik mantiqiy xatolar tajribali axloqiy xakerlar (ethical hackers) tomonidan doimiy ravishda penetratsion testlar (pentest) orqali tekshirilib boriladi. Ularning asosiy maqsadi – jinoyatchi xakerlardan (qora shlyapalar) oldin tizimdagi darchalarni topish va ularni yamashdir.</p><p>Ma'lumotlar bazasiga inyeksiya hujumlari (SQLi), saytlararo skriptlash (XSS) va ijtimoiy muhandislik kabi usullar bugungi kundagi eng keng tarqalgan tahdidlardan hisoblanadi. Ijtimoiy muhandislik texnologiyaga emas, to'g'ridan-to'g'ri inson psixologiyasiga hujum qiladi. Ya'ni, insonlarning ishonchuvchanligi, qo'rquvi yoki qiziqishlaridan foydalanib, tizim parollarini o'g'irlash usulidir.</p>` },
+            
+            { id: 2, title: "3. Moliyaviy Savodxonlik: Sarmoya va Erkinlik", category: 1,
+              content: `<p>Boylikning haqiqiy o'lchovi bu sizning qancha ko'p pul topishingiz bilan emas, balki o'sha topilgan pulni qanday boshqarishingiz va uni kelajak uchun saqlab qola olishingiz bilan o'lchanadi. Moliyaviy erkinlik insonning ishlash uchun emas, yashash uchun pul topish tizimini yo'lga qo'ygan holatidir. Buning asosiy siri moliyaviy savodxonlik, ya'ni aktiv va passiv tushunchalarini to'g'ri farqlashda yashirin.</p><p>Kambag'al va o'rta sinf insonlari o'zlariga asosan "passivlar" sotib olishadi va buni boylik deb o'ylashadi. Masalan, kreditga olingan qimmatbaho avtomobil, eng so'nggi rusumdagi telefon yoki hashamatli uy sizning cho'ntagingizdan har oy pul olib chiqib ketadi. Haqiqiy boylar esa "aktivlar" yig'adilar. Aktivlar — bu o'z-o'zidan cho'ntagingizga pul keltiruvchi narsalar: biznes, qimmatli qog'ozlar, intellektual mulk yoki ijaraga beriladigan ko'chmas mulkdir.</p><p>Murakkab foiz (compound interest) atamasi iqtisodiyotdagi sakkizinchi mo'jiza hisoblanadi. Agar siz yoshlikdan boshlab muntazam ravishda kichik summalarni sarmoya qilib borsangiz, yillar o'tib bu sarmoya o'zining foizlari hisobiga eksponensial tarzda o'sishni boshlaydi.</p>` },
+            
+            { id: 3, title: "4. Chuqur Diqqat: Fokus San'ati", category: 1,
+              content: `<p>Hozirgi axborot texnologiyalari asrida chalg'ituvchi omillar shu qadar ko'pki, bitta vazifaga to'liq diqqatni jamlab ishlash noyob va o'ta qimmatbaho qobiliyatga aylanib bormoqda. Kardiologik operatsiya qilayotgan shifokor yoki murakkab tizim kodini yozayotgan dasturchi uchun diqqat – ularning eng asosiy qurolidir. "Chuqur ish" (Deep Work) tushunchasi insonning o'z aqliy sig'imini maksimal darajada ishlatib, hech qanday chalg'ishlarsiz murakkab qadriyat yaratish holatini anglatadi.</p><p>Aksariyat odamlar kunini elektron pochtalarga javob berish, ijtimoiy tarmoqlardagi tasmasini varaqlash va qisqa videolarni ko'rish bilan, ya'ni "yuzaki ishlar" (shallow work) bilan o'tkazadilar. Yuzaki ishlar odamga faqat bandlik hissini beradi, ammo iqtisodiy va shaxsiy jihatdan hech qanday katta qiymat yaratmaydi.</p><p>Inson miyasi ko'p vazifalilikni (multitasking) yoqtirmaydi. Bir vaqtning o'zida ham musiqa eshitish, ham xabar yozish, ham kitob o'qish aslo mumkin emas. Miya shunchaki bir vazifadan ikkinchisiga o'ta tezlik bilan sakraydi va bu jarayonda u juda ko'p energiya yo'qotadi.</p>` },
+            
+            { id: 4, title: "5. Kosmik Olam va Qora Tuynuklar", category: 1,
+              content: `<p>Koinot shu qadar ulkan va sirli ki, inson aqli uning o'lchamlarini to'liq tasavvur qilishga ojizdir. Biz tungi osmonga boqib ko'radigan yulduzlarning nuri bizgacha yetib kelishi uchun yillar, hatto millionlab yillar kerak bo'ladi. Bu degani, biz har safar yulduzlarga qaraganimizda aslida o'tmishni, ularning ming yillar oldingi holatini ko'rayotgan bo'lamiz. Koinot tinimsiz kengaymoqda va bu jarayon galaktikalar orasidagi masofani tobora uzoqlashtirmoqda.</p><p>Koinotdagi eng qiziqarli va haligacha to'liq o'rganilmagan obyektlardan biri bu — qora tuynuklardir (Black holes). Ular yulduzlar o'z hayotini yakunlab, ulkan portlashdan (o'ta yangi yulduz portlashi) so'ng o'z ichiga qulab tushishi natijasida hosil bo'ladi. Qora tuynukning tortishish kuchi shu qadar kuchliki, undan hatto eng tezkor narsa — yorug'lik ham qochib qutula olmaydi.</p>` },
+            
+            // 6-10
+            { id: 5, title: "6. Veb-Dasturlash Arxitekturasi", category: 1,
+              content: `<p>Zamonaviy veb-dasturlash shunchaki brauzerda ochiladigan oddiy sahifalar yaratishdan ancha uzoqlashgan. Bugungi kunda u insonlar hayotini osonlashtiruvchi, global miqyosda ishlovchi murakkab raqamli ilovalar qurish san'atidir. Har bir mukammal ishlangan veb-sayt ortida yuzlab soatlik mehnat, mantiqiy yechimlar va foydalanuvchi tajribasini (UX) yaxshilashga qaratilgan tinimsiz izlanishlar yotadi.</p><p>Frontend (foydalanuvchi ko'radigan qism) va Backend (server va mantiq qismi) o'rtasidagi uyg'unlik mukammal dastur ishlashining kafolatidir. Shisha effektlari (Glassmorphism), silliq animatsiyalar va hatto veb-ilovalar ichidagi terminal interfeyslari kabi innovatsion yechimlar foydalanuvchilarni o'ziga jalb qiladi.</p>` },
+            
+            { id: 6, title: "7. Kiberhimoya va Tahlil", category: 1,
+              content: `<p>Bugungi kunda har qanday tashkilotning eng muhim boyligi bu uning ma'lumotlar bazasidir. Kiberxavfsizlik ana shu axborotlarni uchinchi shaxslar hujumidan himoya qiluvchi murakkab tizimdir. Tarmoq xavfsizligini ta'minlashda tizimning ichki mexanizmlarini chuqur anglash va zaifliklarni (vulnerabilities) oldindan aniqlash hal qiluvchi ahamiyatga ega.</p><p>Xavfsizlik sohasini o'rganish kishidan yuksak mantiqiy va tahliliy fikrlashni talab qiladi. Dastur kodlarining qanday ishlashini to'liq anglamasdan turib, uni himoya qilish imkonsizdir.</p>` },
+            
+            { id: 7, title: "8. Ovoz Muhandisligi: Phonk", category: 1,
+              content: `<p>Musiqa yaratish jarayoni bugungi kunda faqatgina cholg'u asboblarini chalish bilan cheklanmaydi; u to'liq raqamli muhandislik va fizika san'atiga aylangan. Ovoz to'lqinlarini boshqarish, chastotalarni o'zaro moslashtirish va tinglovchiga hissiy ta'sir ko'rsatish zamonaviy musiqaning asosidir. Xususan, elektron musiqa va so'nggi yillarda katta trendga chiqqan Phonk janri o'zining o'zgacha atmosferasi va kuchli basslari (808s) bilan ajralib turadi.</p><p>Bugungi kunda musiqiy prodyuserlar kuchli kompyuterlar va ochiq kodli muhitlarda ham bemalol ijod qila olishmoqda. Eng muhimi — g'oya va tovushlar arxitekturasini his qila olish.</p>` },
+            
+            { id: 8, title: "9. Raqamli Savodxonlik", category: 1,
+              content: `<p>Kelajak avlodni tarbiyalashda an'anaviy usullarning o'rni beqiyos, biroq bugungi raqamli asr bolalarning e'tiborini jalb qilish uchun yangicha, interaktiv yondashuvlarni talab qiladi. Bolalarga o'qish va yozishni o'rgatuvchi zamonaviy dasturlar ularning qabul qilish xususiyatlariga to'liq moslashtirilgan bo'lishi kerak. Quruq matnlar va zerikarli qoidalardan voz kechib, jarayonni vizual o'yin darajasiga olib chiqish yuqori samaradorlikni ta'minlaydi.</p>` },
+            
+            { id: 9, title: "10. Sun'iy Intellekt Asoslari", category: 1,
+              content: `<p>Sun'iy intellekt (AI) insoniyat tarixidagi eng ulug'vor kashfiyotlardan biriga aylanib ulgurdi. Bir necha o'n yillar oldin u faqatgina fantastika hisoblangan bo'lsa, bugun u kundalik hayotimizning ajralmas mexanizmi. Mashinali o'rganish (Machine Learning) va neyrotarmoqlar kompyuterlarga biz yozib bergan qat'iy qoidalarsiz ham ma'lumotlarni tahlil qilish va qaror qabul qilish imkonini bermoqda.</p><p>Texnologiyaning bu darajada tez rivojlanishi bizga shuni ko'rsatadiki, yaqin kelajakda inson mashinalar bilan raqobatlashmaydi, balki ular bilan hamkorlikda ishlashni o'rganadi.</p>` },
+            
+            // 11-15
+            { id: 10, title: "11. Kvant Fizikasi Mo'jizalari", category: 2,
+              content: `<p>Kvant fizikasi — bu koinotning eng mitti zarrachalari qanday ishlashini o'rganuvchi fan bo'lib, u bizning voqelik haqidagi an'anaviy tasavvurlarimizni butunlay ost-ust qilib yuboradi. Klassik fizikadan farqli o'laroq, kvant olamida jismlar bir vaqtning o'zida ikkita joyda bo'lishi (superpozitsiya) yoki bir-biri bilan koinotning ikki chekkasida turib ham bir zumda aloqa qilishi (kvant chalkashligi) mumkin.</p><p>Kvant olamining eng mashhur tajribalaridan biri "Ikki yoriqli tajriba" (Double-slit experiment) hisoblanadi. Bu tajriba shuni ko'rsatdiki, yorug'lik va elektronlar ham to'lqin, ham zarracha xususiyatiga ega. Eng qizig'i shundaki, zarrachaning o'zini qanday tutishi uni "kuzatuvchi" bor yoki yo'qligiga qarab o'zgaradi.</p>` },
+            
+            { id: 11, title: "12. Vaqtni Boshqarish San'ati", category: 2,
+              content: `<p>Vaqt — inson hayotidagi yagona qaytarib bo'lmaydigan va sotib olinmaydigan resursdir. Boy va kambag'al, yosh va qari — barchaga bir kunda aynan 24 soat beriladi. Ammo nima uchun ba'zilar bu vaqt ichida ulkan ishlarni amalga oshiradi-yu, boshqalar hatto kundalik yumushlariga ham ulgurmaydi? Buning siri vaqtning o'zida emas, balki diqqatni va ustuvorliklarni (priorities) to'g'ri taqsimlay olishdadir.</p><p>Samaradorlikning eng mashhur usullaridan biri bu Eyzenxauer matritsasidir. Bu tizim barcha ishlarni 4 toifaga ajratadi: muhim va shoshilinch, muhim lekin shoshilinch emas, muhim emas lekin shoshilinch, shuningdek, muhim ham, shoshilinch ham bo'lmagan ishlar.</p>` },
+            
+            { id: 12, title: "13. Psixologiya: Ong Sirlari", category: 2,
+              content: `<p>Inson miyasi koinotdagi eng murakkab va sirli obyektlardan biridir. Uning atigi 1.5 kilogramm keladigan biologik massasi butun boshli sivilizatsiyalarni yaratishga, hissiyotlarni boshdan kechirishga va borliqni anglashga qodir. Psixologiya ana shu ongli va ongsiz jarayonlarni o'rganuvchi fandir. Biz qabul qilayotgan har bir qaror, har bir xatti-harakatimiz ortida o'zimiz ham sezmaydigan chuqur psixologik sabablar yotadi.</p><p>Inson ongi ikkita asosiy qismdan iborat: ongli (ratsional) va ongsiz (subconscious) qism. Psixologlarning ta'kidlashicha, bizning kundalik hayotdagi harakatlarimizning qariyb 95% ongsiz ravishda, ya'ni avtopilot rejimida amalga oshiriladi.</p>` },
+            
+            { id: 13, title: "14. Kriptovalyuta Inqilobi", category: 2,
+              content: `<p>Iqtisodiyot tarixiga nazar tashlasak, pul tizimi doimiy ravishda evolyutsiya qilib kelganini ko'ramiz: tovar ayirboshlashdan tortib, oltin tangalarga, so'ngra qog'oz pullarga va elektron raqamlarga. Bugungi kunda esa moliyaviy dunyo navbatdagi katta inqilob — markazlashmagan raqamli pullar, ya'ni kriptovalyutalar davriga qadam qo'ydi. Bitcoin yaratilishi bilan markaziy banklarga va hukumatlarga qaram bo'lmagan, erkin va ochiq moliya tizimi g'oyasi haqiqatga aylandi.</p><p>Kriptovalyutalarning ishlash mexanizmi "Blokcheyn" (Blockchain) texnologiyasiga asoslanadi. Blokcheyn — bu axborotni saqlashning shunday usuliki, unda ma'lumotlar zanjir ko'rinishida, butun dunyodagi minglab kompyuterlarda bir vaqtning o'zida saqlanadi.</p>` },
+            
+            { id: 14, title: "15. Bionika: Tabiat Dizayni", category: 2,
+              content: `<p>Bionika (yoki biomimetika) — tabiatdagi biologik mexanizmlarni va ularning ishlash prinsiplarini o'rganib, ularni zamonaviy texnologiyalarga tadbiq etuvchi kelajak fanidir. Tabiat millionlab yillik evolyutsiya davomida mukammal dizayn va yechimlarni yaratgan. Muhandislar va olimlar bugungi kunda bu tayyor "xaritalar" dan foydalanib, insoniyatning eng qiyin muammolariga innovatsion yechimlar topmoqdalar.</p><p>Eng mashhur bionik kashfiyotlardan biri bo'lmish "Velkro" (yopishtirgich lenta) oddiygina qariqiz o'simligining itlar va kiyimga yopishib qolish xususiyatini o'rganish natijasida kashf qilingan.</p>` },
+            
+            // 16-20
+            { id: 15, title: "16. Nanotexnologiya", category: 2,
+              content: `<p>Nanotexnologiya — bu moddalarni atom va molekula darajasida (1 dan 100 nanometrgacha bo'lgan o'lchamda) boshqarish va yangi xususiyatlarga ega materiallar yaratish fanidir. Tasavvur qilish uchun, bir nanometr soch tolasidan qariyb 100,000 marta yupqaroqdir. Bu o'lchamda moddalarning fizik va kimyoviy xususiyatlari butunlay o'zgaradi.</p><p>Nanotexnologiyaning eng katta yutuqlaridan biri uglerod nanotrubkalari va grafenning kashf etilishidir. Grafen po'latdan 200 barobar kuchli, ammo undan bir necha barobar yengil va shaffof bo'lgan bir atom qalinligidagi uglerod qatlamidir.</p>` },
+            
+            { id: 16, title: "17. Ekologiya: Sayyora Kelajagi", category: 2,
+              content: `<p>Yer sayyorasi o'zining 4.5 milliard yillik tarixi davomida ko'plab iqlim o'zgarishlarini boshdan kechirgan. Biroq, so'nggi ikki asr ichida, xususan Sanoat inqilobidan keyin yuz berayotgan global isish jarayoni to'g'ridan-to'g'ri inson faoliyati bilan bog'liqdir. Qazib olinuvchi yoqilg'ilarning (ko'mir, neft, gaz) katta miqdorda yoqilishi oqibatida atmosferaga milliardlab tonna karbonat angidrid (CO2) ajralib chiqmoqda.</p><p>Global isishning oqibatlari nafaqat havo haroratining ko'tarilishida, balki butun ekotizimning buzilishida namoyon bo'lmoqda. Arktika va Antarktidadagi muzliklarning erishi dunyo okeani sathining ko'tarilishiga olib keladi.</p>` },
+            
+            { id: 17, title: "18. Metaolam va Virtual Reallik", category: 2,
+              content: `<p>Internetning evolyutsiyasi endilikda ikki o'lchamli ekranlardan chiqib, bizni to'liq qamrab oluvchi uch o'lchamli fazoga — Metaolamga (Metaverse) ko'chib o'tmoqda. Virtual reallik (VR) va To'ldirilgan reallik (AR) texnologiyalari orqali insonlar raqamli olamni xuddi jismoniy dunyodagidek his qilish imkoniyatiga ega bo'lmoqdalar.</p><p>Virtual reallik (VR) sizni butunlay yangi, yopiq raqamli dunyoga olib kirsa, To'ldirilgan reallik (AR) jismoniy dunyo ustiga raqamli qatlamni tushiradi. Bu texnologiyalar avvaliga faqat video o'yinlar industriyasi uchun qiziqarli ko'ringan bo'lsa, bugungi kunda ular ta'lim, arxitektura, muhandislik va tibbiyot kabi sohalarda inqilob qilmoqda.</p>` },
+            
+            { id: 18, title: "19. Avtomobilsozlik Evolyutsiyasi", category: 2,
+              content: `<p>Yuz yildan ortiq vaqt davomida insoniyatning asosiy transport vositasi bo'lib kelgan ichki yonuv dvigatellari o'z o'rnini elektromobillarga (EV) bo'shatib bermoqda. Bu avtomobilsozlik tarixidagi eng katta va eng tezkor texnologik inqilobdir. Elektromobillarning asosiy ustunligi nafaqat ularning ekologik tozaligi, balki tuzilishining o'ta soddaligidadir.</p><p>Hozirgi kunda bu sohaning eng muhim kurash maydoni akkumulyatorlar texnologiyasidir. Litiy-ion batareyalar o'rnini tez orada qattiq jismli (solid-state) batareyalar egallashi kutilmoqda.</p>` },
+            
+            { id: 19, title: "20. Tibbiyotda Gen Tahriri", category: 2,
+              content: `<p>Tibbiyot sohasi inson umrini uzaytirish va hayot sifatini yaxshilashda doim eng ilg'or fan bo'lib kelgan, ammo bugungi kundagi texnologik integratsiya uni fantastika darajasiga olib chiqdi. An'anaviy jarrohlik o'rnini asta-sekin robot-jarrohlar (masalan, da Vinci jarrohlik tizimi) egallamoqda.</p><p>Tibbiyotdagi eng katta biologik inqilob bu CRISPR-Cas9 — gendagi o'zgarishlarni tahrirlash texnologiyasidir. Bu texnologiya olimlarga DNK zanjiridagi xato yoki kasallikka sabab bo'luvchi qismni xuddi kompyuterdagi "qirqib olib, o'rniga yopishtirish" funksiyasi kabi o'zgartirish imkonini beradi.</p>` },
+            
+            // 21-25
+            { id: 20, title: "21. Sotsiologiya va Ommaviy Ong", category: 3,
+              content: `<p>Sotsiologiya insonlarning o'zaro munosabatlarini, jamiyat qanday shakllanishini va uning qanday qonuniyatlar asosida rivojlanishini o'rganuvchi fandir. Biz ko'pincha o'z qarorlarimizni mutlaqo mustaqil qabul qilamiz deb o'ylaymiz, ammo sotsiologik tadqiqotlar shuni ko'rsatadiki, bizning didimiz, e'tiqodimiz va hatto kelajakdagi maqsadlarimiz ham biz yashayotgan jamiyat tomonidan oldindan dasturlashtirilgan bo'ladi.</p><p>Ommaviy ong (Mass consciousness) tushunchasi axborot asrida ayniqsa dolzarb ahamiyat kasb etmoqda. Odamlar guruh bo'lib harakat qilganda, ularning individual mantiqiy fikrlashi susayib, hissiyotlarga asoslangan "stada" instinkti ishga tushadi.</p>` },
+            
+            { id: 21, title: "22. Kino San'ati Tarixi", category: 3,
+              content: `<p>Kino — bu insoniyat kashf etgan san'at turlarining eng yoshi, ammo eng ta'sirchanidir. XIX asr oxirida aka-uka Lyumyerlar tomonidan namoyish etilgan "Poyezdning yetib kelishi" nomli qisqa metrajli ovozsiz videodan tortib, bugungi kundagi milliard dollarlik byudjetga ega Gollivud blokbasterlarigacha bo'lgan yo'l — texnologiya va inson xayolotining ajoyib evolyutsiyasidir.</p><p>Kinematografiyaning haqiqiy sehri montaj jarayonida yashiringan. Mashhur "Kuleshov effekti" shuni ko'rsatadiki, ikkita bir-biriga bog'liq bo'lmagan kadrni ketma-ket qo'yish orqali tomoshabinda mutlaqo uchinchi, yangi ma'no va hissiyot uyg'otish mumkin.</p>` },
+            
+            { id: 22, title: "23. Arxitektura va Estetika", category: 3,
+              content: `<p>Arxitektura shunchaki odamlarni sovuqdan yoki yomg'irdan himoya qiluvchi to'rt devor va tomdan iborat emas. U muhandislik, san'at va psixologiyaning mukammal kesishuv nuqtasidir. Qadimgi faylasuflar arxitekturani "muzlagan musiqa" deb atashgan, chunki undagi proporsiyalar, ritm va garmoniya xuddi musiqiy asardek inson ruhiyatiga sokinlik yoxud jo'shqinlik baxsh eta oladi.</p><p>Arxitektura tarixi insoniyat sivilizatsiyasining tarixidir. Qadimgi Misr ehromlarining ulug'vorligi fir'avnlarning ilohiy kuchini namoyish etishga qaratilgan bo'lsa, Gotika cherkovlarining osmonga sanchilgan uchli gumbazlari insonni Yaratganga yaqinroq bo'lish intilishini aks ettirgan.</p>` },
+            
+            { id: 23, title: "24. Global Logistika", category: 3,
+              content: `<p>Siz ushbu matnni o'qib turgan smartfoningiz qanday yaratilgani haqida hech o'ylab ko'rganmisiz? Uning ekrani Koreyada ishlangan, protsessori Tayvanda yasalgan, akkumulyatoridagi litiy Afrikadan qazib olingan, dizayni AQShda chizilgan va yakunda Xitoyda yig'ilib, sizning qo'lingizga yetib kelgan. Bu murakkab zanjir — global logistika va savdo tizimining mo'jizasi hisoblanadi.</p><p>Zamonaviy yetkazib berish zanjirlari "Just-in-Time" (Ayni vaqtida) falsafasiga qurilgan. Zavodlar o'z omborlarida oylik zaxiralarni saqlamaydilar, ehtiyot qismlar konveyerga aynan kerak bo'lgan daqiqalardagina yetib keladi.</p>` },
+            
+            { id: 24, title: "25. Diplomatiya: Yumshoq Kuch", category: 3,
+              content: `<p>Insoniyat tarixi qonli urushlar bilan to'la bo'lsa-da, bugungi kunda dunyoni ushlab turgan narsa qurol emas, balki so'z va kelishuvlardir. Diplomatiya — bu davlatlar o'rtasidagi manfaatlarni tinch yo'l bilan hal etish, nizo va ziddiyatlarning oldini olish san'ati hisoblanadi. Usta diplomat uchinchi Jahon urushini bitta to'g'ri tashkil etilgan muzokara stoli atrofida to'xtatib qolishga qodir.</p><p>Xalqaro munosabatlarda "Qattiq kuch" (Harbiy va iqtisodiy bosim) va "Yumshoq kuch" (Soft power) tushunchalari mavjud. Zamonaviy dunyoda davlatning qudrati uning tanklari soni bilan emas, balki madaniyati, ta'lim tizimi va qadriyatlari qanchalik jozibador ekanligi bilan o'lchanadi.</p>` },
+            
+            // 26-30
+            { id: 25, title: "26. Mifologiya: Qadimgi Sirlar", category: 3,
+              content: `<p>Insoniyat o'zining butun tarixi davomida atrof-muhitdagi tushunarsiz hodisalarni anglashga intilgan. Qadimgi dunyo odamlari uchun chaqmoq, zilzila yoki quyosh tutilishi shunchaki tabiat hodisasi emas, balki ilohiy kuchlarning g'azabi yoki ishorasi bo'lib tuyulgan. Mifologiya — qadimgi insonlarning koinot, hayot va o'lim haqidagi ibtidoiy, ammo o'ta murakkab tasavvurlari majmuasidir.</p><p>Qadimgi Yunoniston afsonalaridagi Zevs, Poseydon va Afina kabi xudolar shunchaki ilohlar emas, balki insoniy nuqsonlar va ehtiroslarga ega bo'lgan obrazlardir. Ular orqali yunonlar adolat, qasos, jasorat va xiyonat kabi axloqiy tushunchalarni tushuntirishgan.</p>` },
+            
+            { id: 26, title: "27. Biologik Xilma-xillik", category: 3,
+              content: `<p>Yer sayyorasi koinotdagi hozircha bizga ma'lum bo'lgan yagona tiriklik maskanidir. Bu tiriklikning eng katta mo'jizasi uning cheksiz xilma-xilligidadir. Biologik xilma-xillik (Biodiversitet) — bu mikroskopik bakteriyalardan tortib, bahaybat ko'k kitlargacha bo'lgan barcha tirik organizmlarning va ular yashaydigan ekotizimlarning o'zaro murakkab tarmog'idir.</p><p>Ekotizimlar xuddi jenga o'yiniga o'xshaydi. Agar siz bitta kichik yog'och bo'lagini sug'urib olsangiz, butun minora qulab tushishi mumkin. Masalan, asalarilar va boshqa changlatuvchi hasharotlarning qirilib ketishi insoniyatning oziq-ovqat xavfsizligiga to'g'ridan-to'g'ri tahdid soladi.</p>` },
+            
+            { id: 27, title: "28. Koinotni O'zlashtirish", category: 3,
+              content: `<p>Odamzot qadim zamonlardan beri osmonga boqib, yulduzlar ortida nima borligiga qiziqib kelgan. XX asrning o'rtalariga kelib, texnologik taraqqiyot bu azaliy orzuni haqiqatga aylantirdi. 1957-yilda Yerning birinchi sun'iy yo'ldoshi uchirilishi va ko'p o'tmay insonning fazoga parvozi insoniyat tarixidagi eng buyuk sakrashlardan biri bo'ldi.</p><p>Marsni o'zlashtirish va u yerda inson koloniyasini barpo etish zamonaviy kosmonavtikaning eng asosiy maqsadlaridan biridir. Qizil sayyora o'zining sharoitlari bilan Yerga eng o'xshash joy bo'lib, kelajakda insoniyat uchun zaxira sayyora vazifasini o'tashi mumkin.</p>` },
+            
+            { id: 28, title: "29. Xotirani Kuchaytirish", category: 3,
+              content: `<p>Inson xotirasi shunchaki ma'lumotlarni saqlovchi passiv arxiv emas, balki uzluksiz ishlaydigan va o'zgarib turadigan o'ta murakkab neyrobiologik jarayondir. Biz ko'pincha "mening xotiram yomon" deb nolishga odatlanganmiz, ammo zamonaviy neyrobiologiya shuni isbotlaydiki, sog'lom insonning miyasi deyarli cheksiz miqdordagi axborotni saqlash salohiyatiga ega.</p><p>Axborotni uzoq muddatli xotiraga o'tkazishning eng samarali usullaridan biri bu "Mnemonika" san'atidir. Mnemonika quruq raqamlar yoki yodlash qiyin bo'lgan so'zlarni yorqin, his-tuyg'ularga boy va hatto kulgili vizual obrazlarga aylantirishga asoslanadi.</p>` },
+            
+            { id: 29, title: "30. Kriptografiya Ilmi", category: 3,
+              content: `<p>Axborotni yashirish va uni faqat kerakli odam o'qiy olishini ta'minlash ehtiyoji insoniyat yozuvni kashf qilgan ilk davrlardanoq paydo bo'lgan. Kriptografiya — maxfiy kodlar va shifrlash san'ati bo'lib, u shohlar, sarkardalar va josuslar o'rtasidagi yozishmalarni himoya qilishda asrlar davomida hal qiluvchi rol o'ynagan.</p><p>Kompyuterlarning paydo bo'lishi bilan kriptografiya murakkab matematik funksiyalarga ko'chdi. Zamonaviy dunyoda, hatto tarmoq ichida ham, biz har kuni internetga kirganimizda, ijtimoiy tarmoqlardan xabar yuborganimizda yoki karta orqali to'lov qilganimizda, o'zimiz sezmagan holda o'ta kuchli shifrlash algoritmlaridan foydalanamiz.</p>` },
+            
+            // 31-35
+            { id: 30, title: "31. Bioxaking: Tana Dasturlash", category: 4,
+              content: `<p>Bioxaking (Biohacking) — bu inson tanasining biologik tizimlarini optimallashtirish va ularning ish faoliyatini yaxshilashga qaratilgan ilmiy va amaliy yondashuvdir. Bu uyquni, ovqatlanishni va jismoniy faollikni ilmiy asosda boshqarish orqali miya va tana ishini maksimal darajaga olib chiqishdir.</p><p>Bioxakerlar turli xil texnologiyalar va metodlardan foydalanadilar: doimiy glyukoza monitorlari, nootropik moddalar, sovuq va issiq terapiyasi va vaqt oralab ovqatlanish (intermittent fasting). Maqsad — inson organizmini xuddi kompyuter kodi kabi "optimal sozlash"dir.</p>` },
+            
+            { id: 31, title: "32. Minimalizm Falsafasi", category: 4,
+              content: `<p>Minimalizm — bu shunchaki kam narsaga ega bo'lish emas, balki hayotdagi eng muhim narsalarga e'tiborni qaratish falsafasidir. U ortiqcha moddiy narsalar va raqamli chalg'itishlardan voz kechib, insonning o'ziga, munosabatlariga va ma'naviy rivojlanishiga ko'proq vaqt ajratishga undaydi.</p><p>Minimalizm "ozroq narsa, ko'proq ma'no" tamoyiliga asoslanadi. Bu sizning uyingizda bo'sh devorlar va kam mebel bo'lishi kerak degani emas; bu sizni chalg'itadigan, vaqtingizni va energiyangizni oladigan hamma narsani ongli ravishda chiqarib tashlashdir.</p>` },
+            
+            { id: 32, title: "33. Kvant Ruhiyati", category: 4,
+              content: `<p>Kvant ruhiyati — zamonaviy kvant fizikasi kashfiyotlari bilan qadimgi falsafiy va ruhiy ta'limotlar o'rtasidagi bog'liqlikni o'rganuvchi yo'nalishdir. U kuzatuvchining ongi haqiqatni shakllantirishda qanday rol o'ynashi mumkinligi haqidagi savollarni o'rtaga tashlaydi.</p><p>Kvant fizikasidagi "kuzatuvchi effekti" (observer effect) shuni ko'rsatadiki, zarrachaning o'zini qanday tutishi uning kuzatilayotganligiga bog'liq. Bu falsafada ming yillar davomida muhokama qilinib kelgan "ong haqiqatni yaratadimi?" degan savolga yangi qiziqarli qarashlarni olib keladi.</p>` },
+            
+            { id: 33, title: "34. Axborot Urushi", category: 4,
+              content: `<p>Axborot urushi — bu zamonaviy dunyoda davlatlar va tashkilotlar o'rtasidagi kurashning eng muhim frontlaridan biridir. U qarama-qarshi tomonning axborot tizimlariga hujum qilish, jamoatchilik fikrini manipulyatsiya qilish va noto'g'ri ma'lumotlar (dezinformatsiya) tarqatish orqali siyosiy va harbiy maqsadlarga erishishni o'z ichiga oladi.</p><p>Ijtimoiy tarmoqlar va raqamli platformalar axborot urushining asosiy maydoniga aylandi. Bitta yolg'on xabar millionlab odamlarga bir necha soat ichida yetib borishi mumkin. Bu esa demokratik jamiyatlarning zaif tomonlarini ochib, ularni ichkaridan parchalash xavfini tug'diradi.</p>` },
+            
+            { id: 34, title: "35. Mikrobiom: Ichki Koinot", category: 4,
+              content: `<p>Inson tanasida, ayniqsa ichaklarimizda trillionlab bakteriyalar, viruslar va zamburug'lar yashaydi. Bu mikroorganizmlar yig'indisi mikrobiom deb ataladi va uning umumiy og'irligi 2 kilogrammgacha yetishi mumkin. So'nggi tadqiqotlar shuni ko'rsatadiki, mikrobiom nafaqat ovqat hazm qilishga, balki kayfiyat, immunitet va hatto vaznga ham kuchli ta'sir qiladi.</p><p>Mikrobiomni "ikkinchi miya" deb ham atashadi, chunki u miya bilan to'g'ridan-to'g'ri aloqa qiladi. Stress, noto'g'ri ovqatlanish va antibiotiklar mikrobiom muvozanatini buzishi mumkin, bu esa depressiya va boshqa ruhiy kasalliklarga olib keladi.</p>` },
+            
+            // 36-40
+            { id: 35, title: "36. Xalqaro Huquq", category: 4,
+              content: `<p>Xalqaro huquq — bu mustaqil davlatlar o'rtasidagi munosabatlarni tartibga soluvchi, global xaos (tartibsizlik) va yadroviy urushlarning oldini olib turuvchi ko'rinmas qoidalar majmuasidir. Agar milliy huquq bitta davlat ichidagi fuqarolar o'rtasidagi munosabatlarni boshqarsa, xalqaro huquq Yer yuzidagi barcha suveren davlatlarni yagona o'yin qoidalariga bo'ysundirishga harakat qiladi.</p><p>Ushbu tizimning eng muhim yutuqlaridan biri Jeneva konvensiyalaridir. Garchi urush insoniyatning eng shafqatsiz harakati bo'lsa-da, xalqaro huquq unga ham insoniylik chegaralarini o'rnatgan. Tinch aholini nishonga olmaslik, asirlarni qiynamaslik va kimyoviy qurollardan foydalanmaslik kabi qoidalar aynan shu konvensiyalar orqali tasdiqlangan.</p>` },
+            
+            { id: 36, title: "37. Kaizen: O'z-o'zini Rivojlantirish", category: 4,
+              content: `<p>Yaponlarning mashhur "Kaizen" (Uzluksiz takomillashuv) falsafasi shuni uqtiradiki, inson birdaniga katta o'zgarishlar qilishga urinmasdan, har kuni o'z ustida atigi 1 foizlik ijobiy o'zgarish qilsa, yakunda beqiyos natijalarga erishadi. Bu "katta maqsadlarni kichik qadamlarga bo'lish" tamoyili miyani haddan tashqari yuklamasdan, asta-sekin o'zgartirish imkonini beradi.</p><p>Psixolog Kerol Dvekning "O'sish fikrlash tarzi" (Growth Mindset) nazariyasiga ko'ra, insonlar ikki xil fikrlashga ega bo'ladilar. Qotib qolgan fikrlash tarziga ega insonlar iste'dod va aql tug'ma bo'ladi deb hisoblab, qiyinchiliklardan qochadilar. O'sish fikrlash tarziga ega insonlar esa har qanday qobiliyatni mehnat va o'rganish orqali rivojlantirish mumkinligiga ishonadilar.</p>` },
+            
+            { id: 37, title: "38. Musiqa Neyrobiologiyasi", category: 4,
+              content: `<p>Musiqa insoniyatning eng qadimiy va universal tilidir. Neyrobiologlar musiqaning inson miyasiga ta'sirini o'rganganda hayratlanarli xulosaga keldilar: musiqa eshitish yoki cholg'u asbobini chalish miyaning faqatgina bitta qismini emas, balki deyarli barcha hududlarini (xotira, harakat, hissiyot, ko'rish va eshitish markazlarini) bir vaqtning o'zida faollashtiruvchi yagona mashg'ulotdir.</p><p>Sevimli musiqangizni eshitganingizda tanangizda jimirlash (titroq) paydo bo'lishini sezganmisiz? Bu jarayon miyada dopamin — baxt va rohat gormonining kuchli ajralib chiqishi bilan bog'liq. Musiqa to'g'ridan-to'g'ri hissiyotlar markazi bo'lmish amigdalaga ta'sir o'tkaza oladi.</p>` },
+            
+            { id: 38, title: "39. Ijtimoiy Tarmoqlar Qaramligi", category: 4,
+              content: `<p>Ijtimoiy tarmoqlar dizayni tasodifan yaratilmagan; ular inson psixologiyasi va qimor o'yinlari (kazinolar) ishlash prinsiplaridan ilhomlangan holda qurilgan. Cheksiz varaqlash (Infinite scroll), "layk" bosish va bildirishnomalar (notifications) miyada o'zgaruvchan mukofotlash tizimini ishga tushiradi. Siz har safar telefon ekranini yangilaganingizda miyangiz qanday xabar chiqishini kutib qisqa dopamin porsiyasini oladi.</p><p>Raqamli olamning eng xavfli oqibatlaridan biri bu — solishtirish madaniyatidir (Comparison culture). Insonlar ijtimoiy tarmoqlarda o'z hayotlarining faqat eng chiroyli, tahrirlangan (filtrdan o'tgan) va baxtli onlarini joylaydilar. Buni ko'rgan oddiy foydalanuvchi o'zining real, oddiy hayotini o'zgalarning "mukammal" sahifaviy hayoti bilan solishtiradi.</p>` },
+            
+            { id: 39, title: "40. Startaplar Anatomiyasi", category: 4,
+              content: `<p>Startap – bu shunchaki yangi ochilgan kichik biznes emas. Startap – bu o'ta yuqori noaniqlik sharoitida innovatsion mahsulot yoki xizmatni yaratish va qisqa muddat ichida global miqyosda tezkor o'sishga (scaling) erishish uchun mo'ljallangan vaqtinchalik tashkilotdir. Oddiy novvoyxona yoki qahvaxona ochish biznes bo'lsa, butun dunyo novvoyxonalarini bitta platformada birlashtiruvchi va sun'iy intellekt orqali xaridorlarni topib beruvchi ilova yaratish – bu startapdir.</p><p>Startap dunyosida "Tejamkor startap" (Lean Startup) metodologiyasi eng oltin qoida hisoblanadi. Ko'pchilik tadbirkorlar mukammal mahsulot yarataman deb yillab vaqtini va pulini sarflaydi, bozorga chiqqanda esa bu mahsulot hech kimga kerak emasligi ma'lum bo'ladi.</p>` },
+            
+            // 41-45
+            { id: 40, title: "41. Muvaffaqiyatsizlik Saboqlari", category: 5,
+              content: `<p>Muvaffaqiyat haqidagi kitoblar juda ko'p, ammo muvaffaqiyatsizlikning asl mohiyati va uning shaxs shakllanishidagi o'rni ko'pincha e'tibordan chetda qoladi. Aslida, har bir buyuk g'alaba – bu o'nlab, ba'zan yuzlab xatolar va mag'lubiyatlar ustiga qurilgan poydevordir. Muvaffaqiyatsizlik bu yo'lning oxiri emas, balki tizimning qayerida xato borligini ko'rsatib beruvchi eng aniq axborot (feedback) manbayidir.</p><p>Tarixdagi eng buyuk ixtirochilar ham bir urinishda muvaffaqiyatga erishmagan. Tomas Edison lampochkani ixtiro qilishdan avval 10,000 marta muvaffaqiyatsizlikka uchragan. U o'z tajribalariga "Men 10,000 marta xato qilmadim, shunchaki ishlamaydigan 10,000 ta yo'lni topdim" deb baho bergan.</p>` },
+            
+            { id: 41, title: "42. Agile va Scrum", category: 5,
+              content: `<p>Zamonaviy dunyoda ishlar shu qadar tez o'zgaradiki, bir necha yil oldin tuzilgan reja bugun o'z kuchini yo'qotishi mumkin. An'anaviy loyiha boshqaruvi (Waterfall) endilikda o'z o'rnini egiluvchan va moslashuvchan metodologiyalarga bo'shatib bermoqda. Agile (Egiluvchan) – bu shunchaki ish uslubi emas, balki jamoaviy fikrlash tarzi bo'lib, u mijoz ehtiyojlarini birinchi o'ringa qo'yish va mahsulotni kichik-kichik qismlar bilan muntazam ravishda topshirishga asoslanadi.</p><p>Agile ichidagi eng mashhur freymvorklardan biri – Scrum hisoblanadi. Scrumda ishlar "Sprint" deb ataluvchi qisqa muddatli (odatda 2 hafta) davrlarga bo'linadi. Har bir sprint yakunida tayyor, ishlaydigan mahsulot bo'lagi namoyish etilishi shart.</p>` },
+            
+            { id: 42, title: "43. Zamonaviy San'at", category: 5,
+              content: `<p>Ko'pchilik odamlar zamonaviy san'at asarlariga qaraganda: "Buni men ham chiza olardim-ku!" degan fikrga borishadi. Biroq zamonaviy san'atda asosiy qadriyat – bu rasmning qanchalik realistik chizilganida (texnikada) emas, balki uning ortida yotgan g'oyada (konseptda) va u uyg'otadigan hissiyotda yashirin. San'at endilikda dunyoni shunchaki nusxalamaydi, balki dunyoga savol beradi va odatiy narsalarga yangicha nazar bilan qarashga undaydi.</p><p>Abstraksionizm, minimalizm va kontseptualizm kabi yo'nalishlar XX asr boshlarida paydo bo'lib, san'at haqidagi barcha qoliplarni parchalab tashladi. Marsel Dyushanning oddiy "Pissuar"ni ko'rgazma zaliga qo'yishi san'at tarixidagi eng katta inqiloblardan biri bo'ldi.</p>` },
+            
+            { id: 43, title: "44. Raqamli Minimalizm", category: 5,
+              content: `<p>Biz axborot to'lqinlari ichida suzayotgan emas, balki ularning ostida qolib g'arq bo'layotgan avlodmiz. Har kuni o'rtacha inson o'z telefonini 2,500 martadan ortiq bosadi va yuzlab bildirishnomalarni qabul qiladi. Raqamli minimalizm – bu texnologiyalardan butunlay voz kechish emas, balki ularni hayotingizga qat'iy va ongli ravishda kiritish falsafasidir.</p><p>Bu jarayonni boshlash uchun "Raqamli tozalash" (Digital Declutter) o'tkazish tavsiya etiladi. Bir oy davomida hayotingiz uchun hayotiy zarur bo'lmagan barcha ilovalar va ko'ngilochar platformalardan voz kechib ko'ring. Shunda siz haqiqatda nima siz uchun qadrli ekanini va nimalar shunchaki vaqtingizni o'g'irlayotganini tushunib yetasiz.</p>` },
+            
+            { id: 44, title: "45. Yangi Geosiyosat", category: 5,
+              content: `<p>Dunyo endilikda bitta yoki ikkita super-qudratli davlat atrofida aylanmaydi. Biz "Ko'p qutbli dunyo" (Multipolar world) davriga qadam qo'ydik, unda turli mintaqaviy kuchlar va iqtisodiy markazlar o'z so'zini aytishga intilmoqda. Xalqaro munosabatlar shunchaki diplomatiya emas, bu – resurslar, texnologiyalar va g'oyalar uchun kurash maydonidir.</p><p>Zamonaviy geosiyosatda "Iqtisodiy qurol" (Economic weapon) tushunchasi harbiy kuchdan ko'ra ko'proq ishlatilmoqda. Sanksiyalar, savdo cheklovlari va energetika resurslari bilan bosim o'tkazish orqali davlatlar bir-birining siyosiy qarorlariga ta'sir o'tkazishga harakat qilmoqdalar.</p>` },
+            
+            // 46-50
+            { id: 45, title: "46. Kiber-Psixologiya", category: 5,
+              content: `<p>Kiber-psixologiya — bu insonning texnologiyalar, internet va virtual olam bilan o'zaro ta'sirini o'rganuvchi zamonaviy fan yo'nalishidir. Biz real hayotda bitta shaxsiyatga ega bo'lsak, raqamli dunyoda mutlaqo boshqacha, ko'pincha "idealizatsiya qilingan" obrazda namoyon bo'lamiz. Bu ikki dunyo o'rtasidagi tafovut inson ruhiyatida yangi turdagi ziddiyatlarni va "Raqamli ikkilanish" holatlarini keltirib chiqarmoqda.</p><p>Anonimlik — internetning eng kuchli va ayni paytda eng xavfli xususiyatidir. Inson o'z ismini yashirgan holda, real hayotda hech qachon aytishga jur'at etmaydigan fikrlarini ochiq bayon qiladi. Bu "Onlayn disinhibitsiya effekti" (Online disinhibition effect) deb ataladi.</p>` },
+            
+            { id: 46, title: "47. Smart City", category: 5,
+              content: `<p>2050-yilga kelib dunyo aholisining 70 foizdan ortig'i shaharlarda yashashi bashorat qilinmoqda. Bu ulkan o'sish an'anaviy shahar infratuzilmalariga juda katta bosim o'tkazadi. Yechim — "Aqlli shahar" (Smart City) konsepsiyasidir. Aqlli shahar — bu barcha tizimlari (transport, energiya, suv, chiqindi, xavfsizlik) yagona raqamli tarmoqqa bog'langan va sensorlar yordamida real vaqtda boshqariladigan yashash muhitidir.</p><p>Bunday shaharlarda tirbandliklar deyarli bo'lmaydi, chunki sun'iy intellekt svetoforlarni va avtonom jamoat transportlarini real vaqtda oqimga qarab boshqaradi. Energiya sarfi minimal darajaga tushiriladi: ko'cha chiroqlari faqat odam o'tayotganda yonadi, binolar esa o'zining energiyasini quyosh panellari orqali o'zi ishlab chiqaradi.</p>` },
+            
+            { id: 47, title: "48. Neyro-interfeys", category: 5,
+              content: `<p>Inson miyasi va kompyuter o'rtasida to'g'ridan-to'g'ri aloqa o'rnatish uzoq vaqt fantastik filmlar mavzusi bo'lib kelgan. Ammo bugun BCI (Brain-Computer Interface) texnologiyalari bu chegarani buzib o'tdi. Neyro-interfeys — bu miyadagi neyronlarning elektr signallarini o'qib, ularni raqamli buyruqlarga aylantiruvchi tizimdir. Bu degani, biz yaqin kelajakda kompyuter yoki smartfonni qo'llarimiz bilan emas, balki shunchaki fikr kuchi bilan boshqarishimiz mumkin bo'ladi.</p><p>Ushbu texnologiyaning birinchi navbatdagi maqsadi — tibbiy yordamdir. Falaj bo'lib qolgan yoki nutq qobiliyatini yo'qotgan insonlar neyro-interfeyslar yordamida yana muloqot qilish, virtual klaviaturalarda yozish va hatto robotlashtirilgan oyoq-qo'llarni boshqarish imkoniyatiga ega bo'lmoqdalar.</p>` },
+            
+            { id: 48, title: "49. Kvant Kompyuterlari", category: 5,
+              content: `<p>Kvant kompyuterlari bitlar o'rniga kubitlardan (quantum bits) foydalanishi orqali hisoblash quvvatini fantastik darajaga ko'taradi. Bu texnologiya nafaqat yangi dori vositalarini yaratishda, balki koinotning eng qadimiy sirlarini — Katta portlashdan keyingi ilk soniyalarda nima sodir bo'lganini simulyatsiya qilishda yagona yo'ldir.</p><p>Kvant chalkashligi (Quantum entanglement) hodisasi shuni ko'rsatadiki, ikkita zarracha orasidagi masofa qanchalik uzoq bo'lmasin, ular bir lahzada ma'lumot almasha oladilar. Eynshteyn buni "uzoqdagi g'ayritabiiy harakat" deb atagan edi. Bu hodisadan foydalanib, kelajakda "Kvant interneti" va "Kvant teleportatsiyasi" amalga oshirilishi mumkin.</p>` },
+            
+            { id: 49, title: "50. Insoniyatning Yakuniy Taqdiri", category: 5,
+              content: `<p>Biz ushbu 50 ta kitoblik sayohatimizning so'nggi nuqtasiga yetib keldik. Insoniyatning kelajagi nima bo'ladi? Biz qayerga ketyapmiz? Bu savollar har bir ongli mavjudotni o'ylantirishi tabiiy. Biz hozirda "Kardashev shkalasi" bo'yicha 0-tur sivilizatsiyasidan 1-tur sivilizatsiyasiga o'tish arafasidamiz. Ya'ni, biz o'z sayyoramizning barcha resurslarini to'liq boshqarishni endigina o'rganyapmiz.</p><p>Kelajakda bizni ikki xil yo'l kutishi mumkin: yo biz o'z texnologiyalarimiz qurboniga aylanamiz (ekologik halokat, kiber-urushlar, AI qo'zg'oloni), yoki biz "Transhumanizm" davriga o'tib, o'z biologik chegaralarimizdan chiqib ketamiz. Inson va texnologiyaning birlashishi, ongimizning raqamli shaklga o'tishi va koinotning boshqa nuqtalariga kolonizatsiya qilish — bu shunchaki vaqt masalasidir.</p><p>Koinot milliardlab yillar yashashda davom etadi. Quyoshimiz so'nganidan keyin ham insoniyat (yoki uning raqamli avlodlari) boshqa yulduz tizimlarida hayot kechirishi mumkin. Bu kutubxona sizga dunyoni tushunishda kichik bir chiroq bo'ldi degan umiddamiz. Bilim — bu chegara bilmas kuchdir. Har doim o'rganishda, izlanishda va savol berishda davom eting. Sayohatimiz tugadi, lekin sizning bilimlar olamidagi shaxsiy yo'lingiz endi boshlanmoqda.</p>` }
+        ];
+
+        // ===== STATE =====
+        const state = {
+            user: localStorage.getItem('xoleric_user') || null,
+            lastBook: localStorage.getItem('xoleric_lastBook') ? parseInt(localStorage.getItem('xoleric_lastBook')) : null,
+            fontSize: 18,
+            currentBook: null,
+            currentCategory: 'all',
+            searchQuery: '',
+            isPlaying: false,
+            currentParagraph: 0,
+            paragraphs: []
+        };
+
+        // ===== DOM ELEMENTS =====
+        const dom = {
+            splash: document.getElementById('splashScreen'),
+            welcome: document.getElementById('welcomeScreen'),
+            main: document.getElementById('mainScreen'),
+            reader: document.getElementById('readerScreen'),
+            userNameInput: document.getElementById('userNameInput'),
+            startBtn: document.getElementById('startBtn'),
+            displayUserName: document.getElementById('displayUserName'),
+            booksGrid: document.getElementById('booksGrid'),
+            searchInput: document.getElementById('searchInput'),
+            categories: document.querySelectorAll('.category-chip'),
+            backBtn: document.getElementById('backBtn'),
+            fontBtn: document.getElementById('fontBtn'),
+            fontPanel: document.getElementById('fontPanel'),
+            fontSlider: document.getElementById('fontSlider'),
+            fontValue: document.getElementById('fontValue'),
+            readTitle: document.getElementById('readTitle'),
+            readContent: document.getElementById('readContent'),
+            readerHeaderTitle: document.getElementById('readerHeaderTitle'),
+            playBtn: document.getElementById('playBtn'),
+            playIcon: document.getElementById('playIcon'),
+            pauseIcon: document.getElementById('pauseIcon'),
+            progressBar: document.getElementById('progressBar'),
+            progressText: document.getElementById('progressText'),
+            progressTrack: document.getElementById('progressTrack'),
+            readerContent: document.getElementById('readerContent'),
+            toast: document.getElementById('toast')
+        };
+
+        // ===== UTILITIES =====
+        function showToast(msg, duration = 2000) {
+            dom.toast.textContent = msg;
+            dom.toast.classList.add('show');
+            setTimeout(() => dom.toast.classList.remove('show'), duration);
+        }
+
+        function vibrate(ms) {
+            if (window.navigator && window.navigator.vibrate) {
+                try { window.navigator.vibrate(ms); } catch (e) {}
+            }
+            
+            // Add visual vibration effect
+            document.body.classList.add('vibrate');
+            setTimeout(() => document.body.classList.remove('vibrate'), 100);
+        }
+
+        // ===== SPLASH SCREEN =====
+        setTimeout(() => {
+            dom.splash.classList.add('hide');
+        }, 2000);
+
+        // ===== WELCOME SCREEN =====
+        if (state.user) {
+            dom.userNameInput.style.display = 'none';
+            dom.displayUserName.textContent = state.user.toUpperCase();
+            setTimeout(() => {
+                dom.welcome.classList.add('hide');
+                dom.main.classList.remove('hide');
+                renderLibrary();
+            }, 2000);
+        }
+
+        dom.startBtn.addEventListener('click', () => {
+            const name = dom.userNameInput.value.trim();
+            if (name.length < 2) {
+                showToast('Ismingizni kiriting');
+                vibrate(100);
+                return;
+            }
+            
+            state.user = name;
+            localStorage.setItem('xoleric_user', name);
+            dom.displayUserName.textContent = name.toUpperCase();
+            
+            vibrate(50);
+            dom.welcome.classList.add('hide');
+            dom.main.classList.remove('hide');
+            renderLibrary();
+            
+            // Fullscreen
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            }
+        });
+
+        // ===== RENDER LIBRARY =====
+        function renderLibrary() {
+            let filtered = BOOKS;
+            
+            // Filter by category
+            if (state.currentCategory !== 'all') {
+                filtered = filtered.filter(b => b.category === parseInt(state.currentCategory));
+            }
+            
+            // Filter by search
+            if (state.searchQuery) {
+                const query = state.searchQuery.toLowerCase();
+                filtered = filtered.filter(b => b.title.toLowerCase().includes(query));
+            }
+            
+            dom.booksGrid.innerHTML = '';
+            
+            filtered.forEach(book => {
+                const isLastRead = state.lastBook === book.id;
+                
+                const card = document.createElement('div');
+                card.className = `book-card ${isLastRead ? 'last-read' : ''}`;
+                card.innerHTML = `
+                    <div class="book-number ${isLastRead ? 'last' : ''}">${isLastRead ? '▶ DAVOM ETISH' : `KITOB ${book.id + 1}`}</div>
+                    <div class="book-title">${book.title.replace(/^\d+\.\s*/, '')}</div>
+                    <div class="book-badge">O'QISH</div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    vibrate(30);
+                    openBook(book.id);
+                });
+                
+                dom.booksGrid.appendChild(card);
+            });
+        }
+
+        // ===== CATEGORIES =====
+        dom.categories.forEach(cat => {
+            cat.addEventListener('click', () => {
+                dom.categories.forEach(c => c.classList.remove('active'));
+                cat.classList.add('active');
+                state.currentCategory = cat.dataset.category;
+                renderLibrary();
+                vibrate(20);
+            });
+        });
+
+        // ===== SEARCH =====
+        dom.searchInput.addEventListener('input', (e) => {
+            state.searchQuery = e.target.value;
+            renderLibrary();
+        });
+
+        // ===== OPEN BOOK =====
+        function openBook(id) {
+            const book = BOOKS.find(b => b.id === id);
+            if (!book) return;
+            
+            state.currentBook = book;
+            state.lastBook = id;
+            localStorage.setItem('xoleric_lastBook', id);
+            
+            dom.readTitle.textContent = book.title;
+            dom.readContent.innerHTML = book.content;
+            dom.readerHeaderTitle.textContent = book.title.length > 30 ? book.title.substring(0, 30) + '...' : book.title;
+            
+            // Parse paragraphs for TTS
+            state.paragraphs = Array.from(dom.readContent.querySelectorAll('p'));
+            state.currentParagraph = 0;
+            
+            // Reset player
+            resetPlayer();
+            
+            // Show reader
+            dom.main.classList.add('hide');
+            dom.reader.classList.add('show');
+            
+            // Scroll to top
+            dom.readerContent.scrollTop = 0;
+            
+            // Update library to show last read
+            renderLibrary();
+        }
+
+        // ===== BACK BUTTON =====
+        dom.backBtn.addEventListener('click', () => {
+            vibrate(20);
+            stopTTS();
+            dom.reader.classList.remove('show');
+            dom.main.classList.remove('hide');
+            
+            // Hide font panel
+            dom.fontPanel.classList.remove('show');
+        });
+
+        // ===== FONT CONTROLS =====
+        let pressTimer;
+        
+        dom.fontBtn.addEventListener('mousedown', () => {
+            pressTimer = setTimeout(() => {
+                vibrate(40);
+                dom.fontPanel.classList.add('show');
+            }, 600);
+        });
+        
+        dom.fontBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            pressTimer = setTimeout(() => {
+                vibrate(40);
+                dom.fontPanel.classList.add('show');
+            }, 600);
+        });
+        
+        dom.fontBtn.addEventListener('mouseup', () => clearTimeout(pressTimer));
+        dom.fontBtn.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+        dom.fontBtn.addEventListener('touchend', () => clearTimeout(pressTimer));
+        
+        dom.fontSlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            dom.fontValue.textContent = val;
+            document.documentElement.style.setProperty('--font-size', `${val}px`);
+            state.fontSize = val;
+        });
+        
+        // Close font panel when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!dom.fontPanel.contains(e.target) && e.target !== dom.fontBtn) {
+                dom.fontPanel.classList.remove('show');
+            }
+        });
+
+        // ===== TTS ENGINE =====
+        const synth = window.speechSynthesis;
+        let utterance = null;
+        
+        function updateProgress() {
+            if (!state.paragraphs.length) return;
+            const percent = Math.floor((state.currentParagraph / (state.paragraphs.length - 1)) * 100) || 0;
+            dom.progressBar.style.width = percent + '%';
+            dom.progressText.textContent = percent + '%';
+        }
+        
+        function highlightParagraph(index) {
+            state.paragraphs.forEach(p => p.classList.remove('active'));
+            if (state.paragraphs[index]) {
+                state.paragraphs[index].classList.add('active');
+                
+                // Scroll to paragraph with smooth animation
+                const p = state.paragraphs[index];
+                const container = dom.readerContent;
+                const offset = p.offsetTop - container.offsetTop - (container.clientHeight / 2) + (p.clientHeight / 2);
+                container.scrollTo({ top: Math.max(0, offset), behavior: 'smooth' });
+            }
+        }
+        
+        function playNext() {
+            if (!state.isPlaying) return;
+            
+            if (state.currentParagraph >= state.paragraphs.length) {
+                stopTTS();
+                return;
+            }
+            
+            highlightParagraph(state.currentParagraph);
+            
+            const text = state.paragraphs[state.currentParagraph].textContent;
+            utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.95;
+            utterance.lang = 'uz-UZ';
+            
+            // Try to find Uzbek voice
+            const voices = synth.getVoices();
+            const uzVoice = voices.find(v => v.lang.includes('uz')) || 
+                           voices.find(v => v.lang.includes('ru')) || 
+                           voices[0];
+            if (uzVoice) utterance.voice = uzVoice;
+            
+            utterance.onend = () => {
+                state.currentParagraph++;
+                updateProgress();
+                playNext();
+            };
+            
+            utterance.onerror = () => {
+                state.currentParagraph++;
+                playNext();
+            };
+            
+            synth.speak(utterance);
+        }
+        
+        function togglePlay() {
+            if (!state.currentBook) return;
+            
+            if (state.isPlaying) {
+                synth.pause();
+                state.isPlaying = false;
+                dom.playIcon.style.display = 'block';
+                dom.pauseIcon.style.display = 'none';
+            } else {
+                if (synth.paused) {
+                    synth.resume();
+                } else {
+                    playNext();
+                }
+                state.isPlaying = true;
+                dom.playIcon.style.display = 'none';
+                dom.pauseIcon.style.display = 'block';
+            }
+            vibrate(30);
+        }
+        
+        function stopTTS() {
+            synth.cancel();
+            state.isPlaying = false;
+            state.currentParagraph = 0;
+            dom.playIcon.style.display = 'block';
+            dom.pauseIcon.style.display = 'none';
+            dom.progressBar.style.width = '0%';
+            dom.progressText.textContent = '0%';
+            state.paragraphs.forEach(p => p.classList.remove('active'));
+        }
+        
+        function resetPlayer() {
+            stopTTS();
+            state.currentParagraph = 0;
+            updateProgress();
+        }
+        
+        // ===== PLAY BUTTON =====
+        dom.playBtn.addEventListener('click', () => {
+            togglePlay();
+        });
+        
+        // ===== PROGRESS TRACK =====
+        dom.progressTrack.addEventListener('click', (e) => {
+            if (!state.paragraphs.length) return;
+            
+            const rect = dom.progressTrack.getBoundingClientRect();
+            const percent = ((e.clientX - rect.left) / rect.width) * 100;
+            const newIndex = Math.floor((percent / 100) * (state.paragraphs.length - 1));
+            
+            state.currentParagraph = Math.min(newIndex, state.paragraphs.length - 1);
+            
+            if (state.isPlaying) {
+                synth.cancel();
+                playNext();
+            } else {
+                highlightParagraph(state.currentParagraph);
+            }
+            
+            updateProgress();
+            vibrate(20);
+        });
+
+        // ===== DOUBLE TAP FOR NEXT BOOK =====
+        let lastTap = 0;
+        
+        dom.readerContent.addEventListener('click', (e) => {
+            const now = Date.now();
+            if (now - lastTap < 300) {
+                // Double tap detected - go to next book
+                const nextId = state.currentBook.id + 1;
+                if (nextId < BOOKS.length) {
+                    stopTTS();
+                    openBook(nextId);
+                    showToast('Keyingi kitob');
+                    vibrate(50);
+                }
+            }
+            lastTap = now;
+        });
+
+        // ===== PREVENT CONTEXT MENU =====
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        
+        // ===== INITIAL RENDER =====
+        renderLibrary();
+        
+        // ===== LOAD VOICES =====
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = () => {
+                // Just to load voices
+            };
+        }
+    </script>
+</body>
+</html>
