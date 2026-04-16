@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOLƎRIƆ — QUANTUM INTERFACE</title>
+    <style>
+        :root {
+            --quantum-cyan: #00f5ff;
+            --quantum-violet: #bf00ff;
+            --quantum-pink: #ff0080;
+            --quantum-gold: #ffd700;
+            --void-black: #020208;
+            --nebula: #0a0a1a;
+            --glass: rgba(255,255,255,0.03);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+
+        body {
+            background: var(--void-black);
+            color: #fff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Quantum Cursor */
+        #quantum-cursor {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: screen;
+            background: radial-gradient(circle, var(--quantum-cyan) 0%, transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+        #cursor-ring {
+            position: fixed;
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--quantum-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10001;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s;
+        }
+        #cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: #fff;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10002;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Quantum WebGL Background */
+        #quantum-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-image: url('https://i.ibb.co/JjJ2mjS4/1775193815209-edit-90965910067883.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.5;
+            filter: grayscale(30%) contrast(1.1);
+        }
+
+        /* Holographic Grid */
+        #holo-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0.5;
+            opacity: 0.08;
+            background: 
+                linear-gradient(90deg, transparent 49%, rgba(0,245,255,0.1) 50%, transparent 51%),
+                linear-gradient(0deg, transparent 49%, rgba(0,245,255,0.1) 50%, transparent 51%);
+            background-size: 60px 60px;
+            transform-style: preserve-3d;
+            perspective: 500px;
+            animation: gridMove 20s linear infinite;
+        }
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 60px 60px; }
+        }
+
+        /* Neural Network Canvas */
+        #neural-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.25;
+            mix-blend-mode: screen;
+        }
+
+        /* Main Quantum Interface */
+        #quantum-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        /* Neural Navigation */
+        #neural-nav {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: 50px;
+            pointer-events: all;
+        }
+        .neural-node {
+            position: relative;
+            padding: 12px 24px;
+            background: var(--glass);
+            border: 1px solid rgba(0,245,255,0.3);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            cursor: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        .neural-node::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, var(--quantum-cyan), transparent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+        .neural-node:hover::before {
+            width: 300px;
+            height: 300px;
+            opacity: 0.3;
+        }
+        .neural-node:hover {
+            color: #fff;
+            border-color: var(--quantum-cyan);
+            box-shadow: 0 0 30px rgba(0,245,255,0.3);
+            transform: scale(1.1);
+        }
+        .neural-node .node-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            background: var(--quantum-cyan);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: nodePulse 2s infinite;
+        }
+        @keyframes nodePulse {
+            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(2); }
+        }
+
+        /* Central Quantum Core */
+        #quantum-core {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            z-index: 500;
+            pointer-events: all;
+        }
+        .core-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+            border: 1px solid;
+            transform: translate(-50%, -50%);
+            animation: coreRotate linear infinite;
+        }
+        .core-ring:nth-child(1) {
+            width: 100%;
+            height: 100%;
+            border-color: rgba(0,245,255,0.3);
+            animation-duration: 20s;
+        }
+        .core-ring:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            border-color: rgba(191,0,255,0.3);
+            animation-duration: 15s;
+            animation-direction: reverse;
+        }
+        .core-ring:nth-child(3) {
+            width: 60%;
+            height: 60%;
+            border-color: rgba(255,0,128,0.3);
+            animation-duration: 10s;
+        }
+        .core-ring:nth-child(4) {
+            width: 40%;
+            height: 40%;
+            border-color: rgba(255,215,0,0.3);
+            animation-duration: 8s;
+            animation-direction: reverse;
+        }
+        @keyframes coreRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        .core-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--quantum-cyan) 0%, transparent 70%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .core-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #fff, var(--quantum-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .core-status {
+            font-size: 0.7rem;
+            color: var(--quantum-cyan);
+            letter-spacing: 3px;
+            margin-top: 5px;
+            animation: statusBlink 1.5s infinite;
+        }
+        @keyframes statusBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Floating Particles */
+        .floating-particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--quantum-cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 200;
+            box-shadow: 0 0 10px var(--quantum-cyan);
+        }
+
+        /* Quantum Cards - Morphing Glass */
+        .quantum-card {
+            position: fixed;
+            background: rgba(10, 10, 30, 0.6);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(0,245,255,0.2);
+            border-radius: 20px;
+            padding: 40px;
+            pointer-events: all;
+            cursor: none;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: scale(0.8) translateY(50px);
+        }
+        .quantum-card.visible {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        .quantum-card:hover {
+            border-color: var(--quantum-cyan);
+            box-shadow: 
+                0 0 50px rgba(0,245,255,0.2),
+                inset 0 0 50px rgba(0,245,255,0.05);
+        }
+        .quantum-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #fff, var(--quantum-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .quantum-card p {
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .card-glow {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, var(--quantum-violet), transparent);
+            border-radius: 50%;
+            opacity: 0;
+            filter: blur(50px);
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .quantum-card:hover .card-glow { opacity: 0.3; }
+
+        #card-web { top: 25%; right: 10%; width: 350px; }
+        #card-cyber { top: 50%; right: 5%; width: 380px; }
+        #card-code { top: 75%; right: 15%; width: 360px; }
+
+        /* Holographic Projection Effect */
+        .holo-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        .holo-effect.active { opacity: 1; }
+        .holo-line {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--quantum-cyan), transparent);
+            animation: holoScan 3s linear infinite;
+        }
+        @keyframes holoScan {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Neural Link Lines */
+        .neural-link {
+            position: fixed;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--quantum-cyan), transparent);
+            transform-origin: left center;
+            z-index: 150;
+            opacity: 0;
+            animation: linkPulse 3s infinite;
+        }
+        @keyframes linkPulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Data Stream */
+        #data-stream {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1.2;
+            overflow: hidden;
+            opacity: 0.08;
+        }
+        .data-column {
+            position: absolute;
+            top: -100%;
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--quantum-cyan);
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            animation: dataFall linear infinite;
+            text-shadow: 0 0 5px var(--quantum-cyan);
+            opacity: 0.4;
+        }
+        @keyframes dataFall {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(200vh); }
+        }
+
+        /* Quantum Chat Terminal */
+        #quantum-chat {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 380px;
+            max-height: 500px;
+            background: rgba(5, 5, 20, 0.95);
+            border: 1px solid rgba(0,245,255,0.3);
+            border-radius: 20px;
+            z-index: 2000;
+            pointer-events: all;
+            transform: translateY(150%) scale(0.9);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(30px);
+            overflow: hidden;
+        }
+        #quantum-chat.open {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        .chat-header {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, rgba(0,245,255,0.1), rgba(191,0,255,0.1));
+            border-bottom: 1px solid rgba(0,245,255,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-title {
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            color: var(--quantum-cyan);
+        }
+        .chat-indicator {
+            display: flex;
+            gap: 6px;
+        }
+        .chat-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--quantum-cyan);
+            border-radius: 50%;
+            animation: indicatorPulse 1.4s infinite;
+        }
+        .chat-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .chat-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes indicatorPulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.5); opacity: 1; }
+        }
+        .chat-body {
+            height: 320px;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .chat-msg {
+            max-width: 85%;
+            padding: 15px 20px;
+            border-radius: 15px;
+            line-height: 1.6;
+            animation: msgAppear 0.3s ease;
+        }
+        @keyframes msgAppear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-msg.bot {
+            background: rgba(0,245,255,0.1);
+            border: 1px solid rgba(0,245,255,0.2);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .chat-msg.user {
+            background: linear-gradient(135deg, var(--quantum-cyan), var(--quantum-violet));
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            color: #000;
+            font-weight: 600;
+        }
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid rgba(0,245,255,0.2);
+            display: flex;
+            gap: 15px;
+        }
+        .chat-input-area input {
+            flex: 1;
+            background: rgba(0,245,255,0.05);
+            border: 1px solid rgba(0,245,255,0.3);
+            border-radius: 25px;
+            padding: 12px 20px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .chat-input-area input:focus {
+            border-color: var(--quantum-cyan);
+            box-shadow: 0 0 20px rgba(0,245,255,0.2);
+        }
+        .chat-input-area input::placeholder { color: rgba(255,255,255,0.3); }
+        .chat-send {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--quantum-cyan), var(--quantum-violet));
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: none;
+            transition: all 0.3s;
+        }
+        .chat-send:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(0,245,255,0.5);
+        }
+        .chat-send svg { width: 20px; height: 20px; fill: #000; }
+
+        /* Chat Toggle */
+        #chat-toggle {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--quantum-cyan), var(--quantum-violet));
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2001;
+            cursor: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 50px rgba(0,245,255,0.4);
+        }
+        #chat-toggle:hover {
+            transform: scale(1.15);
+            box-shadow: 0 0 80px rgba(0,245,255,0.6);
+        }
+        #chat-toggle svg { width: 30px; height: 30px; fill: #000; }
+        #chat-toggle .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--quantum-cyan);
+            border-radius: 50%;
+            animation: pulseRing 2s infinite;
+        }
+        @keyframes pulseRing {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        /* Stats HUD */
+        #stats-hud {
+            position: fixed;
+            top: 100px;
+            left: 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: var(--quantum-cyan);
+            z-index: 1000;
+            opacity: 0.6;
+            line-height: 2;
+        }
+        .hud-line {
+            display: flex;
+            gap: 10px;
+        }
+        .hud-label { color: rgba(255,255,255,0.4); }
+        .hud-value { color: var(--quantum-cyan); }
+
+        /* Time Display */
+        #quantum-time {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.4);
+            z-index: 1000;
+            text-align: left;
+        }
+        #quantum-time .time-main {
+            font-size: 2rem;
+            color: var(--quantum-cyan);
+            letter-spacing: 5px;
+        }
+        #quantum-time .time-label {
+            color: rgba(255,255,255,0.3);
+            font-size: 0.7rem;
+            letter-spacing: 3px;
+        }
+
+        /* Ambient Sound Toggle */
+        #ambient-toggle {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--glass);
+            border: 1px solid rgba(0,245,255,0.3);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: none;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        #ambient-toggle:hover {
+            border-color: var(--quantum-cyan);
+            box-shadow: 0 0 20px rgba(0,245,255,0.3);
+        }
+        #ambient-toggle svg { width: 24px; height: 24px; fill: var(--quantum-cyan); }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            #neural-nav { display: none; }
+            #quantum-core { width: 280px; height: 280px; }
+            .core-center { width: 100px; height: 100px; }
+            .core-title { font-size: 1rem; }
+            .quantum-card { 
+                position: relative !important; 
+                top: auto !important; 
+                right: auto !important; 
+                width: 90% !important; 
+                margin: 20px auto;
+                transform: none !important;
+            }
+            #card-container {
+                position: relative;
+                top: 100px;
+                z-index: 500;
+            }
+            #quantum-chat { width: calc(100% - 20px); right: 10px; bottom: 10px; max-height: 70vh; }
+            #chat-toggle { bottom: 20px; right: 20px; width: 60px; height: 60px; }
+            .cursor, #cursor-ring, #cursor-dot { display: none; }
+            * { cursor: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="quantum-bg"></div>
+    <div id="holo-grid"></div>
+    <canvas id="neural-canvas"></canvas>
+    <div id="data-stream"></div>
+
+    <div id="quantum-cursor"></div>
+    <div id="cursor-ring"></div>
+    <div id="cursor-dot"></div>
+
+    <div id="neural-nav">
+        <div class="neural-node" data-target="home">
+            <span class="node-pulse"></span>
+            Tizim
+        </div>
+        <div class="neural-node" data-target="projects">
+            <span class="node-pulse"></span>
+            Loyihalar
+        </div>
+        <div class="neural-node" data-target="audio">
+            <span class="node-pulse"></span>
+            Audio
+        </div>
+        <div class="neural-node" data-target="contact">
+            <span class="node-pulse"></span>
+            Aloqa
+        </div>
+    </div>
+
+    <div id="quantum-core">
+        <div class="core-ring"></div>
+        <div class="core-ring"></div>
+        <div class="core-ring"></div>
+        <div class="core-ring"></div>
+        <div class="core-center">
+            <div class="core-title">XOLƎRIƆ</div>
+            <div class="core-status">● ONLINE</div>
+        </div>
+    </div>
+
+    <div id="card-container">
+        <div class="quantum-card" id="card-web">
+            <div class="card-glow"></div>
+            <h3>Web Arxitektura</h3>
+            <p>Zamonaviy web platformalar, optimallashtirilgan kod va estetika. Har bir piksel muhim.</p>
+        </div>
+        <div class="quantum-card" id="card-cyber">
+            <div class="card-glow"></div>
+            <h3>Kiberxavfsizlik</h3>
+            <p>Linux muhitida avtomatlashtirish, AI assistentlar va xavfsiz infratuzilmalar.</p>
+        </div>
+        <div class="quantum-card" id="card-code">
+            <div class="card-glow"></div>
+            <h3>Phonk & Audio</h3>
+            <p>Raqamli ritm va chuqur bas. Kod va musiqa uyg'unligi.</p>
+        </div>
+    </div>
+
+    <div id="stats-hud">
+        <div class="hud-line"><span class="hud-label">NEURAL LINK:</span><span class="hud-value" id="hud-neural">100%</span></div>
+        <div class="hud-line"><span class="hud-label">QUANTUM STATE:</span><span class="hud-value" id="hud-quantum">STABLE</span></div>
+        <div class="hud-line"><span class="hud-label">PROCESSES:</span><span class="hud-value" id="hud-processes">∞</span></div>
+        <div class="hud-line"><span class="hud-label">CREATIVITY:</span><span class="hud-value" id="hud-creativity">MAX</span></div>
+    </div>
+
+    <div id="quantum-time">
+        <div class="time-label">BIRTH MATRIX</div>
+        <div class="time-main" id="birth-time">03.09.2003</div>
+        <div style="margin-top: 15px;">
+            <div class="time-label">AGE (PRECISE)</div>
+            <div class="time-main" id="live-age" style="font-size: 1.2rem;">0.00000000</div>
+        </div>
+    </div>
+
+    <button id="ambient-toggle" title="Ambient Sound">
+        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+    </button>
+
+    <div id="chat-toggle">
+        <div class="pulse-ring"></div>
+        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    </div>
+
+    <div id="quantum-chat">
+        <div class="chat-header">
+            <span class="chat-title">QUANTUM CORE AI</span>
+            <div class="chat-indicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="chat-body" id="chat-body">
+            <div class="chat-msg bot">Tizim faol. Qanday yordam kerak?</div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Xabar yozing...">
+            <button class="chat-send" onclick="sendQuantumMsg()">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="holo-effect" id="holo-effect">
+        <div class="holo-line" style="left:0; right:0; animation-delay: 0s;"></div>
+        <div class="holo-line" style="left:0; right:0; animation-delay: 1s;"></div>
+        <div class="holo-line" style="left:0; right:0; animation-delay: 2s;"></div>
+    </div>
+
+    <script type="importmap">
+        { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+    </script>
+
+    <script>
+        // ===== QUANTUM CURSOR =====
+        const qCursor = document.getElementById('quantum-cursor');
+        const cRing = document.getElementById('cursor-ring');
+        const cDot = document.getElementById('cursor-dot');
+        let mX = 0, mY = 0;
+        let cX = 0, cY = 0;
+        let ringX = 0, ringY = 0;
+
+        document.addEventListener('mousemove', e => {
+            mX = e.clientX;
+            mY = e.clientY;
+            cDot.style.left = mX + 'px';
+            cDot.style.top = mY + 'px';
+        });
+
+        function animateCursor() {
+            cX += (mX - cX) * 0.15;
+            cY += (mY - cY) * 0.15;
+            ringX += (mX - ringX) * 0.08;
+            ringY += (mY - ringY) * 0.08;
+            
+            qCursor.style.left = cX + 'px';
+            qCursor.style.top = cY + 'px';
+            cRing.style.left = ringX + 'px';
+            cRing.style.top = ringY + 'px';
+            
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        document.querySelectorAll('a, button, .neural-node, .quantum-card, #chat-toggle, .chat-send').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                qCursor.style.width = '100px';
+                qCursor.style.height = '100px';
+                cRing.style.width = '50px';
+                cRing.style.height = '50px';
+                cRing.style.borderColor = 'var(--quantum-violet)';
+            });
+            el.addEventListener('mouseleave', () => {
+                qCursor.style.width = '60px';
+                qCursor.style.height = '60px';
+                cRing.style.width = '30px';
+                cRing.style.height = '30px';
+                cRing.style.borderColor = 'var(--quantum-cyan)';
+            });
+        });
+
+        // ===== FLOATING PARTICLES =====
+        function createParticle() {
+            const p = document.createElement('div');
+            p.className = 'floating-particle';
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.top = Math.random() * 100 + 'vh';
+            p.style.animationDuration = (3 + Math.random() * 5) + 's';
+            p.style.opacity = Math.random() * 0.5 + 0.3;
+            
+            const colors = ['var(--quantum-cyan)', 'var(--quantum-violet)', 'var(--quantum-pink)'];
+            p.style.background = colors[Math.floor(Math.random() * colors.length)];
+            p.style.boxShadow = `0 0 10px ${p.style.background}`;
+            
+            document.body.appendChild(p);
+            
+            let angle = Math.random() * Math.PI * 2;
+            let speed = 0.5 + Math.random();
+            let x = parseFloat(p.style.left);
+            let y = parseFloat(p.style.top);
+
+            function move() {
+                x += Math.cos(angle) * speed;
+                y += Math.sin(angle) * speed;
+                
+                if (x < 0 || x > 100) angle = Math.PI - angle;
+                if (y < 0 || y > 100) angle = -angle;
+                
+                p.style.left = x + 'vw';
+                p.style.top = y + 'vh';
+                requestAnimationFrame(move);
+            }
+            move();
+            
+            setTimeout(() => p.remove(), 10000);
+        }
+        setInterval(createParticle, 300);
+
+        // ===== DATA STREAM =====
+        const dataStream = document.getElementById('data-stream');
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        
+        for (let i = 0; i < 20; i++) {
+            const col = document.createElement('div');
+            col.className = 'data-column';
+            col.style.left = (i * 5) + '%';
+            col.style.animationDuration = (5 + Math.random() * 10) + 's';
+            col.style.animationDelay = Math.random() * 5 + 's';
+            
+            let text = '';
+            for (let j = 0; j < 50; j++) text += chars[Math.floor(Math.random() * chars.length)];
+            col.textContent = text;
+            dataStream.appendChild(col);
+        }
+
+        // ===== LIVE AGE =====
+        const dob = new Date('2003-09-03T00:00:00+05:00').getTime();
+        const ageEl = document.getElementById('live-age');
+        function updateAge() {
+            const now = Date.now();
+            const age = ((now - dob) / (1000 * 60 * 60 * 24 * 365.25)).toFixed(9);
+            ageEl.textContent = age;
+            requestAnimationFrame(updateAge);
+        }
+        updateAge();
+
+        // ===== CARD ANIMATIONS =====
+        const cards = document.querySelectorAll('.quantum-card');
+        setTimeout(() => {
+            cards.forEach((card, i) => {
+                setTimeout(() => card.classList.add('visible'), i * 200);
+            });
+        }, 2000);
+
+        // ===== NEURAL LINKS =====
+        const core = document.getElementById('quantum-core');
+        const nav = document.getElementById('neural-nav');
+        const nodes = document.querySelectorAll('.neural-node');
+
+        function drawNeuralLink(from, to) {
+            const link = document.createElement('div');
+            link.className = 'neural-link';
+            document.body.appendChild(link);
+            
+            const rect1 = from.getBoundingClientRect();
+            const rect2 = to.getBoundingClientRect();
+            
+            const x1 = rect1.left + rect1.width / 2;
+            const y1 = rect1.top + rect1.height / 2;
+            const x2 = rect2.left + rect2.width / 2;
+            const y2 = rect2.top + rect2.height / 2;
+            
+            const length = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+            const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+            
+            link.style.left = x1 + 'px';
+            link.style.top = y1 + 'px';
+            link.style.width = length + 'px';
+            link.style.transform = `rotate(${angle}deg)`;
+            
+            setTimeout(() => link.remove(), 3000);
+        }
+
+        nodes.forEach(node => {
+            node.addEventListener('mouseenter', () => {
+                drawNeuralLink(node, core);
+                nodes.forEach(n => {
+                    if (n !== node) drawNeuralLink(node, n);
+                });
+            });
+        });
+
+        // ===== CHAT SYSTEM =====
+        const chatToggle = document.getElementById('chat-toggle');
+        const chatPanel = document.getElementById('quantum-chat');
+        const chatBody = document.getElementById('chat-body');
+        const chatInput = document.getElementById('chat-input');
+        const GEMINI_API_KEY = "AIzaSyDNZQgoXro59hHLe4uGKuEqrtl-Yat3eQY";
+
+        chatToggle.addEventListener('click', () => {
+            chatPanel.classList.toggle('open');
+        });
+
+        chatInput.addEventListener('keypress', e => {
+            if (e.key === 'Enter') sendQuantumMsg();
+        });
+
+        async function sendQuantumMsg() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            addMsg(text, 'user');
+            chatInput.value = '';
+
+            const typingId = 'typing-' + Date.now();
+            addMsg('...', 'bot', typingId);
+
+            await sleep(1000);
+            addMsg('> Analyzing quantum state...', 'bot');
+
+            await sleep(800);
+
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ contents: [{ parts: [{ text }] }] })
+                });
+                const data = await res.json();
+                document.getElementById(typingId)?.remove();
+                
+                if (data.error) {
+                    addMsg('Tarmoq xatosi', 'bot');
+                } else {
+                    const response = data.candidates[0].content.parts[0].text;
+                    await typeResponse(response);
+                }
+            } catch (e) {
+                document.getElementById(typingId)?.remove();
+                addMsg('Ulanishda xatolik', 'bot');
+            }
+        }
+
+        function addMsg(text, sender, id = null) {
+            const div = document.createElement('div');
+            div.className = `chat-msg ${sender}`;
+            if (id) div.id = id;
+            div.textContent = text;
+            chatBody.appendChild(div);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return div;
+        }
+
+        async function typeResponse(text) {
+            const msgDiv = addMsg('', 'bot');
+            const glitchChars = '!<>-_\\/[]{}—=+*^?#▓▒░';
+            
+            for (let i = 0; i < text.length; i++) {
+                if (Math.random() > 0.9) {
+                    msgDiv.textContent = text.slice(0, i) + glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                } else {
+                    msgDiv.textContent = text.slice(0, i + 1);
+                }
+                chatBody.scrollTop = chatBody.scrollHeight;
+                await sleep(15 + Math.random() * 20);
+            }
+            msgDiv.textContent = text;
+        }
+
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+        // ===== HUD STATS ANIMATION =====
+        const hudQuantum = document.getElementById('hud-quantum');
+        const states = ['STABLE', 'ENTANGLED', 'COHERENT', 'QUANTUM', 'SUPERPOSED'];
+        let stateIndex = 0;
+        setInterval(() => {
+            stateIndex = (stateIndex + 1) % states.length;
+            hudQuantum.textContent = states[stateIndex];
+        }, 3000);
+
+        // ===== AMBIENT SOUND =====
+        let audioCtx = null;
+        let isAudioPlaying = false;
+        const ambientBtn = document.getElementById('ambient-toggle');
+
+        ambientBtn.addEventListener('click', () => {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            if (isAudioPlaying) {
+                audioCtx.suspend();
+                ambientBtn.style.opacity = '0.5';
+            } else {
+                audioCtx.resume();
+                ambientBtn.style.opacity = '1';
+                
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(80, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                
+                setInterval(() => {
+                    oscillator.frequency.setValueAtTime(60 + Math.random() * 40, audioCtx.currentTime);
+                }, 2000);
+            }
+            isAudioPlaying = !isAudioPlaying;
+        });
+
+        // ===== HOLOGRAPHIC EFFECT TOGGLE =====
+        const holoEffect = document.getElementById('holo-effect');
+        let holoActive = false;
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                holoEffect.classList.toggle('active', true);
+                setTimeout(() => holoEffect.classList.remove('active'), 300);
+            }
+        }, 1000);
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // ===== THREE.JS QUANTUM BACKGROUND =====
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('neural-canvas'), alpha: true, antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Quantum Sphere
+        const sphereGeo = new THREE.IcosahedronGeometry(15, 2);
+        const sphereMat = new THREE.MeshBasicMaterial({
+            color: 0x00f5ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.15
+        });
+        const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+        scene.add(sphere);
+
+        // Inner Sphere
+        const innerGeo = new THREE.IcosahedronGeometry(10, 1);
+        const innerMat = new THREE.MeshBasicMaterial({
+            color: 0xbf00ff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.2
+        });
+        const innerSphere = new THREE.Mesh(innerGeo, innerMat);
+        scene.add(innerSphere);
+
+        // Particles
+        const particlesGeo = new THREE.BufferGeometry();
+        const particleCount = 2000;
+        const posArray = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 100;
+        }
+
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        const particlesMat = new THREE.PointsMaterial({
+            size: 0.05,
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+
+        const particles = new THREE.Points(particlesGeo, particlesMat);
+        scene.add(particles);
+
+        // Orbiting rings
+        const rings = [];
+        for (let i = 0; i < 3; i++) {
+            const ringGeo = new THREE.TorusGeometry(20 + i * 5, 0.05, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({
+                color: [0x00f5ff, 0xbf00ff, 0xff0080][i],
+                transparent: true,
+                opacity: 0.3
+            });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2 + i * 0.3;
+            rings.push(ring);
+            scene.add(ring);
+        }
+
+        camera.position.z = 40;
+
+        let mouseX = 0, mouseY = 0;
+        let scrollY = 0;
+
+        document.addEventListener('mousemove', e => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        document.addEventListener('scroll', () => {
+            scrollY = window.scrollY;
+        });
+
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = clock.getElapsedTime();
+
+            sphere.rotation.x = time * 0.1;
+            sphere.rotation.y = time * 0.15;
+            sphere.rotation.z = time * 0.05;
+
+            innerSphere.rotation.x = -time * 0.15;
+            innerSphere.rotation.y = time * 0.2;
+
+            particles.rotation.y = time * 0.05;
+            particles.rotation.x = time * 0.02;
+
+            rings.forEach((ring, i) => {
+                ring.rotation.z = time * (0.2 + i * 0.1);
+                ring.rotation.x = Math.PI / 2 + Math.sin(time * 0.5 + i) * 0.2;
+            });
+
+            camera.position.x += (mouseX * 5 - camera.position.x) * 0.02;
+            camera.position.y += (-mouseY * 5 - camera.position.y) * 0.02;
+            camera.position.z = 40 - scrollY * 0.01;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
